@@ -14,6 +14,7 @@ class Program
     static void Main(string[] args)
     {
         SelectionProbeTests.Run();
+        JuryTests.Run();
         EvidenceTests.Run();
         PipelineTests.Run().GetAwaiter().GetResult();
         BriefCatalogTests.Run();

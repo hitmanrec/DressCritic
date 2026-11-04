@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:dresscritic:evaluation-input:1.0.0",
+  "$id": "urn:dresscritic:evaluation-input:2.0.0",
   "type": "object",
   "required": [
     "schemaVersion",
@@ -13,12 +13,13 @@
     "editorCapabilities",
     "deterministicScores",
     "limitations",
-    "assetNames"
+    "assetNames",
+    "customer"
   ],
   "additionalProperties": false,
   "properties": {
     "schemaVersion": {
-      "const": "1.0.0"
+      "const": "2.0.0"
     },
     "captureId": {
       "type": "string"
@@ -165,6 +166,42 @@
           }
         },
         "additionalProperties": false
+      }
+    },
+    "customer": {
+      "type": "object",
+      "required": [
+        "status",
+        "source",
+        "preferences",
+        "customerId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "verified"
+          ]
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customerId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     }
   }

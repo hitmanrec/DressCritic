@@ -7,8 +7,6 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace DressmakerCritic.Diagnostics
 {
@@ -17,51 +15,10 @@ namespace DressmakerCritic.Diagnostics
     [DataContract] public sealed class ModelReplyEnvelope { [DataMember] public ModelReplyChoice[] choices; }
     public static class AssessmentValidator
     {
-        private static void Members(XElement value, params string[] names)
+        public static void Validate(string json, EvaluationInput input, EvaluationTask task = EvaluationTask.Jury)
         {
-            if (value == null || value.Attribute("type")?.Value != "object" || value.Elements().Count() != names.Length ||
-                names.Any(n => value.Elements(n).Count() != 1) || value.Elements().Any(e => !names.Contains(e.Name.LocalName)))
-                throw new InvalidDataException("Unexpected assessment members");
-        }
-        private static string String(XElement element)
-        {
-            if (element?.Attribute("type")?.Value != "string") throw new InvalidDataException("Expected string");
-            return element.Value;
-        }
-        private static void Strings(XElement element)
-        {
-            if (element?.Attribute("type")?.Value != "array" || element.Elements().Count() > 32) throw new InvalidDataException("Invalid observation list");
-            foreach (var item in element.Elements()) if (String(item).Length > 4096) throw new InvalidDataException("Observation too long");
-        }
-        public static void Validate(string json, EvaluationInput input)
-        {
-            if (json == null || Encoding.UTF8.GetByteCount(json) > 65536) throw new InvalidDataException("Assessment size limit");
-            XElement root;
-            using (var reader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(json), new XmlDictionaryReaderQuotas { MaxDepth = 16, MaxStringContentLength = 65536, MaxArrayLength = 65536 }))
-                root = XElement.Load(reader);
-            Members(root, "schemaVersion", "visualQuality", "briefCompliance", "deterministicGameRequirements", "limitations");
-            if (String(root.Element("schemaVersion")) != "1.0.0") throw new InvalidDataException("Unknown assessment version");
-            var visual = root.Element("visualQuality"); Members(visual, "status", "score", "observations", "uncertainties");
-            string visualStatus = String(visual.Element("status"));
-            if (visualStatus != "assessed" && visualStatus != "unknown") throw new InvalidDataException("Invalid visual status");
-            var score = visual.Element("score");
-            if (visualStatus == "unknown") { if (score.Attribute("type")?.Value != "null") throw new InvalidDataException("Unknown visual quality must have null score"); }
-            else
-            {
-                double number;
-                if (score.Attribute("type")?.Value != "number" || !double.TryParse(score.Value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out number) || double.IsNaN(number) || double.IsInfinity(number) || number < 0 || number > 100)
-                    throw new InvalidDataException("Invalid visual score");
-            }
-            Strings(visual.Element("observations")); Strings(visual.Element("uncertainties"));
-            var brief = root.Element("briefCompliance"); Members(brief, "status", "scope", "observations", "uncertainties");
-            string status = String(brief.Element("status"));
-            if (!new[] {"consistent", "inconsistent", "unknown"}.Contains(status) || String(brief.Element("scope")) != "provided-summary-only") throw new InvalidDataException("Invalid brief result");
-            if (input.order.brief.status != "verified-guid" && input.order.brief.status != "asset-key")
-                if (status != "unknown") throw new InvalidDataException("Cannot judge an unknown brief");
-            Strings(brief.Element("observations")); Strings(brief.Element("uncertainties"));
-            var game = root.Element("deterministicGameRequirements"); Members(game, "status");
-            if (String(game.Element("status")) != "not-evaluated") throw new InvalidDataException("Fabricated deterministic compliance");
-            Strings(root.Element("limitations"));
+            if (task == EvaluationTask.Jury) JuryContract.ReadJury(json, input.captureId);
+            else JuryContract.ApplyContext(json, input, new JuryAssessment());
         }
     }
     public static class LocalEvaluator
@@ -90,7 +47,7 @@ namespace DressmakerCritic.Diagnostics
                 response.EnsureSuccessStatusCode(); return Encoding.UTF8.GetString(buffer.ToArray());
             }
         }
-        public static async Task<string> Run(HttpClient client, string endpoint, string request, EvaluationInput input, CancellationToken cancellation, Action<string> observeResponse = null)
+        public static async Task<string> Run(HttpClient client, string endpoint, string request, EvaluationInput input, CancellationToken cancellation, Action<string> observeResponse = null, EvaluationTask task = EvaluationTask.Jury)
         {
             var uri = ValidateEndpoint(endpoint);
             using (var message = new HttpRequestMessage(HttpMethod.Post, uri))
@@ -112,7 +69,7 @@ namespace DressmakerCritic.Diagnostics
                         buffer.Position = 0;
                         var envelope = (ModelReplyEnvelope)new DataContractJsonSerializer(typeof(ModelReplyEnvelope)).ReadObject(buffer);
                         string result = envelope?.choices?.FirstOrDefault()?.message?.content;
-                        AssessmentValidator.Validate(result, input);
+                        AssessmentValidator.Validate(result, input, task);
                         return result;
                     }
                 }

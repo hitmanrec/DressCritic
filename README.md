@@ -1,10 +1,16 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.7.1**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.0**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
+
+The target is [four independent fashion houses](docs/PRODUCT.md): harmony, character,
+avant-garde and atelier. Each returns 0–10 and a short remark; the mod computes
+the mean and verdict. Order compliance and customer compatibility are separate,
+optional channels. The jury receives neither the brief nor customer preferences.
+This contract is implemented; real-model calibration and the final score UI remain pending.
 
 ## Install
 

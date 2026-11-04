@@ -12,7 +12,7 @@ using DressmakerCritic.Diagnostics;
 
 static class PipelineTests
 {
-    const string Good = "{\"schemaVersion\":\"1.0.0\",\"visualQuality\":{\"status\":\"assessed\",\"score\":70,\"observations\":[\"Fixture observation\"],\"uncertainties\":[\"One view\"]},\"briefCompliance\":{\"status\":\"unknown\",\"scope\":\"provided-summary-only\",\"observations\":[],\"uncertainties\":[\"No brief\"]},\"deterministicGameRequirements\":{\"status\":\"not-evaluated\"},\"limitations\":[\"No recommendations\"]}";
+    static string Good => JuryTests.Good;
     class Server : HttpMessageHandler
     {
         public int calls;
@@ -62,10 +62,7 @@ static class PipelineTests
         input.images[0].file = "image.png";
         string request = DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => image));
         AssessmentValidator.Validate(Good, input);
-        Refuse(() => AssessmentValidator.Validate(Good.Replace("\"score\":70", "\"score\":101"), input), "reject out-of-range subjective score");
-        Refuse(() => AssessmentValidator.Validate(Good.Replace("\"status\":\"not-evaluated\"", "\"status\":\"passed\""), input), "reject invented deterministic compliance");
-        Refuse(() => AssessmentValidator.Validate(Good.Replace("provided-summary-only", "full-client-intent"), input), "cannot overstate brief scope");
-        Refuse(() => AssessmentValidator.Validate(Good.Replace("\"status\":\"unknown\",\"scope\"", "\"status\":\"consistent\",\"scope\""), input), "cannot judge unavailable brief");
+        Refuse(() => AssessmentValidator.Validate(Good.Replace("\"score\":7", "\"score\":11"), input), "reject out-of-range jury score");
         Refuse(() => AssessmentValidator.Validate(Good.Replace("\"limitations\":[", "\"recommendations\":[\"Invent an editor tool\"],\"limitations\":["), input), "reject extra recommendation fields");
         Refuse(() => LocalEvaluator.ValidateEndpoint("https://example.com/v1/chat/completions"), "remote model endpoint rejected");
         Refuse(() => LocalEvaluator.ValidateEndpoint("http://user:password@127.0.0.1:11434/v1/chat/completions"), "embedded credential endpoint rejected");
@@ -74,6 +71,13 @@ static class PipelineTests
             string raw = null;
             string result = await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None, value => raw = value);
             Check(result == Good && handler.calls == 1 && raw.Contains("choices"), "end-to-end injected local server response is preserved and validated");
+            input.order.association = "explicit accepted-order index 0";
+            input.order.definition = new AssetIdentity { status = "fields", prettyName = "Fixture order" };
+            input.order.brief.status = "asset-key"; input.order.brief.summary = "Fixture brief"; input.order.brief.sourceUrl = "https://source.invalid/fixture";
+            handler.response = JuryTests.UnknownContext;
+            string contextRequest = DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => image, EvaluationTask.Context));
+            string contextResult = await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", contextRequest, input, CancellationToken.None, task: EvaluationTask.Context);
+            Check(contextResult == JuryTests.UnknownContext, "separate HTTP context response uses context contract, never jury contract");
             handler.response = "not JSON"; bool failed = false;
             try { await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None); } catch { failed = true; }
             Check(failed, "invalid model reply fails closed");

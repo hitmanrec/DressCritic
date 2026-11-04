@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using DressmakerCritic.Diagnostics;
+
+static class JuryTests
+{
+    public static string Good => Reply(7,6,8,7);
+    public static string UnknownContext => Context();
+    static string Reply(double? a, double? b, double? c, double? d)
+    {
+        var scores = new[] { a,b,c,d };
+        return JsonSerializer.Serialize(new { schemaVersion = "2.0.0", jury = JuryContract.HouseIds.Select((id,i) => new { houseId = id, status = scores[i].HasValue ? "assessed" : "unknown", score = scores[i], remarks = new[] { "Fixture observation of a visible design decision." } }), limitations = new[] { "One view only." } });
+    }
+    static string Context(string orderStatus = "unknown", double? orderScore = null, string customerStatus = "unknown", double? customerScore = null) => JsonSerializer.Serialize(new {
+        schemaVersion = "2.0.0",
+        orderCompliance = new { status = orderStatus, scope = "provided-summary-only", score = orderScore, remarks = new[] { "Fixture contextual observation." } },
+        customerCompatibility = new { status = customerStatus, scope = "verified-customer-preferences-only", score = customerScore, remarks = new[] { "Fixture preference observation." } }, limitations = new string[0] });
+    static void Check(bool ok, string label) { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); }
+    static void Refuse(Action action, string label) { bool failed=false;try{action();}catch{failed=true;}Check(failed,label); }
+    public static void Run()
+    {
+        var result = JuryContract.ReadJury(Good,"fixture");
+        Check(result.jury.Count==4 && result.summary.average==7 && result.summary.verdict=="strong" && result.summary.divided==false, "four-house arithmetic mean and verdict computed by application");
+        var divided=JuryContract.ReadJury(Reply(10,6,5,4),"fixture");
+        Check(divided.summary.average==6.25 && divided.summary.spread==6 && divided.summary.divided==true, "jury disagreement is preserved separately from arithmetic mean");
+        var partial=JuryContract.ReadJury(Reply(7,null,8,7),"fixture");
+        Check(partial.summary.average==null && partial.summary.status=="insufficient-evidence", "missing critic does not become zero or a three-critic mean");
+        Check(JuryContract.ReadJury(Reply(0,0,0,0),"fixture").summary.average==0 && JuryContract.ReadJury(Reply(10,10,10,10),"fixture").summary.average==10, "zero and ten are valid score endpoints");
+        Refuse(()=>JuryContract.ReadJury(Reply(7.25,6,8,7),"fixture"),"jury scores restricted to one decimal");
+        Refuse(()=>JuryContract.ReadJury(Good.Replace("\"character\"","\"harmony\""),"fixture"),"duplicate/missing house rejected");
+        Refuse(()=>JuryContract.ReadJury(Good.Replace("\"limitations\":[","\"average\":99,\"limitations\":["),"fixture"),"model cannot supply or alter aggregate");
+        var input=new EvaluationInput();
+        Check(!JuryContract.NeedsContext(input),"sale garment needs no order or customer request");
+        Refuse(()=>JuryContract.ApplyContext(Context("consistent",9),input,result),"unknown order cannot receive contextual score");
+        Refuse(()=>JuryContract.ApplyContext(Context(customerStatus:"consistent",customerScore:9),input,result),"unknown customer cannot get invented preferences");
+        input.order.association="explicit accepted-order index 0";input.order.definition=new AssetIdentity{status="fields",prettyName="ORDER_SECRET"};
+        input.order.brief.status="verified-guid";input.order.brief.summary="BRIEF_SECRET";input.order.brief.sourceUrl="https://source.invalid/brief";
+        JuryContract.ApplyContext(Context("consistent",9.5),input,result);
+        Check(result.orderCompliance.score==9.5 && result.summary.average==7,"order score never changes jury mean");
+        input.customer.status="verified";input.customer.customerId="CUSTOMER_ID_SECRET";input.customer.source="SOURCE_SECRET";input.customer.preferences.Add("CUSTOMER_SECRET");
+        JuryContract.ApplyContext(Context("inconsistent",2,"consistent",8),input,result);
+        Check(result.customerCompatibility.score==8 && result.summary.average==7,"customer compatibility never changes jury mean");
+        string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
+        string png=Path.Combine(root,"DressmakerCritic-Diagnostics/exports/captures/image-20261104-141507-684-23ac5b7e/image.png");
+        byte[] bytes=File.ReadAllBytes(png);
+        input.garment=new GarmentSnapshot{garmentStatus="available",source="PlayerProgress.completedQuests[SECRET_INDEX].dress"};
+        input.images.Add(new EvaluationImage{file="image.png",sha256=CaptureSession.Hash(png),width=2048,height=2048,binding="active-state-verified"});
+        var jury=ModelRequest.Build(input,"fixture-model",_=>bytes);
+        string juryFacts=jury.messages[1].content[0].text;
+        Check(new[]{"ORDER_SECRET","BRIEF_SECRET","SOURCE_SECRET","CUSTOMER_SECRET","CUSTOMER_ID_SECRET","SECRET_INDEX"}.All(secret=>!juryFacts.Contains(secret)),"jury request structurally excludes order, client and history context");
+        input.order.budget=424242;input.order.deterministicRequirements.Add(new OrderRequirement{type="GAME_RULE_SECRET"});
+        var context=ModelRequest.Build(input,"fixture-model",_=>bytes,EvaluationTask.Context);
+        Check(context.messages[1].content[0].text.Contains("CUSTOMER_SECRET")&&!context.messages[1].content[0].text.Contains("houseId"),"context request receives preferences without jury votes");
+        Check(!context.messages[1].content[0].text.Contains("GAME_RULE_SECRET")&&!context.messages[1].content[0].text.Contains("424242"),"semantic context cannot be confused with deterministic game thresholds or budget");
+        input.order.definition = null;
+        Check(EvaluationReadiness.Check(input,"fixture-model").canEvaluate && EvaluationReadiness.Check(input,"fixture-model").limitations.Contains("explicit-order-unavailable"), "unavailable order cannot block standalone visual jury");
+        input.customer.status="unknown";input.order.brief.status="missing";
+        Refuse(()=>ModelRequest.Build(input,"fixture-model",_=>bytes,EvaluationTask.Context),"no wasted context request when verified inputs absent");
+    }
+}

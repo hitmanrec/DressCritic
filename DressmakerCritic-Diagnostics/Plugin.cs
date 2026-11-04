@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.7.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -27,7 +27,7 @@ namespace DressmakerCritic.Diagnostics
             orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
-            Logger.LogInfo("Dressmaker Critic 0.7.1: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.8.0: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -104,6 +104,7 @@ namespace DressmakerCritic.Diagnostics
                         input.order.definition = normalized.order; input.order.budget = normalized.budget;
                         input.order.deterministicRequirements = normalized.completionRequirements;
                         var record = FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), selectedOrder);
+                        input.customer.customerId = FieldSnapshot.ResolveFields(record, "questDefinition", "questGiverCharacter", "_guid") as string;
                         var definition = FieldSnapshot.ResolveFields(record, "questDefinition") as UnityEngine.Object;
                         input.order.brief = EvaluationBrief.From(BriefReferenceCatalog.Bundled.Find(normalized.order?.guid, definition == null ? null : definition.name, normalized.order?.prettyName, Application.version));
                     }
@@ -150,12 +151,13 @@ namespace DressmakerCritic.Diagnostics
                         }
                     });
                 }
+                JuryAssessment juryResult = null;
                 if (capture.manifest.readiness.canEvaluate)
                 {
-                    await capture.StageAsync("local-inference", async () => {
+                    await capture.StageAsync("local-jury-inference", async () => {
                         var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)));
                         string json = DiagnosticJson.Serialize(request);
-                        capture.Write("request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
+                        capture.Write("jury-request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
                             requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
                         using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
                         using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) })
@@ -163,13 +165,34 @@ namespace DressmakerCritic.Diagnostics
                         {
                             timeout.CancelAfter(TimeSpan.FromSeconds(90));
                             string assessment = await LocalEvaluator.Run(client, selectedEndpoint, json, input, timeout.Token,
-                                response => File.WriteAllText(Path.Combine(capture.directory, "model-response.json"), response));
-                            File.WriteAllText(Path.Combine(capture.directory, "assessment.json"), assessment);
+                                response => File.WriteAllText(Path.Combine(capture.directory, "jury-model-response.json"), response));
+                            juryResult = JuryContract.ReadJury(assessment, input.captureId);
+                            capture.Write("assessment.json", juryResult);
                         }
                     });
                 }
-                else capture.manifest.stages.Add(new CaptureStage { name = "local-inference", status = "blocked", detail = string.Join(",", capture.manifest.readiness.blockers) });
-                status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этап local-inference в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
+                else capture.manifest.stages.Add(new CaptureStage { name = "local-jury-inference", status = "blocked", detail = string.Join(",", capture.manifest.readiness.blockers) });
+                if (juryResult != null && JuryContract.NeedsContext(input))
+                {
+                    await capture.StageAsync("local-context-inference", async () => {
+                        var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)), EvaluationTask.Context);
+                        string json = DiagnosticJson.Serialize(request);
+                        capture.Write("context-request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
+                            requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
+                        using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
+                        using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) })
+                        using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
+                        {
+                            timeout.CancelAfter(TimeSpan.FromSeconds(90));
+                            string response = await LocalEvaluator.Run(client, selectedEndpoint, json, input, timeout.Token,
+                                raw => File.WriteAllText(Path.Combine(capture.directory, "context-model-response.json"), raw), EvaluationTask.Context);
+                            JuryContract.ApplyContext(response, input, juryResult);
+                            capture.Write("assessment.json", juryResult);
+                        }
+                    });
+                }
+                else capture.manifest.stages.Add(new CaptureStage { name = "local-context-inference", status = "skipped", detail = juryResult == null ? "Jury assessment unavailable" : "No verified order or customer context; jury remains independent" });
+                status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этапы жюри и контекста в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
             }
             catch (Exception e) { status = "Сбой сбора: " + e.GetType().Name; Logger.LogError(e); }
             finally

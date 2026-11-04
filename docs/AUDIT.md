@@ -75,7 +75,8 @@ async; idle UI renders no reflection. A packet includes:
 - readiness.json: hard blocker codes and softer limitations, not a vague ready flag.
 - backend.json/local-models.json: explicit local configuration and a 3-second
   metadata probe. Model IDs are not evidence of vision support and not auto-chosen.
-- request-audit.json, model-response.json, assessment.json when applicable: actual
+- jury-request-audit.json / jury-model-response.json and optional
+  context-request-audit.json / context-model-response.json, plus assessment.json: actual
   request metadata/system instruction (no duplicate base64 file), bounded raw
   response even when validation rejects it, and only a validated assessment.
 - manifest.json: independent stage results/durations and every artifact's SHA-256.
@@ -135,3 +136,16 @@ assessment is useful. No final-mod readiness is claimed.
 ## Follow-up: real 0.7.0 packet
 
 [CAPTURE-700.md](CAPTURE-700.md) records the shared RenderTexture mismatch, the premature image-stage guard corrected in 0.7.1, confirmed RTX 5070/12 GB hardware and URP, and concrete local model setup. Native compilation/load of 0.7.0 is now confirmed by the user packet; the new 0.7.1 selector probe is not yet game-verified.
+
+## v0.8.0: independent jury contract
+
+[PRODUCT.md](PRODUCT.md) defines the current destination and supersedes the old
+single visual score. One stateless request judges four fashion tastes without
+order/customer data; an optional separate request assesses sourced context.
+The application validates all four votes and computes their mean and verdict.
+Unknown context never blocks sale garments. No advice or new diagnostics UI is added.
+
+Version 2 schemas distinguish [jury replies](jury-response.schema.json),
+[context replies](context-response.schema.json), and the application-owned
+[assessment](assessment.schema.json). A failed context call preserves the jury.
+The image-identity and genuine local inference blockers above still apply.
