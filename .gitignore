@@ -1,0 +1,11 @@
+# Yuuma ModLoader package (install into the game, don't commit)
+Dressmaker Mod Loader*/
+**/Dressmaker Mod Loader*/
+
+# .NET build output
+**/bin/
+**/obj/
+**/out/
+*.user
+*.suo
+.vs/

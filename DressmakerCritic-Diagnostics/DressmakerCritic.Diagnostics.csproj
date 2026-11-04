@@ -19,8 +19,16 @@
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Framework">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/Framework.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="DressmakerMods">
