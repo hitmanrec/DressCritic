@@ -42,18 +42,19 @@ Restart the game after installing.
 1. Launch Dressmaker through Steam (Proton).
 2. Log should show `Dressmaker Critic Diagnostics 0.5.0`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
-4. Or use the **Экспорт диагностики** button (upper right) — each click creates
-   `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
+4. Or use the in-game export/inspection UI. v0.5+ writes readable reports to
+   `BepInEx/config/DressmakerCritic/reports/inspection-*.txt`; full diagnostic
+   folders still go under `…/captures/<timestamp>-<id>/` when that export is used.
 
 ### Pull captures into the repo
 
 After exporting in-game (game can stay open or closed):
 
 ```bash
-./pull-exports.sh              # NEW captures + log, then delete them from the game folder
+./pull-exports.sh              # NEW captures + reports + log, then clean game copies
 ./pull-exports.sh --commit     # same, then git commit
-./pull-exports.sh --all        # refresh every capture from the game folder
-./pull-exports.sh --keep-source  # copy without cleaning the game captures dir
+./pull-exports.sh --all        # refresh every item from the game folder
+./pull-exports.sh --keep-source  # copy without cleaning the game export dirs
 ```
 
 ## Repository layout
@@ -61,7 +62,7 @@ After exporting in-game (game can stay open or closed):
 | Path | Purpose |
 | --- | --- |
 | `install.sh` | **Unified** build + install (preferred entry point) |
-| `pull-exports.sh` | Copy new in-game captures into `exports/` (optional `--commit`) |
+| `pull-exports.sh` | Copy new in-game `captures/` + `reports/` into `exports/` (optional `--commit`) |
 | `DressmakerCritic-Diagnostics/` | Plugin source, lower-level `build.sh` / `build_and_install.sh` |
 | `DressmakerCritic-Diagnostics/exports/` | Captured JSON / logs kept for analysis |
 | `docs/` | Export schema and runtime findings |
