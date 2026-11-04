@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>DressmakerCritic.Diagnostics</AssemblyName>
+    <RootNamespace>DressmakerCritic.Diagnostics</RootNamespace>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Needed when compiling .NET Framework plugins with dotnet on Linux. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <Reference Include="BepInEx">
+      <HintPath>$(DressmakerGameRoot)/BepInEx/core/BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="DressmakerMods">
+      <HintPath>$(DressmakerGameRoot)/BepInEx/plugins/DressmakerMods.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(DressmakerGameRoot)' == ''" Text="Pass -p:DressmakerGameRoot=/path/to/Dressmaker" />
+    <Error Condition="!Exists('$(DressmakerGameRoot)/Dressmaker.exe')" Text="DressmakerGameRoot must point to the directory containing Dressmaker.exe" />
+    <Error Condition="!Exists('$(DressmakerGameRoot)/BepInEx/plugins/DressmakerMods.dll')" Text="Yuuma's Dressmaker ModLoader must be installed in DressmakerGameRoot." />
+  </Target>
+</Project>
