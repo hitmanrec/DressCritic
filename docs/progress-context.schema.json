@@ -44,6 +44,12 @@
       "items": {
         "$ref": "#/$defs/node"
       }
+    },
+    "unlockedInventory": {
+      "type": [
+        "object",
+        "null"
+      ]
     }
   },
   "additionalProperties": false,

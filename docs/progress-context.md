@@ -69,3 +69,15 @@ unknowns/truncation. If blocked, the exact limitation is now recorded and no
 repeat of the nine-stage garment session is useful. Review raw quest strings
 before sharing. Commission context remains exploratory until a real capture
 confirms the route and the meaning of its values.
+
+## v0.3.2: real access confirmed and normalized output
+
+The two real captures now confirm access before/after an accepted order. See
+[the paired findings](order-pair-findings.md). Exports additionally contain
+`progress-snapshot.json` (six total files per button capture), schema 1.0.0.
+It distinguishes no order from inaccessible progress, preserves raw deterministic
+requirements, and marks semantic brief data unknown. `context-runtime.json` gains
+an optional unlockedInventory section for compact GUID/name membership, capped at
+512 per category; old raw graphs remain truncated at 32 and are reported as such.
+Focused tag roots precede quest recursion. New compact/focused live data is not
+verified by the older captures; all 53 offline checks pass.

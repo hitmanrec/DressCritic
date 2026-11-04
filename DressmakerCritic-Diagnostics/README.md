@@ -199,3 +199,12 @@ field and refuses to read it if a static initializer exists. Available data is
 limited to current-commission fields and unlocked pattern/fabric/accessory lists.
 Blocked or absent progress is reported explicitly. Live access and semantic brief
 mapping remain unverified; [details and one-capture test](../docs/progress-context.md).
+
+### v0.3.2 normalized order and unlock snapshot
+
+Export now writes `progress-snapshot.json` as a sixth file. Real captured progress
+is normalized into no-order/selected/unknown states, raw completion requirements,
+and inventory membership with explicit completeness. Compact unlock IDs/names
+are capped at 512 per category; raw graphs keep their earlier limits. Focused
+requirement tag roots avoid deep recursion. Existing garment schemas are unchanged.
+See [the paired order findings](../docs/order-pair-findings.md).

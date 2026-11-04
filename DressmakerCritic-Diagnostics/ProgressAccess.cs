@@ -28,6 +28,7 @@ namespace DressmakerCritic.Diagnostics
     {
         public string schemaVersion = "1.0.0";
         public string capturedAtUtc, scene, progressAccessStatus;
+        public UnlockedInventory unlockedInventory;
         public string source = "PlayerProgress._current (only if no type initializer exists)";
         public string note = "Exploratory evidence only. Unlock membership is not ownership or proof an editor action is possible. Candidate quest fields may include localization identifiers, not resolved brief text.";
         public System.Collections.Generic.List<ValueNode> objects = new System.Collections.Generic.List<ValueNode>();

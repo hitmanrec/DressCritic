@@ -1,0 +1,382 @@
+{
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "capturedAtUtc",
+    "progressAccessStatus",
+    "orderStatus",
+    "activeOrderCount",
+    "selectedOrderIndex",
+    "budget",
+    "completionRequirementCount",
+    "order",
+    "completionRequirementsStatus",
+    "completionRequirements",
+    "unlocked",
+    "semanticBriefStatus"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "capturedAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "progressAccessStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "orderStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "activeOrderCount": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "selectedOrderIndex": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "budget": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "completionRequirementCount": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "order": {
+      "type": "object",
+      "required": [
+        "status",
+        "guid",
+        "prettyName"
+      ],
+      "properties": {
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "guid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prettyName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "completionRequirementsStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "completionRequirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "status",
+          "comparison",
+          "threshold",
+          "targetScore",
+          "gated",
+          "tag",
+          "interpretation"
+        ],
+        "properties": {
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "comparison": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "threshold": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "targetScore": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "gated": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "tag": {
+            "type": "object",
+            "required": [
+              "status",
+              "guid",
+              "prettyName"
+            ],
+            "properties": {
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "guid": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prettyName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "interpretation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "unlocked": {
+      "type": "object",
+      "required": [
+        "meaning",
+        "patterns",
+        "fabrics",
+        "accessories"
+      ],
+      "properties": {
+        "meaning": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "patterns": {
+          "type": "object",
+          "required": [
+            "status",
+            "totalCount",
+            "items"
+          ],
+          "properties": {
+            "status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "totalCount": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "guid",
+                  "prettyName"
+                ],
+                "properties": {
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "guid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "prettyName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "fabrics": {
+          "type": "object",
+          "required": [
+            "status",
+            "totalCount",
+            "items"
+          ],
+          "properties": {
+            "status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "totalCount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "guid",
+                  "prettyName"
+                ],
+                "properties": {
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "guid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "prettyName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "accessories": {
+          "type": "object",
+          "required": [
+            "status",
+            "totalCount",
+            "items"
+          ],
+          "properties": {
+            "status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "totalCount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "guid",
+                  "prettyName"
+                ],
+                "properties": {
+                  "status": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "guid": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "prettyName": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "semanticBriefStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dressmakercritic:progress-snapshot:1.0.0"
+}

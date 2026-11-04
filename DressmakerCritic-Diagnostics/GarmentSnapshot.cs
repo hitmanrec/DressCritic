@@ -82,27 +82,27 @@ namespace DressmakerCritic.Diagnostics
             }
             return node;
         }
-        private ValueNode Root(string label) => Resolve(roots.FirstOrDefault(n => n != null && n.member == label));
-        private ValueNode Field(ValueNode node, string name)
+        internal ValueNode Root(string label) => Resolve(roots.FirstOrDefault(n => n != null && n.member == label));
+        internal ValueNode Field(ValueNode node, string name)
         {
             node = Resolve(node);
             return Resolve(node?.children?.FirstOrDefault(c => c != null && c.member != null && c.member.EndsWith("." + name, StringComparison.Ordinal)));
         }
-        private string Scalar(ValueNode node) => Resolve(node)?.status == "scalar" ? Resolve(node).value : null;
-        private string Text(ValueNode node, string name) => Scalar(Field(node, name));
-        private bool? Boolean(ValueNode node, string name)
+        internal string Scalar(ValueNode node) => Resolve(node)?.status == "scalar" ? Resolve(node).value : null;
+        internal string Text(ValueNode node, string name) => Scalar(Field(node, name));
+        internal bool? Boolean(ValueNode node, string name)
         { bool value; return bool.TryParse(Text(node, name), out value) ? value : (bool?)null; }
-        private int? Integer(ValueNode node, string name)
+        internal int? Integer(ValueNode node, string name)
         { int value; return int.TryParse(Text(node, name), NumberStyles.Integer, CultureInfo.InvariantCulture, out value) ? value : (int?)null; }
-        private double? Number(ValueNode node, string name)
+        internal double? Number(ValueNode node, string name)
         {
             double value;
             return double.TryParse(Text(node, name), NumberStyles.Float, CultureInfo.InvariantCulture, out value) && !double.IsNaN(value) && !double.IsInfinity(value) ? value : (double?)null;
         }
-        private string Status(ValueNode node) => Resolve(node)?.status ?? "unavailable";
-        private AssetIdentity Identity(ValueNode node) => new AssetIdentity { status = Status(node), guid = Text(node, "_guid"), prettyName = Text(node, "prettyName") };
+        internal string Status(ValueNode node) => Resolve(node)?.status ?? "unavailable";
+        internal AssetIdentity Identity(ValueNode node) => new AssetIdentity { status = Status(node), guid = Text(node, "_guid"), prettyName = Text(node, "prettyName") };
         private Coordinate Vector(ValueNode node) => new Coordinate { status = Status(node), x = Number(node, "x"), y = Number(node, "y"), z = Number(node, "z"), w = Number(node, "w") };
-        private List<ValueNode> Items(ValueNode node, out int? count, out string status)
+        internal List<ValueNode> Items(ValueNode node, out int? count, out string status)
         {
             count = Integer(node, "_size");
             var array = Field(node, "_items");

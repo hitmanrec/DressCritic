@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.3.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.3.2")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -32,7 +32,7 @@ namespace DressmakerCritic.Diagnostics
         {
             showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.3.1 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.3.2 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -131,7 +131,8 @@ namespace DressmakerCritic.Diagnostics
                     File.Exists(Path.Combine(dir, "editor-runtime.json")) &&
                     File.Exists(Path.Combine(dir, "runtime-types.json")) &&
                     File.Exists(Path.Combine(dir, "garment-snapshot.json")) &&
-                    File.Exists(Path.Combine(dir, "context-runtime.json"));
+                    File.Exists(Path.Combine(dir, "context-runtime.json")) &&
+                    File.Exists(Path.Combine(dir, "progress-snapshot.json"));
                 exportButtonStatus = (complete ? "Export complete" : "Partial export - see log") +
                     "\nDressmakerCritic/captures/\n" + name;
                 Logger.LogInfo("Button export: " + dir + "\n" + snapshot + "\n" + editor + "\n" + types);
@@ -287,8 +288,9 @@ namespace DressmakerCritic.Diagnostics
                     File.WriteAllText(Path.Combine(dir, "garment-snapshot.json"), DiagnosticJson.Serialize(garment));
                     var contextReport = CaptureContext(report.timeUtc, report.scene);
                     File.WriteAllText(Path.Combine(dir, "context-runtime.json"), DiagnosticJson.Serialize(contextReport));
+                    File.WriteAllText(Path.Combine(dir, "progress-snapshot.json"), DiagnosticJson.Serialize(ProgressSnapshotBuilder.Build(contextReport)));
                 }
-                return "Exported " + name + (editor ? " and garment-snapshot.json, context-runtime.json" : "");
+                return "Exported " + name + (editor ? " and garment-snapshot.json, context-runtime.json, progress-snapshot.json" : "");
             }
             catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }
         }
@@ -302,9 +304,23 @@ namespace DressmakerCritic.Diagnostics
             object progress = ProgressAccess.TryRead(type, out status);
             result.progressAccessStatus = status;
             if (progress == null) return result;
+            result.unlockedInventory = new UnlockedInventory {
+                patterns = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedPatterns")),
+                fabrics = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedFabrics")),
+                accessories = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedAccessories")) };
             var graph = new FieldSnapshot(4096);
             object index = FieldSnapshot.ResolveFields(progress, "activeCommissionIndex");
             object selected = index is int ? FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), (int)index) : null;
+            object definition = FieldSnapshot.ResolveFields(selected, "questDefinition");
+            var requirements = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(definition, "completionRequirements"));
+            for (int i = 0; i < requirements.Length && !graph.Exhausted; i++)
+            {
+                var requirement = requirements[i];
+                if (requirement == null || requirement.GetType().FullName != "TagScoreRequirement") continue;
+                var tag = graph.Read(FieldSnapshot.ResolveFields(requirement, "tag"));
+                tag.member = "PlayerProgress.selectedCommission.completionRequirements[" + i + "].tag";
+                result.objects.Add(tag);
+            }
             foreach (var pair in new[] {
                 new { label = "PlayerProgress.selectedCommission.questDefinition", value = FieldSnapshot.ResolveFields(selected, "questDefinition") },
                 new { label = "PlayerProgress.selectedCommission", value = selected } })
