@@ -53,6 +53,12 @@ static class JuryTests
         byte[] bytes=File.ReadAllBytes(png);
         input.garment=new GarmentSnapshot{garmentStatus="available",source="PlayerProgress.completedQuests[SECRET_INDEX].dress"};
         input.images.Add(new EvaluationImage{file="image.png",sha256=CaptureSession.Hash(png),width=2048,height=2048,binding="active-state-verified"});
+        var fourInput = new EvaluationInput { garment = input.garment };
+        for (int i=0;i<4;i++) fourInput.images.Add(new EvaluationImage { file="image.png",sha256=CaptureSession.Hash(png),width=2048,height=2048,binding="active-state-verified",view="axis-"+i });
+        var four = ModelRequest.Build(fourInput,"fixture-model",_=>bytes);
+        Check(four.messages[1].content.Count(p=>p.type=="image_url")==4 && four.messages[1].content.Count(p=>p.type=="text" && p.text.StartsWith("View:"))==4,"all four views have explicit adjacent orientation labels");
+        fourInput.images.Add(fourInput.images[0]);
+        Refuse(()=>ModelRequest.Build(fourInput,"fixture-model",_=>bytes),"more than four images rejected");
         var jury=ModelRequest.Build(input,"fixture-model",_=>bytes);
         Check(!jury.messages[0].content[0].text.Contains("One short evidence-based sentence.") &&
               !jury.messages[0].content[0].text.Contains("Return exactly {") &&

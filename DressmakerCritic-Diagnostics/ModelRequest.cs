@@ -44,7 +44,7 @@ namespace DressmakerCritic.Diagnostics
         public static ModelRequest Build(EvaluationInput input, string model, Func<EvaluationImage, byte[]> readImage, EvaluationTask task = EvaluationTask.Jury)
         {
             if (!EvaluationReadiness.Check(input, model).canEvaluate) throw new InvalidOperationException("Evaluation input is blocked");
-            if (input.images.Count > 3) throw new InvalidDataException("At most three images per request");
+            if (input.images.Count > 4) throw new InvalidDataException("At most four images per request");
             var request = new ModelRequest { model = model };
             var visual = new JuryEvidence { garment = new JuryVisualFacts { components = input.garment.components,
                 materials = input.garment.panels.Select(p => new JuryMaterial { index = p.index, fabric = p.fabric }).ToList(), accessories = input.garment.accessories },
@@ -85,7 +85,7 @@ namespace DressmakerCritic.Diagnostics
             var user = new ModelMessage { role = "user" };
             user.content.Add(new ModelPart { type = "text", text = DiagnosticJson.Serialize(evidence) });
             int total = 0;
-            foreach (var image in input.images.Take(3))
+            foreach (var image in input.images.Take(4))
             {
                 if (image.file.Contains("/") || image.file.Contains("\\") || image.file == "." || image.file == ".." || !image.file.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                     throw new InvalidDataException("Image must be a capture-local PNG basename");
@@ -101,6 +101,7 @@ namespace DressmakerCritic.Diagnostics
                 }
                 total = checked(total + data.Length);
                 if (total > 4 * 1024 * 1024) throw new InvalidDataException("Image request byte budget exceeded");
+                user.content.Add(new ModelPart { type = "text", text = "View: " + image.view + ". Same garment; assess across all supplied views. Perspective or occlusion alone is not evidence of asymmetry." });
                 user.content.Add(new ModelPart { type = "image_url", image_url = new ModelImageUrl { url = "data:image/png;base64," + Convert.ToBase64String(data) } });
             }
             request.messages.Add(user); return request;

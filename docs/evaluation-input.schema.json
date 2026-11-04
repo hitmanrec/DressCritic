@@ -82,7 +82,7 @@
     },
     "images": {
       "type": "array",
-      "maxItems": 3,
+      "maxItems": 4,
       "items": {
         "type": "object",
         "required": [
@@ -106,6 +106,7 @@
           "source": {
             "type": "string"
           },
+          "view": {"type": "string"},
           "binding": {
             "enum": [
               "active-state-verified",

@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.11.1**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.11.2**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -112,3 +112,7 @@ viewer image is retained only as a reference. See [the required runtime check](d
 
 v0.11.1 corrects fixed-view framing: mesh-derived mannequin-local bounds replace
 renderer world bounds, skipping empty/degenerate geometry. Runtime review is still required.
+
+v0.11.2 prepares four labeled model image parts (same 4 MiB byte budget) and
+uses the fixed front image for the snapshot preview. The runtime review gate
+remains until camera-rotation invariance and accessory coverage are checked.

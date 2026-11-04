@@ -94,3 +94,28 @@ The extents in fixed-views.json are mannequin-local from this version onward.
 The native pipeline/API is now confirmed on this runtime. Framing and coverage
 remain unverified until another image pair. Repeat the same two-rotation test on
 the existing green dress after updating/installing. Model generation stays blocked.
+
+## First correctly framed capture / v0.11.2
+
+Capture 20261104-210119-876-6a56b304: all artifact sizes/hashes pass. All four
+images inspected: +Z is front, -Z back, +X/-X opposite profile views. Full garment
+is visible; empty animation geometry is excluded (15 skipped), orthographic size
+1.1315 rather than 12.3. Framing center Y=-20.0417, local extents approximately
+(0.5113,0.8583,0.1499). No scene UI or unrelated dress appears in these views.
+This establishes the corrected mesh framing on one undecorated green garment.
+It does not establish rotation invariance or accessory capture.
+
+v0.11.2 prepares four image evidence entries and adjacent orientation labels in
+the model body, extends the three-image cap to four, retains the 4 MiB total byte
+budget and hash/dimension validation. Profiles use side A/B to avoid asserting
+anatomical left/right without verification. The panel photo now uses fixed +Z.
+Candidate bindings remain unverified and the explicit readiness gate stays on;
+no new capture is submitted to the model yet. Tests verify four actual image
+parts plus orientation labels and refusal of a fifth image.
+
+Next useful runtime check: use an existing dress with prominent accessories,
+capture at two very different normal-viewer rotations. These two packets jointly
+check rotation invariance and accessory coverage; repeating an undecorated dress
+alone would leave the latter unknown. No model/config changes, no new garment.
+Compare actual fixed images before approving inference; pipeline success flags
+alone are not sufficient.

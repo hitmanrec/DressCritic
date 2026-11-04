@@ -34,7 +34,7 @@ static class PipelineTests
             {
                 Check(doc.RootElement.GetProperty("reasoning_effort").GetString() == "none", "request disables optional model reasoning to reserve output for final JSON");
                 var parts = doc.RootElement.GetProperty("messages")[1].GetProperty("content");
-                Check(parts.GetArrayLength() == 2 && parts[1].GetProperty("image_url").GetProperty("url").GetString().StartsWith("data:image/png;base64,"), "actual multimodal HTTP body includes image and machine facts");
+                Check(parts.GetArrayLength() == 3 && parts[2].GetProperty("image_url").GetProperty("url").GetString().StartsWith("data:image/png;base64,"), "actual multimodal HTTP body includes image and machine facts");
                 Check(!parts[0].TryGetProperty("image_url", out _), "text request part omits null image fields");
             }
             return new HttpResponseMessage(status) { Content = new StringContent(JsonSerializer.Serialize(new { choices = new[] { new { message = new { content = response, reasoning = "Fixture private analysis must never be used as an assessment." }, finish_reason = finishReason } } })) };
