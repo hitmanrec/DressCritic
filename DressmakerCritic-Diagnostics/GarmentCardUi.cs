@@ -62,6 +62,7 @@ namespace DressmakerCritic.Diagnostics
                     var fabric = graph.Read(FieldSnapshot.ResolveFields(panels[i], "fabric"));
                     fabric.member = "GameManager.activeDress.state.panelStates[" + i + "].fabric"; roots.Add(fabric);
                 }
+                FocusedGarmentFields.AddAccessories(roots, graph, state, source);
                 var current = graph.Read(state); current.member = source; roots.Add(current);
                 var screen = graph.Read(FieldSnapshot.ResolveFields(managers[0], "<CurrentScene>k__BackingField"));
                 screen.member = "GameManager.<CurrentScene>k__BackingField"; roots.Add(screen);
@@ -148,6 +149,8 @@ namespace DressmakerCritic.Diagnostics
             if (GUI.Button(new Rect(x + 236f, y + 24f, 132f, 28f), "Сохранённые")) OpenSavedDresses();
             if (GUI.Button(new Rect(x + 12f, y + 60f, 120f, 28f), "Заказ")) OpenOrderChoices();
             if (GUI.Button(new Rect(x + 144f, y + 60f, 180f, 28f), "Сохранить отчёт")) SaveInspectionReport();
+            if (GUI.Button(new Rect(x + 336f, y + 60f, 140f, 28f), "Текст задания")) CaptureBriefEvidence();
+            if (GUI.Button(new Rect(x + 488f, y + 60f, 160f, 28f), "Изображение")) CaptureGarmentImage();
             // All game reads are in RefreshGarmentCard; this path renders cached text only.
             GUILayout.BeginArea(new Rect(x + 12f, y + 98f, Math.Max(1f, width - 24f), Math.Max(1f, height - 110f)));
             try

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dressmakercritic:brief-evidence:1.0.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "capturedAtUtc",
+    "status",
+    "meaning",
+    "observations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "capturedAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "candidate-text-only",
+        "text-limit"
+      ]
+    },
+    "meaning": {
+      "type": "string"
+    },
+    "observations": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "required": [
+          "source",
+          "text",
+          "truncated"
+        ],
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

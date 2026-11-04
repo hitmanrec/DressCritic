@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.5.0** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.6.0** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.5.0`.
+2. Log should show `Dressmaker Critic Diagnostics 0.6.0`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the in-game export/inspection UI. v0.5+ writes readable reports to
    `BepInEx/config/DressmakerCritic/reports/inspection-*.txt`; full diagnostic
@@ -126,3 +126,13 @@ object. Saved-history access still requires live verification.
 Диагностический захват после проверки также содержит `inspection-report.txt`.
 Игровые названия предметов и заказов сохраняются как в данных игры;
 оценка красоты, игровые очки и вердикт о выполнении заказа пока не вычисляются.
+
+## Три входа оценщика (v0.6.0)
+
+Добавлены кнопки **Текст задания** и **Изображение**, а также более глубокое чтение
+аксессуаров без увеличения общей глубины. Текст диалога сохраняется как отдельное
+свидетельство; привязка к заказу и полнота задания не предполагаются. Изображение
+берётся из открытого игрового просмотра или временной камеры манекена/фотоэкрана;
+неподдерживаемые случаи сообщаются явно. Новые пути ещё требуют проверки в игре.
+Файлы сохраняются в captures/brief-* и captures/image-* и копируются pull-exports.sh.
+См. [подтверждённые результаты, ограничения и отдельные проверки](docs/phase-three-inputs.md).

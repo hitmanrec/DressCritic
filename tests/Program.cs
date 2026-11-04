@@ -15,6 +15,7 @@ class Program
     {
         SavedDressTests.Run();
         OrderChoiceTests.Run();
+        EvidenceTests.Run();
         CardTests.Run();
         SnapshotTests.Run(args);
         ProgressTests.Run();

@@ -19,6 +19,10 @@
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>

@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.5.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.6.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed partial class Plugin : BaseUnityPlugin
     {
@@ -35,7 +35,7 @@ namespace DressmakerCritic.Diagnostics
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
             showInspectButton = Config.Bind("Interface", "ShowInspectButton", true,
                 "Show the read-only garment facts card button across scenes.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.5.0 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.6.0 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -240,6 +240,7 @@ namespace DressmakerCritic.Diagnostics
                         var panels = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(state, "panelStates"));
                         for (int i = 0; i < panels.Length && !graph.Exhausted; i++)
                             AddFocused(report, graph, panels[i], "GameManager.activeDress.state.panelStates[" + i + "].fabric", "fabric");
+                        FocusedGarmentFields.AddAccessories(report.objects, graph, state, "GameManager.activeDress.state");
                         AddFocused(report, graph, manager, "GameManager.activeDress.state", "activeDress", "state");
                         AddFocused(report, graph, manager, "GameManager.proposedQuest", "proposedQuest");
                     }
