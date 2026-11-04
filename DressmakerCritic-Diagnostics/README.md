@@ -216,3 +216,12 @@ Refresh reads the open active garment and progress once, with a two-second coold
 Finished active garments work; unverified history/preview objects are never chosen
 automatically. Current-order requirements are reference information only; no
 compliance/visual score is computed. [Usage and live-test limits](../docs/garment-card.md).
+
+### v0.4.1 saved-history selection
+
+Use Inspect garment -> Saved dresses -> select an entry, then Refresh if needed.
+This reads completed-order dress records explicitly, independently of activeDress
+or the game's thumbnail selection. Active switches back to the current design.
+Export after inspecting includes inspected-garment.json with the selected source;
+normal garment-snapshot.json remains the live active design. Free-design history
+outside completedQuests is not yet supported. See the card documentation for limits.

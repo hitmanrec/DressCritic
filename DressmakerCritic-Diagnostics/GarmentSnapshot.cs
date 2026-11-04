@@ -112,10 +112,10 @@ namespace DressmakerCritic.Diagnostics
             status = items.Count == count && array.status != "node-limit" ? "complete" : "truncated";
             return items;
         }
-        public GarmentSnapshot Build(string capturedAtUtc, string unityScene)
+        public GarmentSnapshot Build(string capturedAtUtc, string unityScene, string sourceRoot = "GameManager.activeDress.state")
         {
-            var state = Root("GameManager.activeDress.state");
-            var result = new GarmentSnapshot { capturedAtUtc = capturedAtUtc, unityScene = unityScene,
+            var state = Root(sourceRoot);
+            var result = new GarmentSnapshot { source = sourceRoot, capturedAtUtc = capturedAtUtc, unityScene = unityScene,
                 screen = Scalar(Root("GameManager.<CurrentScene>k__BackingField")),
                 garmentStatus = Status(state) == "null" ? "absent" : Status(state) == "fields" ? "available" : Status(state),
                 sewingComplete = Boolean(state, "sewingComplete"), finished = Boolean(state, "finished") };

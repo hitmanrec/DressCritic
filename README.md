@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.4.0** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.4.1** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.4.0`.
+2. Log should show `Dressmaker Critic Diagnostics 0.4.1`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the **Export diagnostics** button (upper right) — each click creates  
    `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
@@ -104,3 +104,11 @@ accessories and current-order requirements as separate reference information.
 It does not compute compliance, game scores or visual quality. Finished active
 garments are supported; history/viewer compatibility depends on whether the game
 exposes that garment as active. See [card usage and limits](docs/garment-card.md).
+
+### Saved garment selection (v0.4.1)
+
+In **Inspect garment**, choose **Saved dresses**, then an entry from completed-order
+history. The card shows its source explicitly. **Active** switches back to the
+current garment. Export after inspecting to include `inspected-garment.json`;
+`garment-snapshot.json` continues to describe activeDress, which may be a different
+object. Saved-history access still requires live verification.

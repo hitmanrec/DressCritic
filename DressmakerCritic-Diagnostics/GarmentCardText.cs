@@ -22,7 +22,7 @@ namespace DressmakerCritic.Diagnostics
                 text.AppendLine(garment?.garmentStatus == "absent" ? "No active garment. Open a garment in the game's viewer/editor, then refresh." : "Garment data unavailable. Refresh after opening the garment.");
             else
             {
-                text.AppendLine("ACTIVE GARMENT");
+                text.AppendLine(garment.source == "GameManager.activeDress.state" ? "ACTIVE GARMENT" : "EXPLICITLY SELECTED SAVED GARMENT");
                 text.AppendLine("Sewing complete: " + Flag(garment.sewingComplete) + " | Finished: " + Flag(garment.finished));
                 foreach (var component in garment.components)
                     text.AppendLine(component.slot + ": " + Asset(component.definition) + " | variant " + (component.variant?.ToString() ?? "unknown"));

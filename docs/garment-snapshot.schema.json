@@ -47,7 +47,15 @@
       ]
     },
     "source": {
-      "const": "GameManager.activeDress.state"
+      "oneOf": [
+        {
+          "const": "GameManager.activeDress.state"
+        },
+        {
+          "type": "string",
+          "pattern": "^PlayerProgress\\.completedQuests\\[[0-9]+\\]\\.dress$"
+        }
+      ]
     },
     "garmentStatus": {
       "type": "string"

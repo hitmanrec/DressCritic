@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.4.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.4.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed partial class Plugin : BaseUnityPlugin
     {
@@ -35,7 +35,7 @@ namespace DressmakerCritic.Diagnostics
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
             showInspectButton = Config.Bind("Interface", "ShowInspectButton", true,
                 "Show the read-only garment facts card button across scenes.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.4.0 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.4.1 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -129,6 +129,12 @@ namespace DressmakerCritic.Diagnostics
                 string name = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
                 string dir = Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", name);
                 Directory.CreateDirectory(dir);
+                // Preserve exactly what the user inspected, separately from live activeDress.
+                if (inspectedGarment != null)
+                {
+                    File.WriteAllText(Path.Combine(dir, "inspected-garment.json"), DiagnosticJson.Serialize(inspectedGarment));
+                    if (inspectedProgress != null) File.WriteAllText(Path.Combine(dir, "inspection-order-reference.json"), DiagnosticJson.Serialize(inspectedProgress));
+                }
                 string snapshot = ExportSnapshot(dir);
                 string editor = ExportExploration(true, dir);
                 string types = ExportExploration(false, dir);
@@ -185,6 +191,7 @@ namespace DressmakerCritic.Diagnostics
 
         private void ClearObservation(string scene)
         {
+            inspectedGarment = null; inspectedProgress = null; savedChoice = null; savedProgress = null; historyVisible = false;
             cardText = "Game state changed. Press Refresh to inspect the open garment.";
             recentEvents.Clear();
             lastGarment = null; lastFabric = null; lastEventUtc = null; lastEvent = null; lastVariant = 0;
