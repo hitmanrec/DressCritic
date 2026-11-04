@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.9.1**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.10.0**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -98,3 +98,9 @@ See [v0.9.0 validation and in-game check](docs/RESULT-UI.md).
 v0.9.1 improves result readability with an opaque dark surface, explicit 18px
 body text, larger score/house headings and collapsible limitations, independent
 of the game's translucent IMGUI skin. No model/config changes required.
+
+In v0.10.0 the **Жюри** bookmark opens a paper-styled overlay with an internal
+**Оценить платье** button. Wide layouts show the captured photo and mean beside
+house remarks. **Дома мод / Заказ** tabs separate jury and context. Display names:
+Maison Orvelle, Bellombre, Virelai, Maison Aveline; model IDs/rubrics are unchanged.
+This is the mod's overlay, not a patch to the game's actual notebook tabs.

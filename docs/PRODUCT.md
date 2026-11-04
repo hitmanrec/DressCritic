@@ -10,12 +10,12 @@ One local vision-language model plays four fictional fashion-house roles, not fo
 independent models or agents. House IDs are stable; final fictional brand names
 can be chosen later without changing the contract.
 
-| ID | Working Russian name | Preference |
+| ID | Display name | Preference |
 | --- | --- | --- |
-| harmony | Гармония | Composition, colour/material balance, coherent details |
-| character | Характер | Expressive mood, a legible idea, distinctive visual identity |
-| avant_garde | Авангард | Boldness, experimentation, unexpected combinations |
-| atelier | Ателье | Elegance, proportions and plausibility as real clothing |
+| harmony | Maison Orvelle | Composition, colour/material balance, coherent details |
+| character | Bellombre | Expressive mood, a legible idea, distinctive visual identity |
+| avant_garde | Virelai | Boldness, experimentation, unexpected combinations |
+| atelier | Maison Aveline | Elegance, proportions and plausibility as real clothing |
 
 Every critic judges the whole garment using common scoring anchors, with extra
 weight on their stated taste. No random bonuses, fixed personality offsets or
@@ -78,3 +78,14 @@ Manual Ollama is still required. Customer evidence, context runtime testing,
 repeatability/calibration, active/URP capture outside the history viewer and
 packaging/model lifecycle remain unfinished. Native result UI needs in-game
 verification; no native build is claimed without the proprietary game references.
+
+## v0.10.0 presentation
+
+The Jury bookmark opens a mod-owned paper-styled overlay. At widths >=850px the
+captured image/mean occupy the left page, houses/context tabs the right; smaller
+screens use one text column. Preview is read from the same capture-local PNG
+used for inference, loaded on the GUI thread once per path, and destroyed when
+replaced/unloaded. It never follows a different current garment. Display names
+and Russian mottos do not enter the model prompt or change scoring IDs.
+Native notebook navigation integration, bespoke emblems, localized generated
+remarks and fixed multi-view capture remain separate unfinished work.

@@ -10,7 +10,10 @@ namespace DressmakerCritic.Diagnostics
     {
         public bool open;
         public JuryAssessment result;
-        public string subject, message;
+        public string subject, message, imagePath;
+        private string loadedImagePath;
+        private Texture2D preview;
+        private bool contextTab;
         private Vector2 scroll;
         private bool showLimitations;
         private GameObject inputShield;
@@ -34,11 +37,27 @@ namespace DressmakerCritic.Diagnostics
             inputShield.SetActive(true);
             shieldRect.sizeDelta = new Vector2(width, height);
         }
-        public void Dispose() { if (inputShield != null) UnityEngine.Object.Destroy(inputShield); }
+        public void Dispose() { if (inputShield != null) UnityEngine.Object.Destroy(inputShield); if (preview != null) UnityEngine.Object.Destroy(preview); }
         private static string Number(double? value) => value.HasValue ? value.Value.ToString("0.##", CultureInfo.InvariantCulture) + " / 10" : "Недостаточно данных";
-        private static string House(string id) => id == "harmony" ? "Дом Гармонии" : id == "character" ? "Дом Характера" : id == "avant_garde" ? "Дом Авангарда" : "Дом Ателье";
+        private static string House(string id) => id == "harmony" ? "Maison Orvelle" : id == "character" ? "Bellombre" : id == "avant_garde" ? "Virelai" : "Maison Aveline";
+        private static string Motto(string id) => id == "harmony" ? "Каждая деталь на своём месте" : id == "character" ? "Наряд должен оставлять впечатление" : id == "avant_garde" ? "Привычное — лишь отправная точка" : "Убедительность в каждой линии";
+        private void LoadPreview()
+        {
+            if (loadedImagePath == imagePath) return;
+            if (preview != null) UnityEngine.Object.Destroy(preview);
+            preview = null; loadedImagePath = imagePath;
+            if (string.IsNullOrEmpty(imagePath)) return;
+            try
+            {
+                var bytes = System.IO.File.ReadAllBytes(imagePath);
+                if (bytes.Length > 4 * 1024 * 1024) return;
+                preview = new Texture2D(2, 2, TextureFormat.RGB24, false);
+                if (!ImageConversion.LoadImage(preview, bytes)) { UnityEngine.Object.Destroy(preview); preview = null; }
+            }
+            catch { if (preview != null) UnityEngine.Object.Destroy(preview); preview = null; }
+        }
         private static string Verdict(string value) => value == "exceptional" ? "Выдающаяся работа" : value == "strong" ? "Сильная работа" : value == "competent" ? "Уверенная работа" : value == "uneven" ? "Неравномерная работа" : value == "weak" ? "Слабая работа" : "Недостаточно данных";
-        public void Begin() { open = true; result = null; subject = null; message = "Подготовка изображения и данных платья…"; scroll = Vector2.zero; showLimitations = false; }
+        public void Begin() { open = true; result = null; subject = null; imagePath = null; contextTab = false; message = "Подготовка изображения и данных платья…"; scroll = Vector2.zero; showLimitations = false; }
         private static GUIStyle label, heading, title, score, muted, button, area;
         private static GUIStyle Style(int size, Color color, FontStyle weight = FontStyle.Normal)
         {
@@ -51,19 +70,20 @@ namespace DressmakerCritic.Diagnostics
         private static void InitStyles()
         {
             if (label != null) return;
-            label = Style(18, new Color(0.94f, 0.95f, 0.97f));
-            heading = Style(21, new Color(0.92f, 0.77f, 0.49f), FontStyle.Bold);
-            title = Style(26, Color.white, FontStyle.Bold);
-            score = Style(28, Color.white, FontStyle.Bold);
-            muted = Style(15, new Color(0.74f, 0.79f, 0.85f));
+            label = Style(18, new Color(0.16f, 0.12f, 0.10f));
+            heading = Style(21, new Color(0.40f, 0.18f, 0.15f), FontStyle.Bold);
+            title = Style(26, new Color(0.19f, 0.12f, 0.10f), FontStyle.Bold);
+            score = Style(28, new Color(0.19f, 0.12f, 0.10f), FontStyle.Bold);
+            muted = Style(15, new Color(0.35f, 0.29f, 0.24f));
             button = new GUIStyle(GUI.skin.button) { fontSize = 17, padding = new RectOffset(12, 12, 8, 8) };
             area = new GUIStyle { padding = new RectOffset(24, 24, 18, 18) };
         }
-        public void Draw()
+        public void Draw(Action evaluate, bool busy)
         {
             if (!open) { if (inputShield != null) inputShield.SetActive(false); return; }
             InitStyles();
-            float width = Math.Min(780, Math.Max(200, Screen.width - 32));
+            LoadPreview();
+            float width = Math.Min(1100, Math.Max(200, Screen.width - 32));
             float height = Math.Min(860, Math.Max(180, Screen.height - 72));
             Shield(width, height);
             var rect = new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height);
@@ -71,17 +91,55 @@ namespace DressmakerCritic.Diagnostics
             try
             {
                 // Do not inherit the game's transparent skin or tint for the result surface.
-                GUI.color = new Color(0.055f, 0.075f, 0.105f, 1f);
+                GUI.color = new Color(0.91f, 0.85f, 0.74f, 1f);
                 GUI.DrawTexture(rect, Texture2D.whiteTexture);
+                // Paper margins and the central fold are drawn from mod-owned primitives.
+                GUI.color = new Color(0.62f, 0.48f, 0.34f, 1f);
+                GUI.DrawTexture(new Rect(rect.x + 8, rect.y + 8, 2, rect.height - 16), Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(rect.xMax - 10, rect.y + 8, 2, rect.height - 16), Texture2D.whiteTexture);
+                if (width >= 850)
+                    GUI.DrawTexture(new Rect(rect.x + 276, rect.y + 80, 1, Math.Max(0, rect.height - 104)), Texture2D.whiteTexture);
                 GUI.color = Color.white; GUI.contentColor = Color.white; GUI.backgroundColor = Color.white;
                 GUILayout.BeginArea(rect, area);
                 try
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Жюри домов мод", title);
+                    GUILayout.Label("Салон · Жюри домов мод", title);
+                    bool enabled = GUI.enabled;
+                    GUI.enabled = enabled && !busy;
+                    if (GUILayout.Button(busy ? "Рассматриваем…" : "Оценить платье", button, GUILayout.Width(180))) evaluate();
+                    GUI.enabled = enabled;
                     if (GUILayout.Button("Закрыть", button, GUILayout.Width(110))) open = false;
                     GUILayout.EndHorizontal();
                     GUILayout.Space(8);
+                    bool spread = width >= 850;
+                    GUILayout.BeginHorizontal();
+                    if (spread)
+                    {
+                        GUILayout.BeginVertical(GUILayout.Width(240));
+                        if (preview != null)
+                        {
+                            var photoRect = GUILayoutUtility.GetRect(220, 330, GUILayout.ExpandWidth(false));
+                            GUI.DrawTexture(photoRect, preview, ScaleMode.ScaleToFit);
+                        }
+                        GUILayout.Label("Снимок оцениваемого платья", muted);
+                        if (result != null)
+                        {
+                            GUILayout.Space(12);
+                            GUILayout.Label(Number(result.summary.average), score);
+                            GUILayout.Label(Verdict(result.summary.verdict), heading);
+                        }
+                        GUILayout.EndVertical();
+                        GUILayout.Space(24);
+                    }
+                    GUILayout.BeginVertical();
+                    GUILayout.BeginHorizontal();
+                    GUI.enabled = contextTab;
+                    if (GUILayout.Button("Дома мод", button)) { contextTab = false; scroll = Vector2.zero; }
+                    GUI.enabled = !contextTab;
+                    if (GUILayout.Button("Заказ", button)) { contextTab = true; scroll = Vector2.zero; }
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
                     scroll = GUILayout.BeginScrollView(scroll);
                     try
                     {
@@ -90,20 +148,27 @@ namespace DressmakerCritic.Diagnostics
                         if (!string.IsNullOrEmpty(message)) GUILayout.Label(message, muted);
                         if (result == null) return;
                         GUILayout.Space(12);
-                        GUILayout.Label("Среднее жюри: " + Number(result.summary.average), score);
-                        GUILayout.Label(Verdict(result.summary.verdict), heading);
+                        if (!spread)
+                        {
+                            GUILayout.Label("Среднее жюри: " + Number(result.summary.average), score);
+                            GUILayout.Label(Verdict(result.summary.verdict), heading);
+                        }
                         if (result.summary.divided == true) Text("Мнения жюри разделились.");
-                        foreach (var vote in result.jury)
+                        if (!contextTab) foreach (var vote in result.jury)
                         {
                             GUILayout.Space(20);
                             GUILayout.Label(House(vote.houseId) + " — " + Number(vote.score), heading);
+                            GUILayout.Label(Motto(vote.houseId), muted);
                             foreach (string remark in vote.remarks) Text(remark);
                         }
+                        if (contextTab)
+                        {
                         GUILayout.Space(24);
                         GUILayout.Label("Контекст заказа", heading);
                         Context("Соответствие заказу", result.orderCompliance);
                         Context("Предпочтения заказчицы", result.customerCompatibility);
                         GUILayout.Label("Игровые требования не оценивались. Контекст не входит в среднее жюри.", muted);
+                        }
                         if (result.limitations.Count > 0)
                         {
                             GUILayout.Space(16);
@@ -111,7 +176,7 @@ namespace DressmakerCritic.Diagnostics
                             if (showLimitations) foreach (string limit in result.limitations) GUILayout.Label(limit, muted);
                         }
                     }
-                    finally { GUILayout.EndScrollView(); }
+                    finally { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
                 }
                 finally { GUILayout.EndArea(); }
             }

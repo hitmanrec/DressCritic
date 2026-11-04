@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.9.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.10.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.9.1: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.10.0: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -40,12 +40,9 @@ namespace DressmakerCritic.Diagnostics
             bool previous = GUI.enabled;
             try
             {
-                GUI.enabled = previous && !busy;
-                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 12, 300, 36), busy ? "Жюри оценивает…" : "Оценить платье")) BeginCapture();
                 GUI.enabled = previous;
-                if (!panel.open && (busy || panel.result != null || !string.IsNullOrEmpty(status)))
-                    if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 52, 300, 30), "Открыть результат")) panel.open = true;
-                panel.Draw();
+                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 132), 12, 120, 36), "Жюри")) panel.open = !panel.open;
+                panel.Draw(BeginCapture, busy);
             }
             finally { GUI.enabled = previous; }
         }
@@ -130,6 +127,7 @@ namespace DressmakerCritic.Diagnostics
                         beforeDisplay.historyIndex == selectedSaved && afterDisplay.historyIndex == selectedSaved &&
                         beforeDisplay.displayDressId == afterDisplay.displayDressId && beforeDisplay.cameraId == afterDisplay.cameraId &&
                         beforeDisplay.viewerTextureId == afterDisplay.viewerTextureId;
+                    panel.imagePath = Path.Combine(capture.directory, visual.metadata.files[0]);
                     input.limitations.Add(visual.metadata.uiStatus); input.limitations.Add(visual.metadata.viewsStatus);
                     foreach (string file in visual.metadata.files)
                         input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)), width = visual.metadata.width, height = visual.metadata.height,

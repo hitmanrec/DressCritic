@@ -52,3 +52,18 @@ jury inference: history dress 8 mean 6.25 in 18.6 seconds, history dress 1 mean
 saved garments can reach the UI; it is not a calibration/repeatability benchmark.
 The updated native source passes syntax verification; full Unity build and
 readability/input behavior at the user's display scale need an in-game check.
+
+## v0.10.0 salon layout
+
+Paper-colored opaque surface with dark ink text and burgundy headings replaces
+the dark panel. The Jury bookmark toggles it; Evaluate is inside the header.
+On wide screens a left-page photo is the exact captured image, not a live viewer
+or a screenshot of another garment. Missing photos do not prevent reading scores.
+House names/mottos replace technical taste labels; tabs separate order context.
+No game UI/assets are copied or modified. Existing machine captures are retained.
+
+Verification: production core tests and native syntax check pass. A real native
+build/layout test requires installed game DLLs and runtime. Update/install with
+the game closed, keep the same Ollama model/config, open Жюри and evaluate one
+saved dress. Check tabs, snapshot photo identity, close/reopen, scroll and smaller
+window sizes. UI presentation does not resolve the known single-angle bias.
