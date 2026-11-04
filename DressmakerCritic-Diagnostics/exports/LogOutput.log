@@ -18,19 +18,18 @@
 [Info   :   BepInEx] Loading [Dressmaker Mods 0.7.8]
 [Info   :Dressmaker Mods] Startup patcher is active and matches this loader.
 [Info   :Dressmaker Mods] Dressmaker Mods 0.7.8 loaded (game 0.7.0, Unity 6000.3.4f1, WindowsPlayer).
-[Info   :Dressmaker Mods] Made automatic save backup C:\users\steamuser\Documents\Dressmaker Save Backups\Automatic-save-20261104-165343-694430.zip.
 [Info   :Dressmaker Mods] Deferred accessory loading enabled for 9 game methods.
 [Info   :Dressmaker Mods] Cutting-table layer-mask cache replaced 4 repeated calls.
 [Info   :Dressmaker Mods] Registered Modded fabric tag.
-[Info   :Dressmaker Mods] Asset headers ready: 0 reused, 0 read, 0 files checked in 1 ms; waited 0 ms.
-[Info   :Dressmaker Mods] Registered 0 custom fabric(s) in 0.9 ms.
+[Info   :Dressmaker Mods] Asset headers ready: 0 reused, 0 read, 0 files checked in 2 ms; waited 0 ms.
+[Info   :Dressmaker Mods] Registered 0 custom fabric(s) in 0.8 ms.
 [Info   :Dressmaker Mods] Registered 0 custom accessory(s) in 0.2 ms.
 [Info   :Dressmaker Mods] Registered 0 dress template(s) in 0.0 ms.
 [Info   :Dressmaker Mods] Registered 0 custom garment component(s) in 1.2 ms.
 [Info   :Dressmaker Mods] Registered 0 custom client(s), 0 commission(s), and 0 story dialogue(s) in 0.4 ms.
-[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 11.0 ms.
-[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.2.1]
-[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.2.1 loaded (read-only).
+[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 10.9 ms.
+[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.2.2]
+[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.2.2 loaded (read-only).
 [Message:   BepInEx] Chainloader startup complete
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: Splash; event observation cleared.
 [Info   :Dressmaker Critic Diagnostics] ModLoader content ready; use critic-status or critic-export in the console.
@@ -49,18 +48,19 @@
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=No Collar; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Princess Skirt; variant=0; fabric=(none)
 [Warning:  HarmonyX] AccessTools.Field: Could not find field for type GameManager and name isInIntro
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115432-827-8abff4cd\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115432-827-8abff4cd
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121053-725-8a3b263c\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121053-725-8a3b263c
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115440-451-1846c2cc\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115440-451-1846c2cc
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121058-056-2b2a376c\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121058-056-2b2a376c
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115447-867-202aafdc\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-115447-867-202aafdc
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121102-515-1b1f3096\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121102-515-1b1f3096
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Scene loaded: TitleScreen; event observation cleared.

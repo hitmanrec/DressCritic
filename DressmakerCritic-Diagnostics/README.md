@@ -12,18 +12,28 @@ No AI and no changes to dresses, commissions, or save files yet.
 
 ## Build and install
 
-Find the game folder from Steam → Dressmaker → Properties → Installed Files → Browse.
-The folder must contain `Dressmaker.exe`.
-
-From the extracted source folder:
+Preferred: from the **repository root**, one command builds and installs:
 
 ```bash
-chmod +x build_and_install.sh
-./build_and_install.sh "$HOME/.local/share/Steam/steamapps/common/Dressmaker"
+chmod +x ../install.sh   # once
+../install.sh
+# or: ../install.sh "/path/to/steamapps/common/Dressmaker"
+# or: ../install.sh --build-only
 ```
 
-Replace the path with the **real** installation directory, including capitalization.
-The script does NOT install the ModLoader itself. It copies only our compiled plugin DLL to `BepInEx/plugins/DressmakerCritic/`.
+`install.sh` auto-detects common Steam/Proton game paths (or uses
+`DRESSMAKER_GAME_ROOT`). It does **not** install the ModLoader; it only copies
+`DressmakerCritic.Diagnostics.dll` to `BepInEx/plugins/DressmakerCritic/`.
+
+Lower-level scripts in this folder (same result if you already know the path):
+
+```bash
+bash build_and_install.sh "$HOME/.local/share/Steam/steamapps/common/Dressmaker"
+bash build.sh "$HOME/.local/share/Steam/steamapps/common/Dressmaker"   # compile only
+```
+
+Find the game folder from Steam → Dressmaker → Properties → Installed Files → Browse.
+The folder must contain `Dressmaker.exe`.
 
 ## Verify in game
 
@@ -75,10 +85,11 @@ reads and retains the legacy keys with explicitly unresolved summaries. See
 [findings and limits](../docs/runtime-findings.md) and [schema](../docs/export-schema.md).
 No evaluator, AI requests, screenshots or game asset copying are included.
 
-Build without installing: `bash build.sh "/actual/path/to/Dressmaker"`.
-Build and install: `bash build_and_install.sh "/actual/path/to/Dressmaker"`.
-Both work with paths containing spaces on Linux/Proton; use an authorized game
-installation and the appropriate Windows/Proton loader. Do not commit game DLLs.
+From the repo root: `./install.sh` (build+install) or `./install.sh --build-only`.
+From this folder: `bash build_and_install.sh "/actual/path/to/Dressmaker"` or
+`bash build.sh "/actual/path/to/Dressmaker"`. Paths with spaces work on
+Linux/Proton; use an authorized game install and the Windows/Proton loader.
+Do not commit game DLLs.
 Run independent reflection safety tests from the repository root with
 `dotnet run --project tests/Introspection.Tests.csproj` (.NET 8 SDK).
 The plugin itself still targets net472. Safety tests do not verify Unity or loader APIs.
