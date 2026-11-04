@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Configuration;
 using DressmakerMods;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,10 @@ namespace DressmakerCritic.Diagnostics
     public sealed class Plugin : BaseUnityPlugin
     {
         private ModContext context;
+        private ConfigEntry<bool> showExportButton;
+        private string exportButtonStatus = "";
+        private float nextButtonExport;
+
         private readonly Queue<EventObservation> recentEvents = new Queue<EventObservation>();
         private object lastGarment;
         private object lastFabric;
@@ -25,6 +30,8 @@ namespace DressmakerCritic.Diagnostics
 
         private void Awake()
         {
+            showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
+                "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
             Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.0 loaded (read-only).");
             try
             {
@@ -86,10 +93,58 @@ namespace DressmakerCritic.Diagnostics
             }
         }
 
+        // BepInEx keeps this plugin alive across scenes. IMGUI draws only;
+        // all reflection/file work is gated behind a deliberate button click.
+        private void OnGUI()
+        {
+            if (showExportButton == null || !showExportButton.Value) return;
+            float width = Math.Min(300f, Screen.width);
+            float x = Math.Max(0f, Screen.width - width - 12f);
+            bool previousEnabled = GUI.enabled;
+            try
+            {
+                GUI.enabled = previousEnabled && Time.realtimeSinceStartup >= nextButtonExport;
+                if (GUI.Button(new Rect(x, 12f, width, 36f), "Export diagnostics"))
+                {
+                    nextButtonExport = Time.realtimeSinceStartup + 2f;
+                    ExportFromButton();
+                }
+                GUI.enabled = previousEnabled;
+                if (!string.IsNullOrEmpty(exportButtonStatus))
+                    GUI.Box(new Rect(x, 52f, width, 76f), exportButtonStatus);
+            }
+            finally { GUI.enabled = previousEnabled; }
+        }
+
+        private void ExportFromButton()
+        {
+            try
+            {
+                // Each click has its own directory: comparisons across screens are retained.
+                string name = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                string dir = Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", name);
+                Directory.CreateDirectory(dir);
+                string snapshot = ExportSnapshot(dir);
+                string editor = ExportExploration(true, dir);
+                string types = ExportExploration(false, dir);
+                bool complete = File.Exists(Path.Combine(dir, "diagnostics.json")) &&
+                    File.Exists(Path.Combine(dir, "editor-runtime.json")) &&
+                    File.Exists(Path.Combine(dir, "runtime-types.json"));
+                exportButtonStatus = (complete ? "Export complete" : "Partial export - see log") +
+                    "\nDressmakerCritic/captures/\n" + name;
+                Logger.LogInfo("Button export: " + dir + "\n" + snapshot + "\n" + editor + "\n" + types);
+            }
+            catch (Exception e)
+            {
+                exportButtonStatus = "Export failed - see BepInEx log";
+                Logger.LogError(e);
+            }
+        }
+
         private static string GarmentCatalogPath() =>
             Path.Combine(Paths.ConfigPath, "DressmakerMods", "garment-reference.json");
 
-        private string ExportSnapshot()
+        private string ExportSnapshot(string directory = null)
         {
             try
             {
@@ -106,7 +161,7 @@ namespace DressmakerCritic.Diagnostics
                     activeCommissionSummary = ReadActiveCommissions(),
                     gameManagerSummary = ReadGameManager()
                 };
-                string dir = Path.Combine(Paths.ConfigPath, "DressmakerCritic");
+                string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
                 Directory.CreateDirectory(dir);
                 string file = Path.Combine(dir, "diagnostics.json");
                 File.WriteAllText(file, JsonUtility.ToJson(report, true));
@@ -137,7 +192,7 @@ namespace DressmakerCritic.Diagnostics
             };
         }
 
-        private string ExportExploration(bool editor)
+        private string ExportExploration(bool editor, string directory = null)
         {
             try
             {
@@ -171,7 +226,7 @@ namespace DressmakerCritic.Diagnostics
                     }
                     report.note += " Metadata only; at most 128 candidate types per assembly. Static values and property getters are never read.";
                 }
-                string dir = Path.Combine(Paths.ConfigPath, "DressmakerCritic");
+                string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
                 Directory.CreateDirectory(dir);
                 string name = editor ? "editor-runtime.json" : "runtime-types.json";
                 File.WriteAllText(Path.Combine(dir, name), JsonUtility.ToJson(report, true));

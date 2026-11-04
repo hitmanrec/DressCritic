@@ -107,3 +107,35 @@ The plugin itself still targets net472. Safety tests do not verify Unity or load
 The cloud environment lacks proprietary game assemblies: v0.2 has not been
 compiled against the real game or tested in-game. The steps above are required
 before treating it as verified. Never substitute fake game APIs for that check.
+
+### Export button on every screen
+
+The plugin draws an **Export diagnostics** button in the upper-right corner using
+Unity IMGUI, independent of the game's scene UI. Click it at the title screen,
+in the editor, at the desk, or in another scene. Each click writes all three JSON
+exports to its own directory:
+
+`BepInEx/config/DressmakerCritic/captures/<UTC timestamp>-<capture id>/`
+
+Previous captures are retained for comparisons. The overlay reports complete,
+partial, or failed export; the BepInEx log records the full path and individual
+results. Exports are synchronous and may briefly pause the game. A two-second
+cooldown prevents rapid repeated clicks; idle drawing performs no reflection scans.
+The diagnostic overlay does not pause the game or change cursor/quest/garment state.
+If the game captures the mouse, use its normal menu to release the pointer.
+
+Set `[Diagnostics] ShowExportButton = false` in
+`BepInEx/config/community.dressmakercritic.diagnostics.cfg` and restart to hide it.
+Console commands still work and retain their original output locations.
+Building now also requires `Dressmaker_Data/Managed/UnityEngine.IMGUIModule.dll`
+from the authorized game installation.
+
+In-game verification still required: confirm the button survives scene changes,
+is legible on Linux/Proton at the actual resolution, is clickable without changing
+a garment underneath it, and produces three valid JSON files per capture.
+Test title screen, PatternCutting and commission/desk screens, a second capture,
+a read-only output directory (error feedback), and the hidden-button setting.
+IMGUI does not guarantee blocking game-specific input handlers underneath the
+button; if click-through occurs, hide the overlay and use console commands until
+that integration is addressed. Screen-space placement and input behavior have not
+been validated against the proprietary game runtime in this environment.
