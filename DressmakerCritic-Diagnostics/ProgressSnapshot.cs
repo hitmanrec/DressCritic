@@ -43,7 +43,7 @@ namespace DressmakerCritic.Diagnostics
             foreach (var value in values) section.items.Add(graph.Identity(value));
             return section;
         }
-        public static ProgressSnapshot Build(ContextRuntime source)
+        public static ProgressSnapshot Build(ContextRuntime source, int? explicitOrderIndex = null)
         {
             var graph = new GarmentSnapshotBuilder(source.objects);
             var definition = graph.Root("PlayerProgress.selectedCommission.questDefinition");
@@ -51,7 +51,7 @@ namespace DressmakerCritic.Diagnostics
             graph.Items(graph.Root("PlayerProgress.activeCommissions"), out count, out status);
             int index;
             string rawIndex = graph.Scalar(graph.Root("PlayerProgress.activeCommissionIndex"));
-            int? selected = int.TryParse(rawIndex, out index) ? index : (int?)null;
+            int? selected = explicitOrderIndex ?? (int.TryParse(rawIndex, out index) ? index : (int?)null);
             bool available = source.progressAccessStatus == "available";
             var result = new ProgressSnapshot { capturedAtUtc = source.capturedAtUtc, progressAccessStatus = source.progressAccessStatus,
                 activeOrderCount = count, selectedOrderIndex = selected, order = graph.Identity(definition), budget = graph.Integer(definition, "budget"),

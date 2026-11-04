@@ -26,7 +26,7 @@ namespace DressmakerCritic.Diagnostics
                 object dress = FieldSnapshot.ResolveFields(record, "dress");
                 if (dress == null) continue;
                 string name = FieldSnapshot.ResolveFields(record, "questDefinition", "prettyName") as string;
-                if (string.IsNullOrEmpty(name)) name = "Saved garment";
+                if (string.IsNullOrEmpty(name)) name = "Сохранённое платье";
                 result.Add(new SavedDressChoice { index = i, record = record, label = "#" + (i + 1) + " " + name.Substring(0, Math.Min(name.Length, 128)) });
             }
             status = "Completed-order history: " + result.Count + " garments" + (count < (int)size ? " (partial; first 512 records)" : "");

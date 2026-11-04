@@ -119,3 +119,46 @@ confirm the saved-source label and expected component/material facts, then expor
 Inspect inspected-garment.json, not the live garment-snapshot.json, for that choice.
 If the list is empty/unavailable, record its displayed status rather than creating
 a new garment. No repetition of the nine-stage session is needed.
+
+## v0.5.0: Russian detailed card, explicit order, text reports
+
+The interface/card text is now Russian. Game-provided proper names/tags are kept
+as recorded; raw JSON contracts remain language-independent. Snapshot time is
+shown in UTC+5 (the user's Asia/Yekaterinburg context); JSON timestamps stay UTC.
+Panel indices are displayed starting at 1 but are local snapshot indices, not
+verified persistent panel names. Each panel shows fabric, construction flags and
+raw grain quality; accessories show known identity, placement, scale and available
+position/rotation. Unknown scalars are displayed as unknown, never false/zero.
+Completeness explicitly separates list membership from field/detail availability.
+
+The **Заказ** button lists accepted activeCommissions records (up to 512); selection
+is explicit and checked against save-object and record identity on refresh. It
+reads only known instance fields and does not call a game selection method or
+change activeCommissionIndex. **Без заказа** clears the UI choice. Default is no
+selected order, even when the game has a current order. Selecting a different
+active/saved garment clears the order choice. The chosen index is supplied only
+to the inspection's context capture and normalization; standard raw exports retain
+the game's selected order. The optional inspection-order-reference.json describes
+the user's selected order. Neither choice nor displayed requirements constitutes
+an evaluated compliance verdict or proves the garment was made for that order.
+
+**Сохранить отчёт** saves the exact cached Russian card text as a uniquely named
+UTF-8 text file under BepInEx/config/DressmakerCritic/reports/. It performs no new
+game reads and preserves the inspection's timestamp/source. If no garment snapshot
+has been inspected, it reports that inspection is required first. Diagnostic export
+also adds inspection-report.txt alongside optional inspected-garment.json, using
+the same cached text. No old source captures are rewritten. File errors appear in
+the card/log. No garment comparison feature or comparison-specific state exists.
+
+80 offline checks pass: previous real capture regressions plus accepted-order list,
+identity/stale-save refusal, no automatic selection, Russian detail/unknown output.
+The existing schemas/real exported snapshots are unchanged. New live order-choice,
+report-file and IMGUI/Cyrillic layout paths still require in-game checking; the
+cloud environment has no proprietary game assemblies. Saved-history access from
+v0.4.1 also remains unverified until the game provides those records.
+
+A short smoke check can use an existing garment: choose it, choose an accepted
+order explicitly, confirm its requirements, save the text report, then switch
+between current/saved garments and verify order selection resets. Check scroll,
+Cyrillic glyphs, narrow screens, file output and existing export. No need to create
+another dress or repeat the nine-stage capture sequence.

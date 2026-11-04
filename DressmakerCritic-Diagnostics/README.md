@@ -225,3 +225,12 @@ or the game's thumbnail selection. Active switches back to the current design.
 Export after inspecting includes inspected-garment.json with the selected source;
 normal garment-snapshot.json remains the live active design. Free-design history
 outside completedQuests is not yet supported. See the card documentation for limits.
+
+### v0.5.0 русский интерфейс и подробный отчёт
+
+Карточка переведена на русский: панели и аксессуары перечислены отдельно,
+неизвестные значения и неполные списки отмечены явно. Заказ выбирается вручную
+кнопкой «Заказ»; при смене платья выбор сбрасывается. «Сохранить отчёт» пишет
+читаемый UTF-8 .txt в BepInEx/config/DressmakerCritic/reports/; диагностический
+экспорт также сохраняет inspection-report.txt после проверки. Сравнения платьев
+нет. Схемы исходных снимков и их обычный выбор заказа не изменены.

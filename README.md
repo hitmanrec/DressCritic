@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.4.1** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.5.0** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,9 +40,9 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.4.1`.
+2. Log should show `Dressmaker Critic Diagnostics 0.5.0`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
-4. Or use the **Export diagnostics** button (upper right) — each click creates  
+4. Or use the **Экспорт диагностики** button (upper right) — each click creates
    `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
 
 ### Pull captures into the repo
@@ -98,7 +98,7 @@ Version 0.3.2 also writes `progress-snapshot.json`: normalized accepted-order an
 
 ## Garment facts card (v0.4.0)
 
-Click **Inspect garment** in the upper-right corner, then **Refresh** after changes.
+Click **Проверить платье** in the upper-right corner, then **Обновить** after changes.
 The scrollable card shows the open active garment, construction progress, materials,
 accessories and current-order requirements as separate reference information.
 It does not compute compliance, game scores or visual quality. Finished active
@@ -107,8 +107,21 @@ exposes that garment as active. See [card usage and limits](docs/garment-card.md
 
 ### Saved garment selection (v0.4.1)
 
-In **Inspect garment**, choose **Saved dresses**, then an entry from completed-order
-history. The card shows its source explicitly. **Active** switches back to the
+In **Проверить платье**, choose **Сохранённые**, then an entry from completed-order
+history. The card shows its source explicitly. **Текущее** switches back to the
 current garment. Export after inspecting to include `inspected-garment.json`;
 `garment-snapshot.json` continues to describe activeDress, which may be a different
 object. Saved-history access still requires live verification.
+
+## Русская карточка и отчёт (v0.5.0)
+
+Нажмите **Проверить платье**. Доступны **Текущее**, **Сохранённые**, **Обновить**,
+**Заказ**, **Сохранить отчёт** и **Закрыть**. Заказ выбирается явно из принятых;
+при смене платья привязка сбрасывается. **Без заказа** убирает выбранный заказ.
+Карточка показывает каждую панель, ткани, готовность и известные детали аксессуаров,
+а также отдельно отмечает неизвестные и неполные данные. Сравнения платьев нет.
+
+Читаемые UTF-8 отчёты сохраняются в `BepInEx/config/DressmakerCritic/reports/`.
+Диагностический захват после проверки также содержит `inspection-report.txt`.
+Игровые названия предметов и заказов сохраняются как в данных игры;
+оценка красоты, игровые очки и вердикт о выполнении заказа пока не вычисляются.

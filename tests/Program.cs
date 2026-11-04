@@ -14,6 +14,7 @@ class Program
     static void Main(string[] args)
     {
         SavedDressTests.Run();
+        OrderChoiceTests.Run();
         CardTests.Run();
         SnapshotTests.Run(args);
         ProgressTests.Run();

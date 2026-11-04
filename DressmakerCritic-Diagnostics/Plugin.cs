@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.4.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.5.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed partial class Plugin : BaseUnityPlugin
     {
@@ -35,7 +35,7 @@ namespace DressmakerCritic.Diagnostics
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
             showInspectButton = Config.Bind("Interface", "ShowInspectButton", true,
                 "Show the read-only garment facts card button across scenes.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.4.1 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.5.0 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -107,13 +107,13 @@ namespace DressmakerCritic.Diagnostics
             try
             {
                 GUI.enabled = previousEnabled && Time.realtimeSinceStartup >= nextButtonExport;
-                if (showExportButton.Value && GUI.Button(new Rect(x, 12f, width, 36f), "Export diagnostics"))
+                if (showExportButton.Value && GUI.Button(new Rect(x, 12f, width, 36f), "Экспорт диагностики"))
                 {
                     nextButtonExport = Time.realtimeSinceStartup + 2f;
                     ExportFromButton();
                 }
                 GUI.enabled = previousEnabled;
-                if (showInspectButton != null && showInspectButton.Value && GUI.Button(new Rect(x, showExportButton.Value ? 52f : 12f, width, 36f), "Inspect garment")) RefreshGarmentCard();
+                if (showInspectButton != null && showInspectButton.Value && GUI.Button(new Rect(x, showExportButton.Value ? 52f : 12f, width, 36f), "Проверить платье")) RefreshGarmentCard();
                 if (showExportButton.Value && !string.IsNullOrEmpty(exportButtonStatus))
                     GUI.Box(new Rect(x, 92f, width, 76f), exportButtonStatus);
             }
@@ -135,6 +135,7 @@ namespace DressmakerCritic.Diagnostics
                     File.WriteAllText(Path.Combine(dir, "inspected-garment.json"), DiagnosticJson.Serialize(inspectedGarment));
                     if (inspectedProgress != null) File.WriteAllText(Path.Combine(dir, "inspection-order-reference.json"), DiagnosticJson.Serialize(inspectedProgress));
                 }
+                if (inspectedGarment != null) File.WriteAllText(Path.Combine(dir, "inspection-report.txt"), cardText, System.Text.Encoding.UTF8);
                 string snapshot = ExportSnapshot(dir);
                 string editor = ExportExploration(true, dir);
                 string types = ExportExploration(false, dir);
@@ -144,13 +145,13 @@ namespace DressmakerCritic.Diagnostics
                     File.Exists(Path.Combine(dir, "garment-snapshot.json")) &&
                     File.Exists(Path.Combine(dir, "context-runtime.json")) &&
                     File.Exists(Path.Combine(dir, "progress-snapshot.json"));
-                exportButtonStatus = (complete ? "Export complete" : "Partial export - see log") +
+                exportButtonStatus = (complete ? "Экспорт завершён" : "Частичный экспорт — см. журнал") +
                     "\nDressmakerCritic/captures/\n" + name;
                 Logger.LogInfo("Button export: " + dir + "\n" + snapshot + "\n" + editor + "\n" + types);
             }
             catch (Exception e)
             {
-                exportButtonStatus = "Export failed - see BepInEx log";
+                exportButtonStatus = "Ошибка экспорта — см. журнал BepInEx";
                 Logger.LogError(e);
             }
         }
@@ -191,8 +192,8 @@ namespace DressmakerCritic.Diagnostics
 
         private void ClearObservation(string scene)
         {
-            inspectedGarment = null; inspectedProgress = null; savedChoice = null; savedProgress = null; historyVisible = false;
-            cardText = "Game state changed. Press Refresh to inspect the open garment.";
+            inspectedGarment = null; inspectedProgress = null; savedChoice = null; savedProgress = null; historyVisible = false; selectedOrder = null; selectedOrderProgress = null; ordersVisible = false;
+            cardText = "Состояние игры изменилось. Нажмите «Обновить» для проверки выбранного платья.";
             recentEvents.Clear();
             lastGarment = null; lastFabric = null; lastEventUtc = null; lastEvent = null; lastVariant = 0;
             Logger.LogInfo("Scene loaded: " + scene + "; event observation cleared.");
@@ -308,7 +309,7 @@ namespace DressmakerCritic.Diagnostics
             catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }
         }
 
-        private static ContextRuntime CaptureContext(string time, string scene)
+        private static ContextRuntime CaptureContext(string time, string scene, int? explicitOrderIndex = null)
         {
             var result = new ContextRuntime { capturedAtUtc = time, scene = scene };
             Type type = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp")
@@ -322,7 +323,7 @@ namespace DressmakerCritic.Diagnostics
                 fabrics = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedFabrics")),
                 accessories = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedAccessories")) };
             var graph = new FieldSnapshot(4096);
-            object index = FieldSnapshot.ResolveFields(progress, "activeCommissionIndex");
+            object index = explicitOrderIndex.HasValue ? (object)explicitOrderIndex.Value : FieldSnapshot.ResolveFields(progress, "activeCommissionIndex");
             object selected = index is int ? FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), (int)index) : null;
             object definition = FieldSnapshot.ResolveFields(selected, "questDefinition");
             var requirements = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(definition, "completionRequirements"));

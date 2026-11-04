@@ -26,6 +26,6 @@ static class SavedDressTests
         var snapshot = new GarmentSnapshotBuilder(graph).Build("test", "test", "PlayerProgress.completedQuests[1].dress");
         Check(snapshot.garmentStatus == "available" && snapshot.source == "PlayerProgress.completedQuests[1].dress", "saved snapshot keeps real source provenance");
         string text = GarmentCardText.Build(snapshot, null);
-        Check(text.Contains("EXPLICITLY SELECTED SAVED GARMENT") && text.Contains("has not been linked"), "saved card cannot be mistaken for current garment/order pairing");
+        Check(text.Contains("ВЫБРАННОЕ СОХРАНЁННОЕ ПЛАТЬЕ") && text.Contains("Автоматической привязки нет"), "saved card cannot be mistaken for current garment/order pairing");
     }
 }
