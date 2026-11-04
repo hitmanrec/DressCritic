@@ -81,3 +81,11 @@ an optional unlockedInventory section for compact GUID/name membership, capped a
 512 per category; old raw graphs remain truncated at 32 and are reported as such.
 Focused tag roots precede quest recursion. New compact/focused live data is not
 verified by the older captures; all 53 offline checks pass.
+
+### Actual compact/focused export now verified
+
+Capture 20261104-125434-693-79d9b746 confirms complete compact lists and Elegant,
+Daywear, Simple requirement tags. See the latest section of the paired findings.
+59 checks pass, including exact structural parity between the live normalized
+file and offline reprocessing, plus schema validation of the real three snapshots.
+This establishes data extraction, not semantic brief interpretation or an evaluator.

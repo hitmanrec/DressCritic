@@ -60,3 +60,40 @@ compilation and the new compact/focused exports still require game validation.
 No repeat of the garment construction sequence is necessary. A subsequent ordinary
 capture with an accepted order is sufficient to validate compact membership and
 the focused tags when convenient.
+
+## v0.3.2 follow-up: tags and full compact membership verified
+
+Capture 20261104-125434-693-79d9b746 confirms the same selected Undercover Servant
+order, budget 250, and the following completion requirements:
+
+| Requirement | Comparison | Value |
+| --- | --- | --- |
+| QualityRequirement | AtLeast | 75 |
+| TagScoreRequirement: Elegant | AtLeast | 50 |
+| TagScoreRequirement: Daywear | AtLeast | 50 |
+| TagScoreRequirement: Simple | AtLeast | 25 |
+
+Tag GUIDs, in that order: e3723cd3ed274c344b83ea2199a13ef7,
+f28078b1b4d790c4b85bf48f2ce7b426, 3455b7ea5b6fbdc42bd1cf5014e9f04c.
+All four requirements have gated=false. These are deterministic game constraints,
+not an artistic brief or measurements of visual elegance, simplicity or quality.
+
+Compact inventory is complete for the declared lists: 72 patterns, 212 fabrics,
+182 accessories. Each category has exactly that many observed members, non-null
+GUIDs and no duplicate GUIDs. This is complete unlocked membership in this save,
+not proof of owned stock or executable/affordable editing operations. Matching
+runtime GUIDs to the static name-based catalog still needs verified mapping.
+
+The garment snapshot explicitly says absent in this capture. Therefore no
+order-compliance result can be produced from it. The earlier nine-stage garment
+is a different capture/session; it must not be silently paired with this order.
+Capture directory/timestamp is the context join boundary.
+
+The actual live progress-snapshot.json is structurally identical to the offline
+builder output from its accompanying context-runtime.json. All three new schema
+contracts validate the corresponding real files. The suite now has 59 passing
+checks, including regression coverage of complete membership and resolved tags.
+This confirms v0.3.2 compact and focused output in the real game. No repeat capture
+is required for these findings. Outstanding work: resolved brief/dialogue text,
+actual deterministic score observations, accessory detail/visual appearance,
+verified inventory-to-catalog mapping, and editor operation feasibility.
