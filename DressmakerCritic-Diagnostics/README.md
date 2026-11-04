@@ -190,3 +190,12 @@ new snapshot to its normal directory. It contains typed selected components,
 panels, fabric identities, accessory observations and construction flags, with
 explicit unknown/absent/truncated states. It uses the existing graph and adds no
 runtime scans. See [the contract and offline validation](../docs/garment-snapshot.md).
+
+### v0.3.1 guarded commission/unlock context
+
+Button and `critic-editor` exports now also write `context-runtime.json` (five files
+per button capture). It attempts only the known PlayerProgress._current backing
+field and refuses to read it if a static initializer exists. Available data is
+limited to current-commission fields and unlocked pattern/fabric/accessory lists.
+Blocked or absent progress is reported explicitly. Live access and semantic brief
+mapping remain unverified; [details and one-capture test](../docs/progress-context.md).

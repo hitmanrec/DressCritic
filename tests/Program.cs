@@ -14,6 +14,7 @@ class Program
     static void Main(string[] args)
     {
         SnapshotTests.Run(args);
+        ProgressTests.Run();
         var t = new Trap(); t.self = t;
         var n = new FieldSnapshot().Read(t);
         Check(n.children[0].status == "reference" && n.children[0].referenceId == n.id, "cycle identity; no getters, enumeration or ToString");

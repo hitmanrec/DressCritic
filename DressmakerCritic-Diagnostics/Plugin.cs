@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.3.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.3.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -32,7 +32,7 @@ namespace DressmakerCritic.Diagnostics
         {
             showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.3.0 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.3.1 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -130,7 +130,8 @@ namespace DressmakerCritic.Diagnostics
                 bool complete = File.Exists(Path.Combine(dir, "diagnostics.json")) &&
                     File.Exists(Path.Combine(dir, "editor-runtime.json")) &&
                     File.Exists(Path.Combine(dir, "runtime-types.json")) &&
-                    File.Exists(Path.Combine(dir, "garment-snapshot.json"));
+                    File.Exists(Path.Combine(dir, "garment-snapshot.json")) &&
+                    File.Exists(Path.Combine(dir, "context-runtime.json"));
                 exportButtonStatus = (complete ? "Export complete" : "Partial export - see log") +
                     "\nDressmakerCritic/captures/\n" + name;
                 Logger.LogInfo("Button export: " + dir + "\n" + snapshot + "\n" + editor + "\n" + types);
@@ -284,10 +285,40 @@ namespace DressmakerCritic.Diagnostics
                 {
                     var garment = new GarmentSnapshotBuilder(report.objects).Build(report.timeUtc, report.scene);
                     File.WriteAllText(Path.Combine(dir, "garment-snapshot.json"), DiagnosticJson.Serialize(garment));
+                    var contextReport = CaptureContext(report.timeUtc, report.scene);
+                    File.WriteAllText(Path.Combine(dir, "context-runtime.json"), DiagnosticJson.Serialize(contextReport));
                 }
-                return "Exported " + name + (editor ? " and garment-snapshot.json" : "");
+                return "Exported " + name + (editor ? " and garment-snapshot.json, context-runtime.json" : "");
             }
             catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }
+        }
+
+        private static ContextRuntime CaptureContext(string time, string scene)
+        {
+            var result = new ContextRuntime { capturedAtUtc = time, scene = scene };
+            Type type = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp")
+                .Select(a => a.GetType("PlayerProgress", false)).FirstOrDefault(t => t != null);
+            string status;
+            object progress = ProgressAccess.TryRead(type, out status);
+            result.progressAccessStatus = status;
+            if (progress == null) return result;
+            var graph = new FieldSnapshot(4096);
+            object index = FieldSnapshot.ResolveFields(progress, "activeCommissionIndex");
+            object selected = index is int ? FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), (int)index) : null;
+            foreach (var pair in new[] {
+                new { label = "PlayerProgress.selectedCommission.questDefinition", value = FieldSnapshot.ResolveFields(selected, "questDefinition") },
+                new { label = "PlayerProgress.selectedCommission", value = selected } })
+            {
+                var node = graph.Read(pair.value); node.member = pair.label; result.objects.Add(node);
+            }
+            foreach (string field in new[] { "activeCommissionIndex", "activeCommissions", "unlockedPatterns", "unlockedFabrics", "unlockedAccessories" })
+            {
+                if (graph.Exhausted) { result.note += " Graph budget exhausted."; break; }
+                var node = graph.Read(FieldSnapshot.ResolveFields(progress, field));
+                node.member = "PlayerProgress." + field;
+                result.objects.Add(node);
+            }
+            return result;
         }
 
         private static void AddFocused(Exploration report, FieldSnapshot graph, object root, string label, params string[] path)

@@ -47,7 +47,7 @@ namespace DressmakerCritic.Diagnostics
             var d = new TypeDescription { type = type.AssemblyQualifiedName };
             foreach (var t in Hierarchy(type))
             {
-                foreach (var f in t.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Take(64))
+                foreach (var f in t.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).OrderBy(f => f.IsStatic ? 1 : 0).Take(64))
                     d.fields.Add(t.FullName + "." + f.Name + ": " + f.FieldType.FullName + (f.IsStatic ? " [static; not read]" : ""));
                 foreach (var p in t.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Take(64))
                     d.properties.Add(t.FullName + "." + p.Name + ": " + p.PropertyType.FullName + " [not invoked]");
@@ -99,6 +99,17 @@ namespace DressmakerCritic.Diagnostics
             var result = new object[count];
             for (int i = 0; i < count; i++) result[i] = items.GetValue(i);
             return result;
+        }
+
+        public static object ListItemAt(object value, int index)
+        {
+            if (value == null || index < 0) return null;
+            Type type = value.GetType();
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(List<>)) return null;
+            var items = ResolveFields(value, "_items") as Array;
+            var size = ResolveFields(value, "_size");
+            if (items == null || !(size is int) || index >= (int)size || index >= items.Length) return null;
+            return items.GetValue(index);
         }
 
         public ValueNode Read(object value, int depth = 0)
