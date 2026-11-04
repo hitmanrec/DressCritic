@@ -18,6 +18,17 @@ static class SelectionProbeTests
         var evidence = SelectionProbe.Read(new Owner { selected = state }, progress, "fixture");
         Check(evidence.references.Single().matchingHistoryIndices.SequenceEqual(new[] {1}), "selector probe records exact state reference without invoking getters");
         Check(SelectionProbe.Read(new Owner(), progress, "fixture").references.Count == 0, "null states are never false history matches");
+        Check(HistoryImageBinding.FindState(progress, state) == 1, "display state resolves by exact unique history reference");
+        progress.completedQuests.Add(new Record { dress = state });
+        Check(HistoryImageBinding.FindState(progress, state) == null, "duplicate history state refuses binding");
+        progress.completedQuests.RemoveAt(2);
+        var mannequin = new object(); var previewTexture = new object();
+        Check(HistoryImageBinding.DisplayChain(state,state,mannequin,mannequin,previewTexture,previewTexture,true), "complete visible preview chain verifies identity");
+        Check(!HistoryImageBinding.DisplayChain(state,new object(),mannequin,mannequin,previewTexture,previewTexture,true) &&
+              !HistoryImageBinding.DisplayChain(state,state,new object(),mannequin,previewTexture,previewTexture,true) &&
+              !HistoryImageBinding.DisplayChain(state,state,mannequin,mannequin,previewTexture,new object(),true) &&
+              !HistoryImageBinding.DisplayChain(state,state,mannequin,mannequin,previewTexture,previewTexture,false) &&
+              !HistoryImageBinding.DisplayChain(state,state,null,null,previewTexture,previewTexture,true), "wrong state mannequin camera target and hidden preview refuse identity");
         string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
         string dir = Path.Combine(root, "tests/fixtures/capture-700");
         using (var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(dir, "identity-evidence.json"))))

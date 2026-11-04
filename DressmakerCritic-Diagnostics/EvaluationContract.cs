@@ -58,7 +58,7 @@ namespace DressmakerCritic.Diagnostics
             if (input.garment == null || input.garment.garmentStatus != "available") result.blockers.Add("garment-unavailable");
             if (input.images.Count == 0) result.blockers.Add("image-unavailable");
             if (input.images.Any(i => string.IsNullOrEmpty(i.file) || string.IsNullOrEmpty(i.sha256) || i.width < 1 || i.height < 1 || i.width > 2048 || i.height > 2048)) result.blockers.Add("image-metadata-incomplete");
-            if (input.images.Any(i => i.binding != "active-state-verified" && i.binding != "history-thumbnail-reference-verified")) result.blockers.Add("image-garment-identity-unverified");
+            if (input.images.Any(i => i.binding != "history-display-chain-verified" && i.binding != "active-state-verified" && i.binding != "history-thumbnail-reference-verified")) result.blockers.Add("image-garment-identity-unverified");
             if (input.order.association != "none: no order selected for evaluation" && input.order.definition == null) result.limitations.Add("explicit-order-unavailable");
             if (string.IsNullOrWhiteSpace(model)) result.blockers.Add("local-model-not-configured");
             if (input.order.association != "none: no order selected for evaluation" && input.order.brief.status != "verified-guid" && input.order.brief.status != "asset-key")
@@ -89,7 +89,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class CaptureManifest
     {
         public string schemaVersion = "1.0.0", captureId, startedAtUtc, finishedAtUtc;
-        public string pluginVersion = "0.8.0";
+        public string pluginVersion = "0.8.1";
         public bool complete;
         public List<CaptureStage> stages = new List<CaptureStage>();
         public List<CaptureFile> files = new List<CaptureFile>();

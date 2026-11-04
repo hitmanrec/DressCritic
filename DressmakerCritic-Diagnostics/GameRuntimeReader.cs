@@ -46,6 +46,12 @@ namespace DressmakerCritic.Diagnostics
         public int? declaredHistoryCount;
         public string progressAccessStatus;
     }
+    [Serializable] public sealed class DisplayBindingEvidence
+    {
+        public int? historyIndex, sketchbookId, displayDressId, assignedMannequinId, previewMannequinId, cameraId, cameraTargetId, viewerTextureId;
+        public bool visible, verified;
+        public string rule = "Unique exact history state + live display dress assigned to preview mannequin + preview camera target equals visible viewer texture";
+    }
     public static class GameRuntimeReader
     {
         public static Type GameType(string name) => AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp")
@@ -55,6 +61,31 @@ namespace DressmakerCritic.Diagnostics
             var type = GameType(name);
             if (type == null || !typeof(Component).IsAssignableFrom(type)) return new Component[0];
             return UnityEngine.Object.FindObjectsOfType(type, true).OfType<Component>().Where(c => c != null).ToArray();
+        }
+        public static DisplayBindingEvidence DisplayBinding(object progress, object selectedState = null)
+        {
+            var evidence = new DisplayBindingEvidence();
+            var books = Find("Sketchbook").Where(c => c.gameObject.activeInHierarchy).Take(2).ToArray();
+            var viewers = Find("OldDressView").Where(c => c.gameObject.activeInHierarchy).Take(2).ToArray();
+            if (books.Length != 1 || viewers.Length != 1) return evidence;
+            var book = books[0];
+            var dress = FieldSnapshot.ResolveFields(book, "_displayDress") as Component;
+            var mannequin = FieldSnapshot.ResolveFields(book, "previewMannequin") as Component;
+            var assigned = FieldSnapshot.ResolveFields(dress, "_assignedMannequin") as Component;
+            var camera = FieldSnapshot.ResolveFields(book, "dressPreviewCamera") as Camera;
+            var texture = FieldSnapshot.ResolveFields(FieldSnapshot.ResolveFields(viewers[0], "renderImage"), "m_Texture") as Texture;
+            var target = camera == null ? null : camera.targetTexture; // Unity camera API; no game property getter.
+            object state = FieldSnapshot.ResolveFields(dress, "state");
+            evidence.historyIndex = HistoryImageBinding.FindState(progress, state);
+            evidence.sketchbookId = book.GetInstanceID(); evidence.displayDressId = dress == null ? (int?)null : dress.GetInstanceID();
+            evidence.assignedMannequinId = assigned == null ? (int?)null : assigned.GetInstanceID();
+            evidence.previewMannequinId = mannequin == null ? (int?)null : mannequin.GetInstanceID();
+            evidence.cameraId = camera == null ? (int?)null : camera.GetInstanceID();
+            evidence.cameraTargetId = target == null ? (int?)null : target.GetInstanceID();
+            evidence.viewerTextureId = texture == null ? (int?)null : texture.GetInstanceID();
+            evidence.visible = dress != null && dress.gameObject.activeInHierarchy && mannequin != null && mannequin.gameObject.activeInHierarchy;
+            evidence.verified = evidence.historyIndex.HasValue && HistoryImageBinding.DisplayChain(state, selectedState ?? state, assigned, mannequin, texture, target, evidence.visible);
+            return evidence;
         }
         public static RuntimeEnvironment Environment() => new RuntimeEnvironment {
             gameVersion = Application.version, unityVersion = Application.unityVersion, platform = Application.platform.ToString(),

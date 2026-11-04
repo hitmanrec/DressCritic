@@ -110,6 +110,7 @@
             "enum": [
               "active-state-verified",
               "history-thumbnail-reference-verified",
+              "history-display-chain-verified",
               "unverified"
             ]
           },

@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -23,11 +23,11 @@ namespace DressmakerCritic.Diagnostics
         private volatile string status = "";
         private void Awake()
         {
-            savedRecord = Config.Bind("Selection", "SavedDressIndex", -2, "-2: exact verified viewer binding then active fallback; -1: active dress; otherwise zero-based completedQuests record index. Does not modify the game.");
+            savedRecord = Config.Bind("Selection", "SavedDressIndex", -2, "-2: unique display-state or thumbnail reference then active fallback; -1: active dress; otherwise zero-based completedQuests record index. Does not modify the game.");
             orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
-            Logger.LogInfo("Dressmaker Critic 0.8.0: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.8.1: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -70,7 +70,9 @@ namespace DressmakerCritic.Diagnostics
                     {
                         var viewers = GameRuntimeReader.Find("OldDressView").Where(v => v.gameObject.activeInHierarchy).Take(2).ToArray();
                         object texture = viewers.Length == 1 ? FieldSnapshot.ResolveFields(FieldSnapshot.ResolveFields(viewers[0], "renderImage"), "m_Texture") : null;
-                        selectedSaved = HistoryImageBinding.Find(progress, texture) ?? -1;
+                        var display = GameRuntimeReader.DisplayBinding(progress);
+                        capture.Write("display-binding.json", display);
+                        selectedSaved = display.historyIndex ?? HistoryImageBinding.Find(progress, texture) ?? -1;
                     }
                     if (selectedSaved < -1) throw new InvalidOperationException("Invalid saved dress index");
                     if (selectedSaved >= 0)
@@ -113,11 +115,18 @@ namespace DressmakerCritic.Diagnostics
                 capture.Stage("saved-garment-candidates", () => capture.Write("history-candidates.json", GameRuntimeReader.HistorySnapshots(progress, input.capturedAtUtc, SceneManager.GetActiveScene().name, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"))));
                 capture.Stage("viewer-selection-probe", () => capture.Write("viewer-selection.json", GameRuntimeReader.SelectionProbe(progress)));
                 capture.Stage("images", () => {
+                    var beforeDisplay = GameRuntimeReader.DisplayBinding(progress, state);
                     var visual = GameImageCapture.Capture(capture.directory, manager, state, selectedSaved >= 0 || state == null, FieldSnapshot.ResolveFields(selectedRecord, "thumbnailTex") as Texture);
+                    var afterDisplay = GameRuntimeReader.DisplayBinding(progress, state);
+                    capture.Write("display-binding-after-image.json", afterDisplay);
+                    bool displayVerified = selectedSaved >= 0 && beforeDisplay.verified && afterDisplay.verified &&
+                        beforeDisplay.historyIndex == selectedSaved && afterDisplay.historyIndex == selectedSaved &&
+                        beforeDisplay.displayDressId == afterDisplay.displayDressId && beforeDisplay.cameraId == afterDisplay.cameraId &&
+                        beforeDisplay.viewerTextureId == afterDisplay.viewerTextureId;
                     input.limitations.Add(visual.metadata.uiStatus); input.limitations.Add(visual.metadata.viewsStatus);
                     foreach (string file in visual.metadata.files)
                         input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)), width = visual.metadata.width, height = visual.metadata.height,
-                            source = visual.metadata.source, binding = visual.directActiveBinding ? "active-state-verified" : visual.exactHistoryTexture && FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") is bool && !(bool)FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") && ReferenceEquals(FieldSnapshot.ResolveFields(selectedRecord, "dress"), state) ? "history-thumbnail-reference-verified" : "unverified" });
+                            source = visual.metadata.source, binding = displayVerified ? "history-display-chain-verified" : visual.directActiveBinding ? "active-state-verified" : visual.exactHistoryTexture && FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") is bool && !(bool)FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") && ReferenceEquals(FieldSnapshot.ResolveFields(selectedRecord, "dress"), state) ? "history-thumbnail-reference-verified" : "unverified" });
                     object afterState = selectedSaved >= 0 ? FieldSnapshot.ResolveFields(selectedRecord, "dress") : FieldSnapshot.ResolveFields(manager, "activeDress", "state");
                     var afterRoots = GameRuntimeReader.GarmentGraph(afterState, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
                     var after = new GarmentSnapshotBuilder(afterRoots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
