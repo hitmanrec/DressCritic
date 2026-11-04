@@ -194,3 +194,14 @@ Next verification: a single capture at the mannequin should first show whether
 any loaded.Dress or loaded.PatternPanel objects exist and have populated state.
 If no live objects appear, use the expanded type metadata and shallow scene roots
 to choose the next evidence-based access path. v0.2.3 is not yet game-validated.
+
+## Full nine-stage v0.2.3 workflow
+
+The captures in commit 04a94ed confirm actual dress state from cutting onward,
+14 panel assignments and construction flags, 7 accessory entries, and distinct
+sewingComplete/finished transitions. They also show duplicated loaded objects on
+the photo screen. See [the full evidence table and limitations](nine-stage-findings.md)
+and the reproducible offline summary in `nine-stage-analysis.json`. This supersedes
+any inference that a null activeDress in the earlier empty-editor captures meant
+that the field path was unusable. No plugin update or repeat of the nine-stage
+session is required for this analysis.

@@ -1,0 +1,1560 @@
+{
+  "analysisVersion": "1.0.0",
+  "sourceSchema": "0.2.0",
+  "notice": "Derived offline evidence, not a normalized live-game contract. Unknown scalar values stay null; graph limits still apply.",
+  "captures": [
+    {
+      "step": 1,
+      "userStage": "Main screen",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-121624-528-9eb760a5",
+      "timeUtc": "2026-11-04T12:16:24.5355960Z",
+      "unityScene": "PatternCutting",
+      "screen": "FrontDesk",
+      "dressStateStatus": "null",
+      "sewingComplete": null,
+      "finished": null,
+      "panelCount": null,
+      "observedPanelCount": 0,
+      "joinStateCount": null,
+      "accessoryCount": null,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "sleeveDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": null,
+          "prettyName": null
+        }
+      },
+      "panels": [],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {},
+        "placedOnMannequin": {},
+        "hasBeenStitched": {}
+      },
+      "limits": "Dress loaded=0, inspected up to 0. PatternPanel loaded=0, inspected up to 0. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 37,
+        "depth-limit": 294,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 2,
+      "userStage": "Dress design",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-121657-374-a582b085",
+      "timeUtc": "2026-11-04T12:16:57.3768641Z",
+      "unityScene": "PatternCutting",
+      "screen": "Sketchbook",
+      "dressStateStatus": "null",
+      "sewingComplete": null,
+      "finished": null,
+      "panelCount": null,
+      "observedPanelCount": 0,
+      "joinStateCount": null,
+      "accessoryCount": null,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "sleeveDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": null,
+          "prettyName": null
+        }
+      },
+      "panels": [],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {},
+        "placedOnMannequin": {},
+        "hasBeenStitched": {}
+      },
+      "limits": "Dress loaded=0, inspected up to 0. PatternPanel loaded=0, inspected up to 0. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 37,
+        "depth-limit": 294,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 3,
+      "userStage": "Cutting before cutting panels",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-121720-867-7446d013",
+      "timeUtc": "2026-11-04T12:17:20.8707651Z",
+      "unityScene": "PatternCutting",
+      "screen": "CuttingRoom",
+      "dressStateStatus": "fields",
+      "sewingComplete": "False",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 0,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        }
+      ],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "False": 14
+        },
+        "placedOnMannequin": {
+          "False": 14
+        },
+        "hasBeenStitched": {
+          "False": 14
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 142,
+        "depth-limit": 347,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 4,
+      "userStage": "Shop",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-121813-979-aec1a71f",
+      "timeUtc": "2026-11-04T12:18:13.9807840Z",
+      "unityScene": "PatternCutting",
+      "screen": "Store",
+      "dressStateStatus": "fields",
+      "sewingComplete": "False",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 0,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "False",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "0",
+          "fabricStatus": "null",
+          "fabricName": null,
+          "fabricGuid": null
+        }
+      ],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "False": 14
+        },
+        "placedOnMannequin": {
+          "False": 14
+        },
+        "hasBeenStitched": {
+          "False": 14
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 142,
+        "depth-limit": 348,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 5,
+      "userStage": "Different fabric and cut panels",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-122000-894-6f5474fd",
+      "timeUtc": "2026-11-04T12:20:00.8977817Z",
+      "unityScene": "PatternCutting",
+      "screen": "CuttingRoom",
+      "dressStateStatus": "fields",
+      "sewingComplete": "False",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 0,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "73.67648",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.9914",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.99973",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.95254",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "72.74872",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "71.72221",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "99.98385",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        }
+      ],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "True": 14
+        },
+        "placedOnMannequin": {
+          "False": 14
+        },
+        "hasBeenStitched": {
+          "False": 14
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 167,
+        "depth-limit": 366,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 6,
+      "userStage": "Mannequin",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-122006-727-a30a745d",
+      "timeUtc": "2026-11-04T12:20:06.7309975Z",
+      "unityScene": "PatternCutting",
+      "screen": "Mannequin",
+      "dressStateStatus": "fields",
+      "sewingComplete": "False",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 0,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "73.67648",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.9914",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.99973",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.95254",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "72.74872",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "71.72221",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "99.98385",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "False",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        }
+      ],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "True": 14
+        },
+        "placedOnMannequin": {
+          "False": 14
+        },
+        "hasBeenStitched": {
+          "False": 14
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 167,
+        "depth-limit": 366,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 7,
+      "userStage": "All panels placed, partially sewn",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-122108-178-1e6bac1a",
+      "timeUtc": "2026-11-04T12:21:08.1802581Z",
+      "unityScene": "PatternCutting",
+      "screen": "Mannequin",
+      "dressStateStatus": "fields",
+      "sewingComplete": "False",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 0,
+      "observedAccessoryCount": 0,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "73.67648",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "74.9914",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.99973",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.95254",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "72.74872",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "71.72221",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "99.98385",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "False",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        }
+      ],
+      "accessories": [],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "True": 14
+        },
+        "placedOnMannequin": {
+          "True": 14
+        },
+        "hasBeenStitched": {
+          "True": 7,
+          "False": 7
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 167,
+        "depth-limit": 366,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 8,
+      "userStage": "Sewn dress with accessories",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-122413-989-5c2e58b6",
+      "timeUtc": "2026-11-04T12:24:13.9959721Z",
+      "unityScene": "PatternCutting",
+      "screen": "Mannequin",
+      "dressStateStatus": "fields",
+      "sewingComplete": "True",
+      "finished": "False",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 7,
+      "observedAccessoryCount": 7,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "73.67648",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.9914",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.99973",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.95254",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "72.74872",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "71.72221",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "99.98385",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        }
+      ],
+      "accessories": [
+        {
+          "index": 0,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 1,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 2,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 3,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 4,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 5,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 6,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        }
+      ],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "True": 14
+        },
+        "placedOnMannequin": {
+          "True": 14
+        },
+        "hasBeenStitched": {
+          "True": 14
+        }
+      },
+      "limits": "Dress loaded=1, inspected up to 1. PatternPanel loaded=14, inspected up to 14. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 174,
+        "depth-limit": 369,
+        "field-limit": 2
+      }
+    },
+    {
+      "step": 9,
+      "userStage": "Photo of finished dress",
+      "source": "DressmakerCritic-Diagnostics/exports/captures/20261104-122434-315-f7e1a777",
+      "timeUtc": "2026-11-04T12:24:34.3196971Z",
+      "unityScene": "PatternCutting",
+      "screen": "Photo",
+      "dressStateStatus": "fields",
+      "sewingComplete": "True",
+      "finished": "True",
+      "panelCount": 14,
+      "observedPanelCount": 14,
+      "joinStateCount": 22,
+      "accessoryCount": 7,
+      "observedAccessoryCount": 7,
+      "components": {
+        "bodiceDefinition": {
+          "guid": "15bc11a6dfca0254594baa860a406627",
+          "prettyName": "Heart Princess Bodice"
+        },
+        "sleeveDefinition": {
+          "guid": "9de461db2f93fff4e82e83ce70720403",
+          "prettyName": ""
+        },
+        "collarDefinition": {
+          "guid": null,
+          "prettyName": null
+        },
+        "skirtDefinition": {
+          "guid": "dbd4e04582eb61f478df9a5f3a980ef7",
+          "prettyName": ""
+        }
+      },
+      "panels": [
+        {
+          "index": 0,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "73.67648",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 1,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.9914",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 2,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 3,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 4,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 5,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 6,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 7,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.99973",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 8,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "74.95254",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 9,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "72.74872",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 10,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "71.72221",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 11,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 12,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "99.98385",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        },
+        {
+          "index": 13,
+          "hasBeenCut": "True",
+          "placedOnMannequin": "True",
+          "hasBeenStitched": "True",
+          "grainQuality": "75",
+          "fabricStatus": "fields",
+          "fabricName": "Burlap",
+          "fabricGuid": "3906de95a21587e498bb922ba7058101"
+        }
+      ],
+      "accessories": [
+        {
+          "index": 0,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 1,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 2,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 3,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 4,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 5,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        },
+        {
+          "index": 6,
+          "placed": "True",
+          "definitionStatus": "depth-limit",
+          "definitionGuid": null,
+          "scale": "1"
+        }
+      ],
+      "panelFlagCounts": {
+        "hasBeenCut": {
+          "True": 14
+        },
+        "placedOnMannequin": {
+          "True": 14
+        },
+        "hasBeenStitched": {
+          "True": 14
+        }
+      },
+      "limits": "Dress loaded=2, inspected up to 2. PatternPanel loaded=28, inspected up to 28. Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. Graph budget available.",
+      "graphStatusCounts": {
+        "fields": 174,
+        "depth-limit": 377,
+        "field-limit": 2
+      }
+    }
+  ]
+}
