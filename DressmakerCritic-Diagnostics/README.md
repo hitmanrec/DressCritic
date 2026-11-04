@@ -181,3 +181,12 @@ capped at 8 dresses/32 panels; native search allocates its results before caps.
 Fallback component graphs are shallow. No game getters or static values are read.
 After updating, one mannequin capture is sufficient to check whether these objects
 exist. Inactive/historical objects are candidates, not authoritative current state.
+
+### v0.3.0 unified garment snapshot
+
+The export button now creates **four** files: the existing diagnostics plus
+`garment-snapshot.json`. `critic-editor` writes both the raw editor graph and this
+new snapshot to its normal directory. It contains typed selected components,
+panels, fabric identities, accessory observations and construction flags, with
+explicit unknown/absent/truncated states. It uses the existing graph and adds no
+runtime scans. See [the contract and offline validation](../docs/garment-snapshot.md).

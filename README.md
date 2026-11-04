@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.2.3** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.3.0** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.2.3`.
+2. Log should show `Dressmaker Critic Diagnostics 0.3.0`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the **Export diagnostics** button (upper right) — each click creates  
    `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
@@ -69,3 +69,11 @@ Do not commit the ModLoader ZIP/folder or game DLLs (see `.gitignore`).
 ## Remove
 
 Exit the game, then delete `BepInEx/plugins/DressmakerCritic/` (and optionally `BepInEx/config/DressmakerCritic/`).
+
+## Unified garment snapshot (v0.3.0)
+
+The export button now also saves `garment-snapshot.json` beside the three diagnostic
+files. `critic-editor` produces it too. This read-only normalized snapshot selects
+only `GameManager.activeDress.state`, resolves graph references, uses typed JSON
+booleans/numbers, and preserves unknowns and collection limits. It does not evaluate
+style or recommend changes. See [the snapshot contract](docs/garment-snapshot.md).

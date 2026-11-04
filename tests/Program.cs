@@ -11,8 +11,9 @@ class Trap : IEnumerable
 class Program
 {
     static void Check(bool ok, string label) { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); }
-    static void Main()
+    static void Main(string[] args)
     {
+        SnapshotTests.Run(args);
         var t = new Trap(); t.self = t;
         var n = new FieldSnapshot().Read(t);
         Check(n.children[0].status == "reference" && n.children[0].referenceId == n.id, "cycle identity; no getters, enumeration or ToString");

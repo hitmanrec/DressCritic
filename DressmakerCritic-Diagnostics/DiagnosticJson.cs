@@ -24,6 +24,11 @@ namespace DressmakerCritic.Diagnostics
             if (value is string text) { Quote(text, output); return; }
             if (value is bool flag) { output.Append(flag ? "true" : "false"); return; }
             if (value is int integer) { output.Append(integer.ToString(CultureInfo.InvariantCulture)); return; }
+            if (value is double number)
+            {
+                if (double.IsNaN(number) || double.IsInfinity(number)) throw new InvalidOperationException("Non-finite diagnostic number");
+                output.Append(number.ToString("R", CultureInfo.InvariantCulture)); return;
+            }
             Type type = value.GetType();
             bool list = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
             if (!list && (type.Assembly != typeof(DiagnosticJson).Assembly ||

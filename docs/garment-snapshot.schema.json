@@ -1,0 +1,359 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dressmakercritic:garment-snapshot:1.0.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "capturedAtUtc",
+    "unityScene",
+    "screen",
+    "source",
+    "garmentStatus",
+    "completeness",
+    "commissionStatus",
+    "unlockedInventoryStatus",
+    "visualAppearanceStatus",
+    "sewingComplete",
+    "finished",
+    "panelCount",
+    "accessoryCount",
+    "joinStateCount",
+    "panelsStatus",
+    "accessoriesStatus",
+    "components",
+    "panels",
+    "accessories"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "capturedAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unityScene": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "screen": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source": {
+      "const": "GameManager.activeDress.state"
+    },
+    "garmentStatus": {
+      "type": "string"
+    },
+    "completeness": {
+      "type": "string"
+    },
+    "commissionStatus": {
+      "const": "unknown"
+    },
+    "unlockedInventoryStatus": {
+      "const": "unknown"
+    },
+    "visualAppearanceStatus": {
+      "const": "not-captured"
+    },
+    "sewingComplete": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "finished": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "panelCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "accessoryCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "joinStateCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "panelsStatus": {
+      "enum": [
+        "complete",
+        "truncated",
+        "null",
+        "unavailable"
+      ]
+    },
+    "accessoriesStatus": {
+      "enum": [
+        "complete",
+        "truncated",
+        "null",
+        "unavailable"
+      ]
+    },
+    "components": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "panels": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/panel"
+      }
+    },
+    "accessories": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/accessory"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "required": [
+        "status",
+        "guid",
+        "prettyName"
+      ],
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "guid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prettyName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "coordinate": {
+      "type": "object",
+      "required": [
+        "status",
+        "x",
+        "y",
+        "z",
+        "w"
+      ],
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "x": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "y": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "z": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "w": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "slot",
+        "definition",
+        "variant"
+      ],
+      "properties": {
+        "slot": {
+          "enum": [
+            "bodice",
+            "sleeve",
+            "collar",
+            "skirt"
+          ]
+        },
+        "definition": {
+          "$ref": "#/$defs/identity"
+        },
+        "variant": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "skirtType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "collarType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "usesSleeves": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "detached": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "panel": {
+      "type": "object",
+      "required": [
+        "index",
+        "status",
+        "hasBeenCut",
+        "placedOnMannequin",
+        "hasBeenStitched",
+        "grainQuality",
+        "fabric",
+        "colorStatus"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string"
+        },
+        "hasBeenCut": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "placedOnMannequin": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "hasBeenStitched": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "grainQuality": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "grainQualityMeaning": {
+          "type": "string"
+        },
+        "fabric": {
+          "$ref": "#/$defs/identity"
+        },
+        "colorStatus": {
+          "const": "unknown"
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessory": {
+      "type": "object",
+      "required": [
+        "index",
+        "status",
+        "definition",
+        "placed",
+        "scale",
+        "placedPos",
+        "placedRot"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string"
+        },
+        "definition": {
+          "$ref": "#/$defs/identity"
+        },
+        "placed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "scale": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "placedPos": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "placedRot": {
+          "$ref": "#/$defs/coordinate"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
