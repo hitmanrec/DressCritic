@@ -1,0 +1,4 @@
+﻿Текстовые свидетельства; привязка к заказу не подтверждена.
+
+FrontDesk.nameText.TMPro.TMP_Text.m_text
+Rose

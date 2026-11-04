@@ -18,7 +18,7 @@
 [Info   :   BepInEx] Loading [Dressmaker Mods 0.7.8]
 [Info   :Dressmaker Mods] Startup patcher is active and matches this loader.
 [Info   :Dressmaker Mods] Dressmaker Mods 0.7.8 loaded (game 0.7.0, Unity 6000.3.4f1, WindowsPlayer).
-[Info   :Dressmaker Mods] Made automatic save backup C:\users\steamuser\Documents\Dressmaker Save Backups\Automatic-save-20261104-183721-d78275.zip.
+[Info   :Dressmaker Mods] Made automatic save backup C:\users\steamuser\Documents\Dressmaker Save Backups\Automatic-save-20261104-191304-416fe5.zip.
 [Info   :Dressmaker Mods] Deferred accessory loading enabled for 9 game methods.
 [Info   :Dressmaker Mods] Cutting-table layer-mask cache replaced 4 repeated calls.
 [Info   :Dressmaker Mods] Registered Modded fabric tag.
@@ -28,9 +28,9 @@
 [Info   :Dressmaker Mods] Registered 0 dress template(s) in 0.0 ms.
 [Info   :Dressmaker Mods] Registered 0 custom garment component(s) in 1.2 ms.
 [Info   :Dressmaker Mods] Registered 0 custom client(s), 0 commission(s), and 0 story dialogue(s) in 0.4 ms.
-[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 11.1 ms.
-[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.5.0]
-[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.5.0 loaded (read-only).
+[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 10.9 ms.
+[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.6.1]
+[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.6.1 loaded (read-only).
 [Message:   BepInEx] Chainloader startup complete
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: Splash; event observation cleared.
 [Info   :Dressmaker Critic Diagnostics] ModLoader content ready; use critic-status or critic-export in the console.
@@ -52,4 +52,36 @@
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Peasant Sleeve; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Pussybow Collar; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Flare Skirt; variant=0; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Cinched Keyhole Blouse; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Mermaid Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=VelvetHunter
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=VelvetHunter
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=VelvetHunter
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=VelvetHunter
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Cinched Keyhole Blouse; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Mermaid Skirt; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=SilkWineRed
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=SilkWineRed
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: TitleScreen; event observation cleared.
