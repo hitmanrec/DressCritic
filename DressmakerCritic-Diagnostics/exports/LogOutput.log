@@ -27,9 +27,9 @@
 [Info   :Dressmaker Mods] Registered 0 dress template(s) in 0.0 ms.
 [Info   :Dressmaker Mods] Registered 0 custom garment component(s) in 1.2 ms.
 [Info   :Dressmaker Mods] Registered 0 custom client(s), 0 commission(s), and 0 story dialogue(s) in 0.4 ms.
-[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 10.9 ms.
-[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.2.2]
-[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.2.2 loaded (read-only).
+[Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 11.0 ms.
+[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.2.3]
+[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.2.3 loaded (read-only).
 [Message:   BepInEx] Chainloader startup complete
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: Splash; event observation cleared.
 [Info   :Dressmaker Critic Diagnostics] ModLoader content ready; use critic-status or critic-export in the console.
@@ -48,18 +48,108 @@
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=No Collar; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Princess Skirt; variant=0; fabric=(none)
 [Warning:  HarmonyX] AccessTools.Field: Could not find field for type GameManager and name isInIntro
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121053-725-8a3b263c\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121053-725-8a3b263c
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121624-528-9eb760a5\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121624-528-9eb760a5
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121058-056-2b2a376c\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121058-056-2b2a376c
+[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Princess Heart Bodice; variant=0; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Butterfly Sleeve; variant=0; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Pencil Skirt; variant=0; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121657-374-a582b085\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121657-374-a582b085
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121102-515-1b1f3096\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121102-515-1b1f3096
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121720-867-7446d013\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121720-867-7446d013
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121813-979-aec1a71f\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-121813-979-aec1a71f
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122000-894-6f5474fd\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122000-894-6f5474fd
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122006-727-a30a745d\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122006-727-a30a745d
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122108-178-1e6bac1a\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122108-178-1e6bac1a
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122413-989-5c2e58b6\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122413-989-5c2e58b6
+Exported to BepInEx/config/DressmakerCritic/diagnostics.json
+Exported editor-runtime.json
+Exported runtime-types.json
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Princess Heart Bodice; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Pencil Skirt; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Critic Diagnostics] Garment event: PanelCreated; component=Butterfly Sleeve; variant=-1; fabric=(none)
+[Info   :Dressmaker Mods] Made automatic save backup C:\users\steamuser\Documents\Dressmaker Save Backups\Automatic-save-20261104-172430-1f7c42.zip.
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Princess Heart Bodice; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Pencil Skirt; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Garment event: FabricChanged; component=Butterfly Sleeve; variant=-1; fabric=Burlap
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122434-315-f7e1a777\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-122434-315-f7e1a777
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
 Exported editor-runtime.json
 Exported runtime-types.json
