@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "2.0.0",
+  "jury": [
+    {
+      "houseId": "harmony",
+      "status": "assessed",
+      "score": 6.5,
+      "remarks": [
+        "The color contrast between the deep red outer layer and the striped inner panels creates visual tension.",
+        "The central zigzag seam and decorative buttons add structural interest but risk overwhelming the silhouette."
+      ]
+    },
+    {
+      "houseId": "character",
+      "status": "assessed",
+      "score": 7.0,
+      "remarks": [
+        "The layered construction and contrasting fabrics suggest a dramatic, theatrical mood.",
+        "The feather and brooch accessories elevate the garment to a statement piece with narrative weight."
+      ]
+    },
+    {
+      "houseId": "avant_garde",
+      "status": "assessed",
+      "score": 6.0,
+      "remarks": [
+        "The juxtaposition of traditional dress elements with modern zigzag seam and bold color blocking is intentional.",
+        "The use of multiple fabric types and accessories leans into a curated, non-functional aesthetic."
+      ]
+    },
+    {
+      "houseId": "atelier",
+      "status": "assessed",
+      "score": 5.5,
+      "remarks": [
+        "The garment's proportions are balanced but the layered construction may appear bulky in real wear.",
+        "The visible seam and paneling suggest a complex construction that may not translate well to a standard dress form."
+      ]
+    }
+  ],
+  "limitations": [
+    "Only visible garment and supplied material facts; hidden views, real construction, originality across other dresses and unsupported editor actions are unknown."
+  ]
+}

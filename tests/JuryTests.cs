@@ -47,6 +47,8 @@ static class JuryTests
         Check(result.customerCompatibility.score==8 && result.summary.average==7,"customer compatibility never changes jury mean");
         string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
         Refuse(()=>JuryContract.ReadJury(File.ReadAllText(Path.Combine(root,"tests/fixtures/capture-804/jury-content.json")),"real-fixture"), "exact first Instruct response with copied placeholders is rejected");
+        var real = JuryContract.ReadJury(File.ReadAllText(Path.Combine(root,"tests/fixtures/capture-805/jury-content.json")),"real-success");
+        Check(real.summary.average == 6.25 && real.summary.spread == 1.5 && real.summary.divided == false && real.summary.verdict == "competent", "first successful real model response preserves votes and computes correct aggregate");
         string png=Path.Combine(root,"DressmakerCritic-Diagnostics/exports/captures/image-20261104-141507-684-23ac5b7e/image.png");
         byte[] bytes=File.ReadAllBytes(png);
         input.garment=new GarmentSnapshot{garmentStatus="available",source="PlayerProgress.completedQuests[SECRET_INDEX].dress"};

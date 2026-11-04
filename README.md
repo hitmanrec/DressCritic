@@ -85,3 +85,7 @@ Verify its base is the Instruct model. See [the variant findings](docs/CAPTURE-8
 The first Instruct reply completed in 10.9 seconds but copied the old prompt
 template verbatim. v0.8.5 removes answer examples, explicitly describes assessed
 votes, and rejects the observed placeholder strings. See [capture findings](docs/CAPTURE-804.md).
+
+First real four-house evaluation confirmed on a saved garment: mean **6.25/10**,
+17.3 seconds. This validates the end-to-end path on one example; quality and
+repeatability remain to be tested. See [findings and next priorities](docs/CAPTURE-805.md).
