@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.3**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.4**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -67,3 +67,17 @@ see [capture findings and next test](docs/CAPTURE-801.md).
 The first model reply exhausted its output budget without final JSON. v0.8.3
 requests `reasoning_effort=none`, rejects truncated/empty replies explicitly, and
 positions the JSON reader before parsing. See [the findings](docs/CAPTURE-802.md).
+
+The current model recipe explicitly selects **qwen3-vl:4b-instruct-q4_K_M**.
+The old `qwen3-vl:4b` tag resolves to Thinking weights; the no-thinking request
+option alone did not yield a final reply in the user's runtime. After updating,
+rebuild the existing alias (the config name stays unchanged):
+
+```bash
+ollama pull qwen3-vl:4b-instruct-q4_K_M
+ollama stop dresscritic-vision
+ollama create dresscritic-vision -f model/Modelfile
+ollama show --modelfile dresscritic-vision
+```
+
+Verify its base is the Instruct model. See [the variant findings](docs/CAPTURE-803.md).

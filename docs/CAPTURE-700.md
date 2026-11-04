@@ -42,7 +42,12 @@ false/null state matches. No full-game loop is needed.
 
 ## Concrete local model setup, independent of selection repair
 
-Start with **qwen3-vl:4b**, rather than filling VRAM with the largest possible model
+**Superseded model choice:** the original `qwen3-vl:4b` resolved to Thinking
+weights and repeatedly exhausted the response budget. Use the explicit Instruct
+recipe and commands in [CAPTURE-803.md](CAPTURE-803.md). The original findings below
+are retained as history; do not reinstall the old default tag.
+
+The original test started with **qwen3-vl:4b**, rather than filling VRAM with the largest possible model
 while the game runs. Official Ollama model page reports 3.3 GB, Q4_K_M weights plus
 vision projector; it requires Ollama **0.12.7 or later**. This is a starting choice
 for real evaluation testing, not a benchmark/quality claim on the user's GPU.
