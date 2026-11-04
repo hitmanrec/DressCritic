@@ -139,3 +139,12 @@ IMGUI does not guarantee blocking game-specific input handlers underneath the
 button; if click-through occurs, hide the overlay and use console commands until
 that integration is addressed. Screen-space placement and input behavior have not
 been validated against the proprietary game runtime in this environment.
+
+### v0.2.1 export-content fix
+
+The first five real button captures revealed that Unity's native serializer
+omitted nested diagnostic DTOs and lists. Version 0.2.1 uses a dedicated bounded
+DTO JSON writer; schema version remains 0.2.0. Existing uploaded captures remain
+untouched as evidence. After updating, first make one capture and check that
+`runtime`, `objects` and `types` are present in their respective files before
+recording a longer session. See the findings document for the exact limitations.

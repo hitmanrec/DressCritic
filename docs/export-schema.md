@@ -1,6 +1,6 @@
 # Export contract 0.2.0
 
-All three exports use Unity JsonUtility public-field DTOs, with `schemaVersion`
+All three exports use public-field DTOs and the bounded DiagnosticJson writer (since plugin v0.2.1), with `schemaVersion`
 `0.2.0`. Existing v0.1 files lack that field. Consumers must reject unsupported
 major/minor versions and handle missing optional fields. This is an exploratory
 schema, not a claim that the complete garment or commission has been resolved.

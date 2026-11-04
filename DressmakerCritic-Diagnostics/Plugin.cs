@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -32,7 +32,7 @@ namespace DressmakerCritic.Diagnostics
         {
             showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.0 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.1 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -164,7 +164,7 @@ namespace DressmakerCritic.Diagnostics
                 string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
                 Directory.CreateDirectory(dir);
                 string file = Path.Combine(dir, "diagnostics.json");
-                File.WriteAllText(file, JsonUtility.ToJson(report, true));
+                File.WriteAllText(file, DiagnosticJson.Serialize(report));
                 Logger.LogInfo("Read-only diagnostic snapshot written: " + file);
                 return "Exported to BepInEx/config/DressmakerCritic/diagnostics.json";
             }
@@ -229,7 +229,7 @@ namespace DressmakerCritic.Diagnostics
                 string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
                 Directory.CreateDirectory(dir);
                 string name = editor ? "editor-runtime.json" : "runtime-types.json";
-                File.WriteAllText(Path.Combine(dir, name), JsonUtility.ToJson(report, true));
+                File.WriteAllText(Path.Combine(dir, name), DiagnosticJson.Serialize(report));
                 return "Exported " + name;
             }
             catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }

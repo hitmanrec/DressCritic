@@ -64,3 +64,46 @@ unlocked inventory. Unknown unlocks/constraints must remain unknown and block
 recommendations requiring them. Join future observations to catalog IDs only after
 runtime identity mapping is verified. Raw field graphs are exploratory evidence,
 not a stable normalized garment/commission contract.
+
+## Five real v0.2 button captures (2026-11-04)
+
+The five captures added in commit 9224471 span UTC 11:27:18–11:37:20.
+All report PatternCutting, game 0.7.0 and Unity 6000.3.4f1. Different editor
+screens therefore cannot be distinguished by scene name alone in this evidence.
+The log confirms the button invoked all three exporters for each capture.
+
+However, diagnostics.json omits `runtime`, editor-runtime.json omits `objects`
+and `types`, and runtime-types.json omits `types` and `objects` in **all five**
+captures. These are missing fields, not empty lists. Editor notes report graph
+budget exhaustion, showing traversal happened before serialization. v0.2 native
+Unity serialization failed to retain the custom nested DTOs in this runtime;
+the underlying native serializer/type compatibility reason is not established.
+The UI's file-existence success check consequently did not prove usable contents.
+
+v0.2.1 replaces native Unity serialization with a bounded writer restricted to
+our serializable diagnostic DTOs, strings, integers, booleans and exact List<T>.
+It writes null and empty collections explicitly and is tested using a separate
+JSON parser for nested graphs, metadata lists, reference IDs and escaped strings.
+No live game objects or arbitrary getters are traversed by the JSON writer.
+The schema stays 0.2.0 because this restores intended fields rather than changing
+the contract. Actual Unity/Mono execution of the replacement still needs testing.
+
+The log independently confirms:
+
+- Selection changes to Cinched Keyhole Blouse, Long Sleeve, Peter Pan Collar and
+  Pencil Skirt, each variant 0 at selection time.
+- PanelCreated events for those components with variant -1.
+- FabricChanged events with fabric LinenCoolGrey, also variant -1.
+
+Treat -1 as an observed sentinel with unknown semantics, not a valid catalog
+variant index. Event multiplicity does not establish panel identity/count: events
+can repeat during reconstruction. No color assignments, accessory placement,
+active commission or unlocked-pattern state can be recovered from these missing
+JSON payloads. Preserve the captures as regression evidence; do not fabricate
+replacement runtime values from the log.
+
+Next test: rebuild/install v0.2.1, confirm its version in the log, capture once
+before and after a garment/fabric change, and check that diagnostics.json contains
+`runtime.recentEvents` and graph roots, runtime-types.json contains `types`, and
+editor-runtime.json contains `objects`. Check limit statuses before making another
+long test sequence. The native array allocations and graph caps remain unchanged.

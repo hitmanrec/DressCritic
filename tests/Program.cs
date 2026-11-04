@@ -24,6 +24,20 @@ class Program
         Check(n.status == "depth-limit", "depth bound");
         var graph = new FieldSnapshot(); for(int i=0;i<512;i++) graph.Read(i);
         Check(graph.Read(t).status == "node-limit", "shared global node budget");
+        var escaped = "quotes\" slash\\ newline\n русский \ud83d\udc57";
+        var json = DiagnosticJson.Serialize(new FieldSnapshot().Read(new object[]{escaped, t}));
+        using (var document = System.Text.Json.JsonDocument.Parse(json))
+        {
+            var children = document.RootElement.GetProperty("children");
+            Check(children[0].GetProperty("value").GetString() == escaped, "JSON escaping round-trip");
+            Check(children[1].GetProperty("children")[0].GetProperty("status").GetString() == "reference", "nested graph fields survive JSON serialization");
+        }
+        var descriptions = new System.Collections.Generic.List<TypeDescription> { FieldSnapshot.Describe(typeof(Trap)) };
+        using (var document = System.Text.Json.JsonDocument.Parse(DiagnosticJson.Serialize(descriptions)))
+            Check(document.RootElement[0].GetProperty("properties").GetArrayLength() > 0, "type metadata lists survive JSON serialization");
+        bool refused = false;
+        try { DiagnosticJson.Serialize(t); } catch (InvalidOperationException) { refused = true; }
+        Check(refused, "JSON writer rejects live objects");
         Check(new FieldSnapshot().Read(null).status == "null", "unavailable object");
     }
 }
