@@ -19,6 +19,7 @@ static class PipelineTests
         public string response = Good;
         public HttpStatusCode status = HttpStatusCode.OK;
         public bool delay;
+        public string finishReason;
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellation)
         {
             calls++;
@@ -31,11 +32,12 @@ static class PipelineTests
             string json = await request.Content.ReadAsStringAsync();
             using (var doc = JsonDocument.Parse(json))
             {
+                Check(doc.RootElement.GetProperty("reasoning_effort").GetString() == "none", "request disables optional model reasoning to reserve output for final JSON");
                 var parts = doc.RootElement.GetProperty("messages")[1].GetProperty("content");
                 Check(parts.GetArrayLength() == 2 && parts[1].GetProperty("image_url").GetProperty("url").GetString().StartsWith("data:image/png;base64,"), "actual multimodal HTTP body includes image and machine facts");
                 Check(!parts[0].TryGetProperty("image_url", out _), "text request part omits null image fields");
             }
-            return new HttpResponseMessage(status) { Content = new StringContent(JsonSerializer.Serialize(new { choices = new[] { new { message = new { content = response } } } })) };
+            return new HttpResponseMessage(status) { Content = new StringContent(JsonSerializer.Serialize(new { choices = new[] { new { message = new { content = response, reasoning = "Fixture private analysis must never be used as an assessment." }, finish_reason = finishReason } } })) };
         }
     }
     class HistoryRecord { public object dress = new object(); public object thumbnailTex; public bool thumbnailDirty; }
@@ -78,6 +80,22 @@ static class PipelineTests
             string contextRequest = DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => image, EvaluationTask.Context));
             string contextResult = await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", contextRequest, input, CancellationToken.None, task: EvaluationTask.Context);
             Check(contextResult == JuryTests.UnknownContext, "separate HTTP context response uses context contract, never jury contract");
+            handler.response = ""; handler.finishReason = "length";
+            bool truncated = false;
+            try { await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None); }
+            catch (InvalidDataException e) { truncated = e.Message.Contains("token limit"); }
+            Check(truncated, "real capture empty final content with length finish is diagnosed before JSON parsing");
+            handler.response = Good; // Even apparently valid truncated output must be refused.
+            bool lengthRejected = false;
+            try { await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None); }
+            catch (InvalidDataException e) { lengthRejected = e.Message.Contains("token limit"); }
+            Check(lengthRejected, "truncated completion cannot become a successful assessment");
+            handler.response = ""; handler.finishReason = "stop";
+            bool emptyRejected = false;
+            try { await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None); }
+            catch (InvalidDataException e) { emptyRejected = e.Message.Contains("no final assessment"); }
+            Check(emptyRejected, "reasoning-only reply never supplies scores");
+            handler.finishReason = null;
             handler.response = "not JSON"; bool failed = false;
             try { await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None); } catch { failed = true; }
             Check(failed, "invalid model reply fails closed");

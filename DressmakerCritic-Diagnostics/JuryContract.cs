@@ -51,9 +51,12 @@ namespace DressmakerCritic.Diagnostics
             "Use at most one decimal. Each remarks array contains one or two short sentences, one sentence per item. No edit advice. Use unknown/null if evidence is insufficient.";
         internal static XElement Parse(string json)
         {
-            if (json == null || Encoding.UTF8.GetByteCount(json) > 65536) throw new InvalidDataException("Assessment size limit");
+            if (string.IsNullOrWhiteSpace(json) || Encoding.UTF8.GetByteCount(json) > 65536) throw new InvalidDataException("Assessment size limit");
             using (var reader = JsonReaderWriterFactory.CreateJsonReader(Encoding.UTF8.GetBytes(json), new XmlDictionaryReaderQuotas { MaxDepth = 16, MaxStringContentLength = 65536, MaxArrayLength = 65536 }))
+            {
+                reader.MoveToContent();
                 return XElement.Load(reader);
+            }
         }
         internal static void Members(XElement value, params string[] names)
         {

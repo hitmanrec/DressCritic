@@ -89,7 +89,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class CaptureManifest
     {
         public string schemaVersion = "1.0.0", captureId, startedAtUtc, finishedAtUtc;
-        public string pluginVersion = "0.8.2";
+        public string pluginVersion = "0.8.3";
         public bool complete;
         public List<CaptureStage> stages = new List<CaptureStage>();
         public List<CaptureFile> files = new List<CaptureFile>();

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace DressmakerCritic.Diagnostics
 {
     [DataContract] public sealed class ModelReplyMessage { [DataMember] public string content; }
-    [DataContract] public sealed class ModelReplyChoice { [DataMember] public ModelReplyMessage message; }
+    [DataContract] public sealed class ModelReplyChoice { [DataMember] public ModelReplyMessage message; [DataMember] public string finish_reason; }
     [DataContract] public sealed class ModelReplyEnvelope { [DataMember] public ModelReplyChoice[] choices; }
     public static class AssessmentValidator
     {
@@ -68,7 +68,10 @@ namespace DressmakerCritic.Diagnostics
                         response.EnsureSuccessStatusCode();
                         buffer.Position = 0;
                         var envelope = (ModelReplyEnvelope)new DataContractJsonSerializer(typeof(ModelReplyEnvelope)).ReadObject(buffer);
-                        string result = envelope?.choices?.FirstOrDefault()?.message?.content;
+                        var choice = envelope?.choices?.FirstOrDefault();
+                        if (choice?.finish_reason == "length") throw new InvalidDataException("Model output token limit reached; no complete assessment accepted. Use reasoning_effort=none for Ollama.");
+                        string result = choice?.message?.content;
+                        if (string.IsNullOrWhiteSpace(result)) throw new InvalidDataException("Model returned no final assessment content; reasoning is not an assessment.");
                         AssessmentValidator.Validate(result, input, task);
                         return result;
                     }

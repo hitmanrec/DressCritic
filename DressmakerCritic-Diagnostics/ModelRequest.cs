@@ -35,6 +35,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class ModelRequest
     {
         public string model;
+        public string reasoning_effort = "none";
         public double temperature = 0.2;
         public int max_tokens = 2048;
         public bool stream = false;

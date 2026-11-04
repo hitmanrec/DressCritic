@@ -22,6 +22,7 @@ static class JuryTests
     static void Refuse(Action action, string label) { bool failed=false;try{action();}catch{failed=true;}Check(failed,label); }
     public static void Run()
     {
+        Refuse(()=>JuryContract.ReadJury(" ","fixture"), "empty assessment rejected explicitly");
         var result = JuryContract.ReadJury(Good,"fixture");
         Check(result.jury.Count==4 && result.summary.average==7 && result.summary.verdict=="strong" && result.summary.divided==false, "four-house arithmetic mean and verdict computed by application");
         var divided=JuryContract.ReadJury(Reply(10,6,5,4),"fixture");
