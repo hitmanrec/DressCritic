@@ -143,7 +143,8 @@ fi
 
 if [[ "$KEEP_SOURCE" -eq 0 ]]; then
   clean_failed=0
-  for name in "${synced_names[@]:-}"; do
+  for name in "${synced_names[@]}"; do
+    [[ -n "$name" ]] || continue
     dest="$DEST_CAPTURES/$name"
     src="$SRC_CAPTURES/$name"
     if [[ ! -d "$dest" ]]; then
