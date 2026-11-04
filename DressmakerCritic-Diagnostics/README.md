@@ -1,4 +1,4 @@
-# Dressmaker Critic — Diagnostics 0.1 (experimental source)
+# Dressmaker Critic — Diagnostics 0.2 (experimental source)
 
 A **read-only diagnostic scaffold** for Dressmaker + Yuuma's Dressmaker ModLoader 0.7.8.
 No AI and no changes to dresses, commissions, or save files yet.
@@ -56,3 +56,54 @@ Exit the game and delete `BepInEx/plugins/DressmakerCritic/` and (optionally) `B
 - https://threadbox.cc/modloader/index.php/Mod_Loader/Plugin_lifecycle
 - https://threadbox.cc/modloader/index.php/Mod_Loader/Reference/API_index
 - https://www.nexusmods.com/dressmaker/mods/1
+
+## Diagnostics v0.2 — exploratory runtime exports
+
+Version 0.2 keeps `critic-status` and `critic-export` and adds:
+
+- `critic-types`: candidate game/loader type names, fields and property metadata,
+  written to `BepInEx/config/DressmakerCritic/runtime-types.json`.
+- `critic-editor`: bounded field graphs for game components in the active scene,
+  written to `BepInEx/config/DressmakerCritic/editor-runtime.json`.
+- `critic-export` now writes schema 0.2.0, recent event observations and field graphs
+  for the most recent garment/fabric event roots to the original diagnostics.json.
+
+All commands are read-only with respect to game state; only diagnostic files are
+written. They never invoke arbitrary getters or enumerate game collections.
+Legacy quest extraction used speculative property reads; v0.2 disables those
+reads and retains the legacy keys with explicitly unresolved summaries. See
+[findings and limits](../docs/runtime-findings.md) and [schema](../docs/export-schema.md).
+No evaluator, AI requests, screenshots or game asset copying are included.
+
+Build without installing: `bash build.sh "/actual/path/to/Dressmaker"`.
+Build and install: `bash build_and_install.sh "/actual/path/to/Dressmaker"`.
+Both work with paths containing spaces on Linux/Proton; use an authorized game
+installation and the appropriate Windows/Proton loader. Do not commit game DLLs.
+Run independent reflection safety tests from the repository root with
+`dotnet run --project tests/Introspection.Tests.csproj` (.NET 8 SDK).
+The plugin itself still targets net472. Safety tests do not verify Unity or loader APIs.
+
+### Next in-game test
+
+1. Exit the game, back up the save, build/install v0.2 and restart. Verify the log
+   identifies plugin 0.2.0 and registers all four commands without exceptions.
+2. At the title screen run all four commands. Confirm absent roots produce null
+   nodes and commands return gracefully. Copy outputs elsewhere before repeating:
+   filenames are overwritten on each successful export.
+3. Load a save with a known commission, enter PatternCutting, select known
+   components, variants, panel fabrics/colours and accessories through normal UI.
+   Run `critic-types`, `critic-editor`, `critic-export`. Record the UI choices
+   alongside the files and scene/time. Confirm observations correspond to choices;
+   do not interpret the last selection event as the whole garment.
+4. Change one UI choice at a time, repeat exports and compare field paths. Open the
+   commission/desk UI and repeat to locate brief text, identifiers and requirements.
+5. Repeat with saves having different known unlocks and inspect inventory/editor
+   fields versus the reference catalog. Do not unlock anything through diagnostics.
+6. Check references/limit statuses, responsiveness, scene transition clearing,
+   absent objects, and output sizes. Verify normal play and saving behave as before.
+   Review exports for private strings before sharing diagnostics.json,
+   runtime-types.json, editor-runtime.json and relevant log excerpts.
+
+The cloud environment lacks proprietary game assemblies: v0.2 has not been
+compiled against the real game or tested in-game. The steps above are required
+before treating it as verified. Never substitute fake game APIs for that check.

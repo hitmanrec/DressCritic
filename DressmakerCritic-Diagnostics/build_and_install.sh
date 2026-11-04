@@ -21,8 +21,7 @@ if ! command -v dotnet >/dev/null 2>&1; then
   exit 1
 fi
 
-dotnet build "$ROOT/DressmakerCritic.Diagnostics.csproj" -c Release \
-  "-p:DressmakerGameRoot=$GAME_DIR" -o "$ROOT/out"
+bash "$ROOT/build.sh" "$GAME_DIR"
 
 DEST="$GAME_DIR/BepInEx/plugins/DressmakerCritic"
 mkdir -p "$DEST"

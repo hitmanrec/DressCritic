@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dressmakercritic:runtime-export:0.2.0",
+  "title": "Dressmaker Critic exploratory runtime exports",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "timeUtc",
+    "scene"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.2.0"
+    },
+    "timeUtc": {
+      "type": "string"
+    },
+    "scene": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "status",
+        "commissionStatus",
+        "unlockedPatternsStatus",
+        "editorConstraintsStatus"
+      ],
+      "properties": {
+        "garmentObservation": {
+          "$ref": "#/$defs/node"
+        },
+        "fabricObservation": {
+          "$ref": "#/$defs/node"
+        },
+        "recentEvents": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "fields",
+          "properties",
+          "status"
+        ]
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "runtime"
+      ]
+    },
+    {
+      "required": [
+        "objects",
+        "types",
+        "note"
+      ]
+    }
+  ],
+  "$defs": {
+    "node": {
+      "type": "object",
+      "required": [
+        "status",
+        "children"
+      ],
+      "properties": {
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "member": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "referenceId": {
+          "type": "integer"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    }
+  }
+}
