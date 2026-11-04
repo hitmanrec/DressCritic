@@ -13,6 +13,7 @@ class Program
     static void Check(bool ok, string label) { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); }
     static void Main(string[] args)
     {
+        CardTests.Run();
         SnapshotTests.Run(args);
         ProgressTests.Run();
         ContextFixtureTests.Run(args);

@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.3.2** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.4.0** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.3.2`.
+2. Log should show `Dressmaker Critic Diagnostics 0.4.0`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the **Export diagnostics** button (upper right) — each click creates  
    `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
@@ -95,3 +95,12 @@ It reports why access was unavailable or blocked; it does not claim commission o
 unlock support is verified. See [the access contract](docs/progress-context.md).
 
 Version 0.3.2 also writes `progress-snapshot.json`: normalized accepted-order and unlocked-membership evidence. Six files are now produced per button capture. See [paired findings](docs/order-pair-findings.md).
+
+## Garment facts card (v0.4.0)
+
+Click **Inspect garment** in the upper-right corner, then **Refresh** after changes.
+The scrollable card shows the open active garment, construction progress, materials,
+accessories and current-order requirements as separate reference information.
+It does not compute compliance, game scores or visual quality. Finished active
+garments are supported; history/viewer compatibility depends on whether the game
+exposes that garment as active. See [card usage and limits](docs/garment-card.md).

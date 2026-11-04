@@ -208,3 +208,11 @@ and inventory membership with explicit completeness. Compact unlock IDs/names
 are capped at 512 per category; raw graphs keep their earlier limits. Focused
 requirement tag roots avoid deep recursion. Existing garment schemas are unchanged.
 See [the paired order findings](../docs/order-pair-findings.md).
+
+### v0.4.0 Inspect garment card
+
+**Inspect garment** opens a cached, scrollable facts card without writing files.
+Refresh reads the open active garment and progress once, with a two-second cooldown.
+Finished active garments work; unverified history/preview objects are never chosen
+automatically. Current-order requirements are reference information only; no
+compliance/visual score is computed. [Usage and live-test limits](../docs/garment-card.md).
