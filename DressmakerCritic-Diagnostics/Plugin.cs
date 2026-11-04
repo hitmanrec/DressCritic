@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Net.Http;
+using System.Threading;
 using BepInEx;
 using BepInEx.Configuration;
 using DressmakerMods;
@@ -11,413 +11,172 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.6.2")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.7.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
-    public sealed partial class Plugin : BaseUnityPlugin
+    public sealed class Plugin : BaseUnityPlugin
     {
-        private ModContext context;
-        private ConfigEntry<bool> showExportButton;
-        private ConfigEntry<bool> showInspectButton;
-        private string exportButtonStatus = "";
-        private float nextButtonExport;
-
-        private readonly Queue<EventObservation> recentEvents = new Queue<EventObservation>();
-        private object lastGarment;
-        private object lastFabric;
-        private string lastEventUtc;
-        private string lastEvent;
-        private int lastVariant;
-        private readonly List<IDisposable> registrations = new List<IDisposable>();
-
+        private ConfigEntry<int> savedRecord, orderIndex;
+        private ConfigEntry<string> model, endpoint;
+        private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
+        private IDisposable command;
+        private volatile bool busy;
+        private volatile string status = "";
         private void Awake()
         {
-            showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
-                "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            showInspectButton = Config.Bind("Interface", "ShowInspectButton", true,
-                "Show the read-only garment facts card button across scenes.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.6.2 loaded (read-only).");
-            try
-            {
-                context = ModLoaderApi.Register(this);
-                registrations.Add(ModLifecycleApi.WhenContentReady(context, () =>
-                    Logger.LogInfo("ModLoader content ready; use critic-status or critic-export in the console.")));
-                registrations.Add(ModLifecycleApi.Subscribe(context, ModLifecycleEvent.SceneLoaded, ev =>
-                    ClearObservation(ev.SceneName)));
-                registrations.Add(ModLifecycleApi.Subscribe(context, ModLifecycleEvent.SaveLoaded, ev =>
-                    ClearObservation("save loaded (slot suppressed)")));
-
-                foreach (GarmentEvent kind in new[] { GarmentEvent.Selected, GarmentEvent.PanelCreated, GarmentEvent.FabricChanged })
-                {
-                    registrations.Add(GarmentEventsApi.Subscribe(context, kind, ev =>
-                    {
-                        lastGarment = ev.Garment;
-                        lastFabric = ev.Fabric;
-                        lastVariant = ev.Variant;
-                        lastEvent = ev.Event.ToString();
-                        lastEventUtc = DateTime.UtcNow.ToString("O");
-                        recentEvents.Enqueue(new EventObservation { timeUtc = lastEventUtc, kind = lastEvent,
-                            componentName = ev.Garment == null ? null : ev.Garment.name,
-                            componentType = ev.Garment == null ? null : ev.Garment.GetType().AssemblyQualifiedName,
-                            variant = ev.Variant, fabricName = ev.Fabric == null ? null : ev.Fabric.name });
-                        while (recentEvents.Count > 32) recentEvents.Dequeue();
-                        string garmentName = ev.Garment == null ? "(none)" : ev.Garment.name;
-                        Logger.LogInfo("Garment event: " + ev.Event +
-                                       "; component=" + garmentName +
-                                       "; variant=" + ev.Variant +
-                                       "; fabric=" + (ev.Fabric == null ? "(none)" : ev.Fabric.name));
-                    }));
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Plugin initialization error: " + ex);
-            }
+            savedRecord = Config.Bind("Selection", "SavedDressIndex", -2, "-2: exact verified viewer binding then active fallback; -1: active dress; otherwise zero-based completedQuests record index. Does not modify the game.");
+            orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
+            model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
+            endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
+            Logger.LogInfo("Dressmaker Critic 0.7.0: evaluation pipeline; read-only game access.");
         }
-
         private void Start()
         {
-            try
-            {
-                registrations.Add(DebugConsoleApi.Register("critic-status", "Show Dressmaker Critic diagnostic status", _ =>
-                {
-                    string s = "Critic Diagnostics OK | scene=" + SceneManager.GetActiveScene().name +
-                        " | garment catalog=" + (File.Exists(GarmentCatalogPath()) ? "found" : "missing");
-                    Logger.LogInfo(s);
-                    return s;
-                }));
-                registrations.Add(DebugConsoleApi.Register("critic-export", "Export read-only diagnostic data to JSON", _ => ExportSnapshot()));
-                registrations.Add(DebugConsoleApi.Register("critic-types", "Export candidate runtime type/member metadata (no getters)", _ => ExportExploration(false)));
-                registrations.Add(DebugConsoleApi.Register("critic-editor", "Export bounded loaded-scene component fields", _ => ExportExploration(true)));
-                Logger.LogInfo("Commands registered: critic-status, critic-export, critic-types, critic-editor (console: Ctrl+`).");
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Could not register diagnostic console commands: " + ex);
-            }
+            command = DebugConsoleApi.Register("critic-export", "Capture one complete evaluation diagnostic package", _ => { BeginCapture(); return "Evaluation diagnostic capture started"; });
         }
-
-        // BepInEx keeps this plugin alive across scenes. IMGUI draws only;
-        // all reflection/file work is gated behind a deliberate button click.
         private void OnGUI()
         {
-            if (showExportButton == null) return;
-            float width = Math.Min(300f, Screen.width);
-            float x = Math.Max(0f, Screen.width - width - 12f);
-            bool previousEnabled = GUI.enabled;
+            bool previous = GUI.enabled;
             try
             {
-                GUI.enabled = previousEnabled && Time.realtimeSinceStartup >= nextButtonExport;
-                if (showExportButton.Value && GUI.Button(new Rect(x, 12f, width, 36f), "Экспорт диагностики"))
-                {
-                    nextButtonExport = Time.realtimeSinceStartup + 2f;
-                    ExportFromButton();
-                }
-                GUI.enabled = previousEnabled;
-                if (showInspectButton != null && showInspectButton.Value && GUI.Button(new Rect(x, showExportButton.Value ? 52f : 12f, width, 36f), "Проверить платье")) RefreshGarmentCard();
-                if (showExportButton.Value && !string.IsNullOrEmpty(exportButtonStatus))
-                    GUI.Box(new Rect(x, 92f, width, 76f), exportButtonStatus);
+                GUI.enabled = previous && !busy;
+                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 12, 300, 36), busy ? "Сбор пакета…" : "Диагностика оценщика")) BeginCapture();
+                if (!string.IsNullOrEmpty(status)) GUI.Label(new Rect(Math.Max(0, Screen.width - 412), 52, 400, 100), status);
             }
-            finally { GUI.enabled = previousEnabled; }
-            DrawGarmentCard();
+            finally { GUI.enabled = previous; }
         }
-
-        private void ExportFromButton()
+        private async void BeginCapture()
         {
+            if (busy) return;
+            busy = true; status = "Собираются данные, изображение и причины блокировки оценки.";
+            CaptureSession capture = null;
             try
             {
-                // Each click has its own directory: comparisons across screens are retained.
-                string name = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
-                string dir = Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", name);
-                Directory.CreateDirectory(dir);
-                // Preserve exactly what the user inspected, separately from live activeDress.
-                if (inspectedGarment != null)
-                {
-                    File.WriteAllText(Path.Combine(dir, "inspected-garment.json"), DiagnosticJson.Serialize(inspectedGarment));
-                    if (inspectedProgress != null) File.WriteAllText(Path.Combine(dir, "inspection-order-reference.json"), DiagnosticJson.Serialize(inspectedProgress));
-                }
-                if (inspectedGarment != null) File.WriteAllText(Path.Combine(dir, "inspection-report.txt"), cardText, System.Text.Encoding.UTF8);
-                string snapshot = ExportSnapshot(dir);
-                string editor = ExportExploration(true, dir);
-                string types = ExportExploration(false, dir);
-                bool complete = File.Exists(Path.Combine(dir, "diagnostics.json")) &&
-                    File.Exists(Path.Combine(dir, "editor-runtime.json")) &&
-                    File.Exists(Path.Combine(dir, "runtime-types.json")) &&
-                    File.Exists(Path.Combine(dir, "garment-snapshot.json")) &&
-                    File.Exists(Path.Combine(dir, "context-runtime.json")) &&
-                    File.Exists(Path.Combine(dir, "progress-snapshot.json"));
-                exportButtonStatus = (complete ? "Экспорт завершён" : "Частичный экспорт — см. журнал") +
-                    "\nDressmakerCritic/captures/\n" + name;
-                Logger.LogInfo("Button export: " + dir + "\n" + snapshot + "\n" + editor + "\n" + types);
-            }
-            catch (Exception e)
-            {
-                exportButtonStatus = "Ошибка экспорта — см. журнал BepInEx";
-                Logger.LogError(e);
-            }
-        }
-
-        private static string GarmentCatalogPath() =>
-            Path.Combine(Paths.ConfigPath, "DressmakerMods", "garment-reference.json");
-
-        private string ExportSnapshot(string directory = null)
-        {
-            try
-            {
-                var report = new Snapshot
-                {
-                    schemaVersion = "0.2.0",
-                    runtime = CaptureRuntime(),
-                    timeUtc = DateTime.UtcNow.ToString("O"),
-                    scene = SceneManager.GetActiveScene().name,
-                    unityVersion = Application.unityVersion,
-                    gameVersion = Application.version,
-                    garmentReferenceFound = File.Exists(GarmentCatalogPath()),
-                    questDefinitions = ReadQuestNames(),
-                    activeCommissionSummary = ReadActiveCommissions(),
-                    gameManagerSummary = ReadGameManager()
-                };
-                string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
-                Directory.CreateDirectory(dir);
-                string file = Path.Combine(dir, "diagnostics.json");
-                File.WriteAllText(file, DiagnosticJson.Serialize(report));
-                Logger.LogInfo("Read-only diagnostic snapshot written: " + file);
-                return "Exported to BepInEx/config/DressmakerCritic/diagnostics.json";
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-                return "Export failed; see BepInEx/LogOutput.log: " + ex.GetType().Name;
-            }
-        }
-
-        private void ClearObservation(string scene)
-        {
-            inspectedGarment = null; inspectedProgress = null; savedChoice = null; savedProgress = null; historyVisible = false; selectedOrder = null; selectedOrderProgress = null; ordersVisible = false;
-            cardText = "Состояние игры изменилось. Нажмите «Обновить» для проверки выбранного платья.";
-            recentEvents.Clear();
-            lastGarment = null; lastFabric = null; lastEventUtc = null; lastEvent = null; lastVariant = 0;
-            Logger.LogInfo("Scene loaded: " + scene + "; event observation cleared.");
-        }
-
-        private RuntimeReport CaptureRuntime()
-        {
-            var graph = new FieldSnapshot();
-            return new RuntimeReport {
-                recentEvents = recentEvents.ToList(),
-                lastEventUtc = lastEventUtc, lastEvent = lastEvent, lastVariant = lastVariant,
-                garmentObservation = graph.Read(lastGarment), fabricObservation = graph.Read(lastFabric)
-            };
-        }
-
-        private string ExportExploration(bool editor, string directory = null)
-        {
-            try
-            {
-                var report = new Exploration { timeUtc = DateTime.UtcNow.ToString("O"), scene = SceneManager.GetActiveScene().name };
-                if (editor)
-                {
-                    var graph = new FieldSnapshot(4096);
-                    var candidates = new List<Component>();
-                    var queue = new Queue<Transform>();
-                    // Unity returns the roots as an array; traversal after this allocation is bounded.
-                    foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects().Take(128)) queue.Enqueue(root.transform);
-                    int visited = 0;
-                    while (queue.Count > 0 && visited++ < 128)
+                string id = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                capture = new CaptureSession(Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", id), id);
+                var input = new EvaluationInput { captureId = id, capturedAtUtc = capture.manifest.startedAtUtc };
+                object progress = null, state = null, selectedRecord = null; Component manager = null;
+                string progressStatus = "not-read", source = "GameManager.activeDress.state";
+                string selectedModel = model.Value, selectedEndpoint = endpoint.Value;
+                int selectedSaved = savedRecord.Value, selectedOrder = orderIndex.Value;
+                int requestedSaved = selectedSaved;
+                capture.Stage("runtime", () => capture.Write("runtime.json", GameRuntimeReader.Environment()));
+                capture.Stage("selection-and-identity", () => {
+                    progress = ProgressAccess.TryRead(GameRuntimeReader.GameType("PlayerProgress"), out progressStatus);
+                    capture.Write("identity-evidence.json", GameRuntimeReader.Identity(progress, progressStatus));
+                    var managers = GameRuntimeReader.Find("GameManager");
+                    if (managers.Length != 1) throw new InvalidOperationException("GameManager count=" + managers.Length);
+                    manager = managers[0];
+                    if (selectedSaved == -2)
                     {
-                        var t = queue.Dequeue();
-                        foreach (var component in t.gameObject.GetComponents<Component>().Take(32))
-                            if (component != null && component.GetType().Assembly.GetName().Name == "Assembly-CSharp")
-                                if (candidates.Count < 256) candidates.Add(component);
-                        for (int i = 0; i < t.childCount && i < 64 && queue.Count < 128; i++) queue.Enqueue(t.GetChild(i));
+                        var viewers = GameRuntimeReader.Find("OldDressView").Where(v => v.gameObject.activeInHierarchy).Take(2).ToArray();
+                        object texture = viewers.Length == 1 ? FieldSnapshot.ResolveFields(FieldSnapshot.ResolveFields(viewers[0], "renderImage"), "m_Texture") : null;
+                        selectedSaved = HistoryImageBinding.Find(progress, texture) ?? -1;
                     }
-                    // Capture proven paths before generic graphs can consume the budget.
-                    var manager = candidates.FirstOrDefault(c => c.GetType().FullName == "GameManager");
-                    if (manager != null)
+                    if (selectedSaved < -1) throw new InvalidOperationException("Invalid saved dress index");
+                    if (selectedSaved >= 0)
                     {
-                        AddFocused(report, graph, manager, "GameManager.<CurrentScene>k__BackingField", "<CurrentScene>k__BackingField");
-                        AddFocused(report, graph, manager, "GameManager.<LastScene>k__BackingField", "<LastScene>k__BackingField");
-                        var state = FieldSnapshot.ResolveFields(manager, "activeDress", "state");
-                        var panels = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(state, "panelStates"));
-                        for (int i = 0; i < panels.Length && !graph.Exhausted; i++)
-                            AddFocused(report, graph, panels[i], "GameManager.activeDress.state.panelStates[" + i + "].fabric", "fabric");
-                        FocusedGarmentFields.AddAccessories(report.objects, graph, state, "GameManager.activeDress.state");
-                        AddFocused(report, graph, manager, "GameManager.activeDress.state", "activeDress", "state");
-                        AddFocused(report, graph, manager, "GameManager.proposedQuest", "proposedQuest");
+                        var record = FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "completedQuests"), selectedSaved);
+                        if (record == null) throw new InvalidOperationException("Selected history record unavailable: " + selectedSaved);
+                        selectedRecord = record; state = FieldSnapshot.ResolveFields(record, "dress"); source = "PlayerProgress.completedQuests[" + selectedSaved + "].dress";
                     }
-                    // These types/instance fields are proven by the uploaded metadata.
-                    // Native search excludes assets and includes inactive loaded scene objects;
-                    // array allocation is not bounded, but inspection is capped on explicit export.
-                    foreach (string typeName in new[] { "Dress", "PatternPanel" })
+                    else state = FieldSnapshot.ResolveFields(manager, "activeDress", "state");
+                    capture.Write("selection.json", new SelectionDiagnostic { requestedSavedIndex = requestedSaved, resolvedSavedIndex = selectedSaved,
+                        requestedOrderIndex = selectedOrder, source = source, progressStatus = progressStatus, stateType = state?.GetType().FullName });
+                });
+                capture.Stage("garment", () => {
+                    var roots = GameRuntimeReader.GarmentGraph(state, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
+                    capture.Write("garment-raw.json", roots);
+                    input.garment = new GarmentSnapshotBuilder(roots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
+                    input.assetNames = GameRuntimeReader.AssetNames(state);
+                    capture.Write("garment.json", input.garment);
+                });
+                if (selectedOrder >= 0) input.order.association = "explicit accepted-order index " + selectedOrder;
+                capture.Stage("orders-and-inventory", () => {
+                    var context = RuntimeContextCapture.Capture(GameRuntimeReader.GameType("PlayerProgress"), input.capturedAtUtc, SceneManager.GetActiveScene().name, selectedOrder >= 0 ? (int?)selectedOrder : null);
+                    capture.Write("order-raw.json", context);
+                    var normalized = ProgressSnapshotBuilder.Build(context, selectedOrder >= 0 ? (int?)selectedOrder : null);
+                    capture.Write("order.json", normalized);
+                    capture.Write("inventory.json", normalized.unlocked);
+                    if (selectedOrder >= 0)
                     {
-                        Type gameType = AppDomain.CurrentDomain.GetAssemblies()
-                            .Where(a => a.GetName().Name == "Assembly-CSharp")
-                            .Select(a => a.GetType(typeName, false)).FirstOrDefault(t => t != null);
-                        if (gameType == null || !typeof(Component).IsAssignableFrom(gameType)) continue;
-                        var loaded = UnityEngine.Object.FindObjectsOfType(gameType, true);
-                        int count = Math.Min(loaded.Length, typeName == "Dress" ? 8 : 32);
-                        for (int i = 0; i < count && !graph.Exhausted; i++)
+                        input.order.association = "explicit accepted-order index " + selectedOrder;
+                        if (normalized.orderStatus != "selected") throw new InvalidOperationException("Explicit order unavailable");
+                        input.order.definition = normalized.order; input.order.budget = normalized.budget;
+                        input.order.deterministicRequirements = normalized.completionRequirements;
+                        var record = FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), selectedOrder);
+                        var definition = FieldSnapshot.ResolveFields(record, "questDefinition") as UnityEngine.Object;
+                        input.order.brief = EvaluationBrief.From(BriefReferenceCatalog.Bundled.Find(normalized.order?.guid, definition == null ? null : definition.name, normalized.order?.prettyName, Application.version));
+                    }
+                });
+                capture.Stage("targeted-api-metadata", () => capture.Write("targeted-api.json", GameRuntimeReader.Metadata()));
+                capture.Stage("images", () => {
+                    if (state == null || manager == null) throw new InvalidOperationException("No selected garment state");
+                    var visual = GameImageCapture.Capture(capture.directory, manager, state, selectedSaved >= 0, FieldSnapshot.ResolveFields(selectedRecord, "thumbnailTex") as Texture);
+                    input.limitations.Add(visual.metadata.uiStatus); input.limitations.Add(visual.metadata.viewsStatus);
+                    foreach (string file in visual.metadata.files)
+                        input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)), width = visual.metadata.width, height = visual.metadata.height,
+                            source = visual.metadata.source, binding = visual.directActiveBinding ? "active-state-verified" : visual.exactHistoryTexture && FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") is bool && !(bool)FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") && ReferenceEquals(FieldSnapshot.ResolveFields(selectedRecord, "dress"), state) ? "history-thumbnail-reference-verified" : "unverified" });
+                    object afterState = selectedSaved >= 0 ? FieldSnapshot.ResolveFields(selectedRecord, "dress") : FieldSnapshot.ResolveFields(manager, "activeDress", "state");
+                    var afterRoots = GameRuntimeReader.GarmentGraph(afterState, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
+                    var after = new GarmentSnapshotBuilder(afterRoots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
+                    if (!ReferenceEquals(afterState, state) || DiagnosticJson.Serialize(after) != DiagnosticJson.Serialize(input.garment))
+                    {
+                        foreach (var image in input.images) image.binding = "unverified";
+                        input.limitations.Add("garment-state-changed-during-render");
+                        capture.Write("garment-after-render.json", after);
+                    }
+                });
+                bool backendValid = capture.Stage("backend-configuration", () => capture.Write("backend.json", new BackendDiagnostic {
+                    model = selectedModel, endpoint = LocalEvaluator.ValidateEndpoint(selectedEndpoint).AbsoluteUri,
+                    configured = !string.IsNullOrWhiteSpace(selectedModel) }));
+                capture.Write("evaluation-input.json", input);
+                capture.manifest.readiness = EvaluationReadiness.Check(input, selectedModel);
+                if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
+                capture.Write("readiness.json", capture.manifest.readiness);
+                capture.Write("manifest.json", capture.manifest);
+                // All Unity reads/rendering above run synchronously on the game thread.
+                // Only local HTTP and file I/O run after this await; no background game scans.
+                if (backendValid)
+                {
+                    await capture.StageAsync("local-server-metadata", async () => {
+                        using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
+                        using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(3) })
+                        using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
                         {
-                            var component = loaded[i] as Component;
-                            if (component == null) continue;
-                            string label = "loaded." + typeName + "[" + i + "]";
-                            report.objects.Add(new ValueNode { member = label + ".scene", type = "System.String",
-                                value = component.gameObject.scene.name, status = "scalar" });
-                            AddFocused(report, graph, component, label + ".state", "state");
-                            if (typeName == "PatternPanel")
-                            {
-                                AddFocused(report, graph, component, label + ".state.fabric", "state", "fabric");
-                                AddFocused(report, graph, component, label + ".definition", "definition");
-                            }
+                            timeout.CancelAfter(TimeSpan.FromSeconds(3));
+                            string metadata = await LocalEvaluator.Probe(client, selectedEndpoint, timeout.Token);
+                            File.WriteAllText(Path.Combine(capture.directory, "local-models.json"), metadata);
                         }
-                        report.note += typeName + " loaded=" + loaded.Length + ", inspected up to " + count + ". ";
-                    }
-                    foreach (var component in candidates.OrderBy(c => c.GetType().FullName == "GameManager" ? 0 : Candidate(c.GetType().Name) ? 1 : 2))
-                    {
-                        if (graph.Exhausted) break;
-                        report.objects.Add(graph.Read(component, FieldSnapshot.MaxDepth - 1));
-                    }
-                    report.note += "Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. " +
-                        "Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. " +
-                        "Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. " +
-                        (graph.Exhausted ? "Graph budget exhausted." : "Graph budget available.");
+                    });
                 }
-                else
+                if (capture.manifest.readiness.canEvaluate)
                 {
-                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp" || a.GetName().Name == "DressmakerMods"))
-                    {
-                        Type[] types;
-                        try { types = assembly.GetTypes(); }
-                        catch (ReflectionTypeLoadException e) { types = e.Types.Where(t => t != null).ToArray(); report.note = "Partial type load."; }
-                        foreach (var type in types.OrderBy(t => t.FullName).Where(t => Candidate(t.Name)).Take(128))
-                            report.types.Add(FieldSnapshot.Describe(type));
-                    }
-                    report.note += " Metadata only; at most 128 candidate types per assembly. Static values and property getters are never read.";
+                    await capture.StageAsync("local-inference", async () => {
+                        var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)));
+                        string json = DiagnosticJson.Serialize(request);
+                        capture.Write("request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
+                            requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
+                        using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
+                        using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) })
+                        using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
+                        {
+                            timeout.CancelAfter(TimeSpan.FromSeconds(90));
+                            string assessment = await LocalEvaluator.Run(client, selectedEndpoint, json, input, timeout.Token,
+                                response => File.WriteAllText(Path.Combine(capture.directory, "model-response.json"), response));
+                            File.WriteAllText(Path.Combine(capture.directory, "assessment.json"), assessment);
+                        }
+                    });
                 }
-                string dir = directory ?? Path.Combine(Paths.ConfigPath, "DressmakerCritic");
-                Directory.CreateDirectory(dir);
-                string name = editor ? "editor-runtime.json" : "runtime-types.json";
-                File.WriteAllText(Path.Combine(dir, name), DiagnosticJson.Serialize(report));
-                if (editor)
-                {
-                    var garment = new GarmentSnapshotBuilder(report.objects).Build(report.timeUtc, report.scene);
-                    File.WriteAllText(Path.Combine(dir, "garment-snapshot.json"), DiagnosticJson.Serialize(garment));
-                    var contextReport = CaptureContext(report.timeUtc, report.scene);
-                    File.WriteAllText(Path.Combine(dir, "context-runtime.json"), DiagnosticJson.Serialize(contextReport));
-                    File.WriteAllText(Path.Combine(dir, "progress-snapshot.json"), DiagnosticJson.Serialize(ProgressSnapshotBuilder.Build(contextReport)));
-                }
-                return "Exported " + name + (editor ? " and garment-snapshot.json, context-runtime.json, progress-snapshot.json" : "");
+                else capture.manifest.stages.Add(new CaptureStage { name = "local-inference", status = "blocked", detail = string.Join(",", capture.manifest.readiness.blockers) });
+                status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этап local-inference в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
             }
-            catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }
-        }
-
-        private static ContextRuntime CaptureContext(string time, string scene, int? explicitOrderIndex = null)
-        {
-            var result = new ContextRuntime { capturedAtUtc = time, scene = scene };
-            Type type = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp")
-                .Select(a => a.GetType("PlayerProgress", false)).FirstOrDefault(t => t != null);
-            string status;
-            object progress = ProgressAccess.TryRead(type, out status);
-            result.progressAccessStatus = status;
-            if (progress == null) return result;
-            result.unlockedInventory = new UnlockedInventory {
-                patterns = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedPatterns")),
-                fabrics = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedFabrics")),
-                accessories = ProgressSnapshotBuilder.CaptureMembership(FieldSnapshot.ResolveFields(progress, "unlockedAccessories")) };
-            var graph = new FieldSnapshot(4096);
-            object index = explicitOrderIndex.HasValue ? (object)explicitOrderIndex.Value : FieldSnapshot.ResolveFields(progress, "activeCommissionIndex");
-            object selected = index is int ? FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), (int)index) : null;
-            object definition = FieldSnapshot.ResolveFields(selected, "questDefinition");
-            var requirements = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(definition, "completionRequirements"));
-            for (int i = 0; i < requirements.Length && !graph.Exhausted; i++)
+            catch (Exception e) { status = "Сбой сбора: " + e.GetType().Name; Logger.LogError(e); }
+            finally
             {
-                var requirement = requirements[i];
-                if (requirement == null || requirement.GetType().FullName != "TagScoreRequirement") continue;
-                var tag = graph.Read(FieldSnapshot.ResolveFields(requirement, "tag"));
-                tag.member = "PlayerProgress.selectedCommission.completionRequirements[" + i + "].tag";
-                result.objects.Add(tag);
+                try { capture?.Finish(); } catch (Exception e) { Logger.LogError(e); }
+                busy = false;
             }
-            foreach (var pair in new[] {
-                new { label = "PlayerProgress.selectedCommission.questDefinition", value = FieldSnapshot.ResolveFields(selected, "questDefinition") },
-                new { label = "PlayerProgress.selectedCommission", value = selected } })
-            {
-                var node = graph.Read(pair.value); node.member = pair.label; result.objects.Add(node);
-            }
-            foreach (string field in new[] { "activeCommissionIndex", "activeCommissions", "unlockedPatterns", "unlockedFabrics", "unlockedAccessories" })
-            {
-                if (graph.Exhausted) { result.note += " Graph budget exhausted."; break; }
-                var node = graph.Read(FieldSnapshot.ResolveFields(progress, field));
-                node.member = "PlayerProgress." + field;
-                result.objects.Add(node);
-            }
-            return result;
         }
-
-        private static void AddFocused(Exploration report, FieldSnapshot graph, object root, string label, params string[] path)
-        {
-            if (graph.Exhausted) return;
-            var node = graph.Read(FieldSnapshot.ResolveFields(root, path));
-            node.member = label;
-            report.objects.Add(node);
-        }
-
-        private static bool Candidate(string name)
-        {
-            return new[] { "garment", "pattern", "panel", "fabric", "color", "colour", "accessor", "quest", "commission", "progress", "unlock", "editor", "dress", "manager", "cuttingroom", "frontdesk", "mannequin" }
-                .Any(term => name.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0);
-        }
-
-        // Legacy keys are retained, but speculative getters are intentionally no longer executed.
-        private static List<string> ReadQuestNames() => new List<string>();
-        private static List<string> ReadActiveCommissions() => new List<string> { "Unresolved: inspect scene candidate fields; no commission getter invoked" };
-        private static List<string> ReadGameManager() => new List<string> { "Unresolved: static singleton getters disabled" };
-
-        [Serializable] public sealed class EventObservation
-        {
-            public string timeUtc, kind, componentName, componentType, fabricName;
-            public int variant;
-        }
-        [Serializable] public sealed class RuntimeReport
-        {
-            public string status = "exploratory; latest event is not the complete current design";
-            public string lastEventUtc, lastEvent;
-            public int lastVariant;
-            public List<EventObservation> recentEvents;
-            public ValueNode garmentObservation, fabricObservation;
-            public string commissionStatus = "unknown";
-            public string unlockedPatternsStatus = "unknown; catalog membership does not imply unlocked";
-            public string editorConstraintsStatus = "unknown; inspect runtime fields and catalog compatibility";
-        }
-        [Serializable] public sealed class Exploration
-        {
-            public string schemaVersion = "0.2.0";
-            public string timeUtc, scene, note;
-            public List<ValueNode> objects = new List<ValueNode>();
-            public List<TypeDescription> types = new List<TypeDescription>();
-        }
-
-        private void OnDestroy()
-        {
-            foreach (IDisposable registration in registrations)
-            {
-                try { registration.Dispose(); } catch { }
-            }
-            registrations.Clear();
-            if (context != null) context.Dispose();
-        }
-
-        [Serializable]
-        public sealed class Snapshot
-        {
-            public string schemaVersion;
-            public RuntimeReport runtime;
-            public string timeUtc;
-            public string scene;
-            public string gameVersion;
-            public string unityVersion;
-            public bool garmentReferenceFound;
-            public List<string> questDefinitions;
-            public List<string> activeCommissionSummary;
-            public List<string> gameManagerSummary;
-        }
+        private void OnDestroy() { lifetime.Cancel(); command?.Dispose(); }
     }
 }

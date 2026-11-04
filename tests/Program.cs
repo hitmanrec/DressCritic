@@ -13,12 +13,9 @@ class Program
     static void Check(bool ok, string label) { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); }
     static void Main(string[] args)
     {
-        SavedDressTests.Run();
-        OrderChoiceTests.Run();
         EvidenceTests.Run();
+        PipelineTests.Run().GetAwaiter().GetResult();
         BriefCatalogTests.Run();
-        ImageFixtureTests.Run();
-        CardTests.Run();
         SnapshotTests.Run(args);
         ProgressTests.Run();
         ContextFixtureTests.Run(args);

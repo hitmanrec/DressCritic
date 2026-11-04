@@ -142,7 +142,7 @@ namespace DressmakerCritic.Diagnostics
             {
                 var item = accessories[i];
                 result.accessories.Add(new GarmentAccessory { index = i, status = Status(item), definition = Identity(Field(item, "definition")),
-                    placed = Boolean(item, "placed"), scale = Number(item, "scale"), placedPos = Vector(Field(item, "placedPos")), placedRot = Vector(Field(item, "placedRot")) });
+                    placed = Boolean(item, "placed"), scale = Number(item, "scale"), placedPos = Vector(Root(sourceRoot + ".accessoryStates[" + i + "].placedPos") ?? Field(item, "placedPos")), placedRot = Vector(Root(sourceRoot + ".accessoryStates[" + i + "].placedRot") ?? Field(item, "placedRot")) });
             }
             result.joinStateCount = Integer(Field(state, "joinStates"), "_size");
             return result;

@@ -16,8 +16,6 @@ static class BriefCatalogTests
         Check(catalog.Find("wrong-guid", null, "Undercover Servant", "0.7.0").status == "identity-conflict", "title fallback cannot bypass known GUID conflict");
         Check(catalog.Find(null, "RoseWork", null, "0.8.0").entry == null, "wrong game version fails closed");
         Check(catalog.Find(null, "UnknownQuest", "Unknown title", "0.7.0").status == "missing", "unresearched quests do not get invented summaries");
-        string text = catalog.Describe(match);
-        Check(text.Contains("household work") && text.Contains("Source: https://dressmakerwiki.com/") && text.Contains("not a complete dialogue transcript"), "English summary keeps source and transcript limitation");
-        Check(catalog.Describe(catalog.Find(null, null, "Pigeon Adoption", "0.7.0")).Contains("не подтверждено"), "uncertain mapping is visible in UI/report");
+        Check(match.entry.summary.Contains("household work") && match.entry.sourceUrl.StartsWith("https://dressmakerwiki.com/") && match.entry.dialogueCoverage.Contains("excerpt-only"), "English reference preserves evidence and coverage");
     }
 }

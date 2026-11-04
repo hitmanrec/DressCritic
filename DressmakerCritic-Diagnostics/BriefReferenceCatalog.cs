@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-using System.Text;
 
 namespace DressmakerCritic.Diagnostics
 {
@@ -65,24 +64,6 @@ namespace DressmakerCritic.Diagnostics
             if (titles.Length == 1 && !string.IsNullOrEmpty(guid) && !string.IsNullOrEmpty(titles[0].verifiedGuid) && guid != titles[0].verifiedGuid)
                 return new BriefReferenceMatch { status = "identity-conflict" };
             return new BriefReferenceMatch { status = titles.Length == 1 ? "title-only-unverified" : "missing", entry = titles.Length == 1 ? titles[0] : null };
-        }
-        public string Describe(BriefReferenceMatch match)
-        {
-            var text = new StringBuilder("\nАНГЛИЙСКИЙ СПРАВОЧНИК ЗАДАНИЙ\n");
-            if (match.entry == null) return text + "Описание недоступно для этого задания или версии. Причина: " + match.status + ".\n";
-            if (match.status == "title-only-unverified") text.AppendLine("Кандидат по точному английскому названию; соответствие идентификатору не подтверждено.");
-            else text.AppendLine("Соответствие: " + (match.status == "verified-guid" ? "проверенный GUID" : "внутренний идентификатор задания"));
-            var entry = match.entry;
-            text.AppendLine(entry.englishTitle + " — " + entry.client);
-            text.AppendLine(entry.summary);
-            foreach (var request in entry.requests ?? new string[0]) text.AppendLine("Request: " + request);
-            foreach (var prohibition in entry.prohibitions ?? new string[0]) text.AppendLine("Constraint: " + prohibition);
-            foreach (var uncertainty in entry.uncertainties ?? new string[0]) text.AppendLine("Uncertainty: " + uncertainty);
-            text.AppendLine("Source: " + entry.sourceUrl);
-            text.AppendLine("Game: " + data.gameVersion + " | Reviewed: " + entry.reviewedAt);
-            text.AppendLine("Coverage: " + entry.dialogueCoverage);
-            text.AppendLine("Original English summary, not a complete dialogue transcript or an evaluated compliance verdict.");
-            return text.ToString();
         }
     }
 }

@@ -3,8 +3,7 @@ namespace DressmakerCritic.Diagnostics
 {
     [Serializable] public sealed class ImageEvidence
     {
-        public string schemaVersion = "1.0.0", capturedAtUtc, source;
-        public string pairing = "unpaired: image is not automatically assigned to the inspected garment or order";
+        public string schemaVersion = "2.0.0", capturedAtUtc, source;
         public string uiStatus, file = "image.png";
         public int width, height;
         public string viewsStatus = "single-view";

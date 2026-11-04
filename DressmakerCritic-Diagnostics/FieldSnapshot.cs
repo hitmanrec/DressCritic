@@ -124,6 +124,7 @@ namespace DressmakerCritic.Diagnostics
                 var s = (string)value; n.value = s.Substring(0, Math.Min(s.Length, MaxString));
                 n.status = s.Length > MaxString ? "string-limit" : "scalar"; return n;
             }
+            if (type == typeof(IntPtr) || type == typeof(UIntPtr)) { n.status = "opaque"; return n; }
             if (type.IsPrimitive || type.IsEnum || type == typeof(decimal))
             { n.value = Convert.ToString(value, CultureInfo.InvariantCulture); n.status = "scalar"; return n; }
             if (!type.IsValueType)

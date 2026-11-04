@@ -158,19 +158,28 @@ if [[ "$has_captures" -eq 1 ]]; then
   for src in "$SRC_CAPTURES"/*/; do
     name="$(basename "$src")"
     dest="$DEST_CAPTURES/$name"
+    in_progress=0
+    if [[ -f "$src.capture-in-progress" ]]; then
+      in_progress=1
+      if [[ "$MODE" == "new" ]]; then
+        echo "skip    captures/$name (capture still running; --all copies partial evidence without cleaning it)"
+        continue
+      fi
+    fi
 
-    if [[ "$MODE" == "new" && -d "$dest" ]]; then
+    if [[ "$MODE" == "new" && -d "$dest" && ! -f "$dest/.capture-in-progress" ]]; then
       echo "skip    captures/$name (already in repo)"
       skipped=$((skipped + 1))
-      synced_capture_names+=("$name")
+      if [[ "$in_progress" -eq 0 ]]; then synced_capture_names+=("$name"); fi
       continue
     fi
 
     mkdir -p "$dest"
     cp -a "$src." "$dest/"
+    if [[ "$in_progress" -eq 0 ]]; then rm -f -- "$dest/.capture-in-progress"; fi
     echo "pulled  captures/$name"
     copied=$((copied + 1))
-    synced_capture_names+=("$name")
+    if [[ "$in_progress" -eq 0 ]]; then synced_capture_names+=("$name"); fi
   done
   shopt -u nullglob
 fi

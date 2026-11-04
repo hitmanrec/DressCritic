@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dresscritic:evaluation-input:1.0.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "captureId",
+    "capturedAtUtc",
+    "garment",
+    "order",
+    "images",
+    "actionRecommendationsAllowed",
+    "editorCapabilities",
+    "deterministicScores",
+    "limitations",
+    "assetNames"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "captureId": {
+      "type": "string"
+    },
+    "capturedAtUtc": {
+      "type": "string"
+    },
+    "garment": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "urn:dressmakercritic:garment-snapshot:1.0.0"
+        }
+      ]
+    },
+    "order": {
+      "type": "object",
+      "required": [
+        "association",
+        "definition",
+        "budget",
+        "deterministicRequirements",
+        "brief"
+      ],
+      "properties": {
+        "association": {
+          "type": "string"
+        },
+        "definition": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "budget": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "deterministicRequirements": {
+          "type": "array"
+        },
+        "brief": {
+          "type": "object",
+          "required": [
+            "status",
+            "summary",
+            "sourceUrl",
+            "coverage",
+            "requests",
+            "constraints",
+            "uncertainties"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "images": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "sha256",
+          "source",
+          "binding",
+          "width",
+          "height"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "pattern": "^[^/\\\\]+\\.png$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "string"
+          },
+          "binding": {
+            "enum": [
+              "active-state-verified",
+              "history-thumbnail-reference-verified",
+              "unverified"
+            ]
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2048
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2048
+          }
+        }
+      }
+    },
+    "actionRecommendationsAllowed": {
+      "const": false
+    },
+    "editorCapabilities": {
+      "type": "string"
+    },
+    "deterministicScores": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assetNames": {
+      "type": "array",
+      "maxItems": 68,
+      "items": {
+        "type": "object",
+        "required": [
+          "guid",
+          "assetName",
+          "runtimeType"
+        ],
+        "properties": {
+          "guid": {
+            "type": "string"
+          },
+          "assetName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "runtimeType": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
