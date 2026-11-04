@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.12.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.3")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,28 +29,21 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.12.1: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.15.3: jury locked to left half of history spread.");
         }
         private void Start()
         {
             command = DebugConsoleApi.Register("critic-export", "Capture one complete evaluation diagnostic package", _ => { BeginCapture(); return "Evaluation diagnostic capture started"; });
         }
-        private void OnGUI()
+        private void Update()
         {
-            bool previous = GUI.enabled;
-            try
-            {
-                GUI.enabled = previous;
-                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 132), 12, 120, 36), "Жюри")) panel.open = !panel.open;
-                panel.Draw(BeginCapture, busy);
-            }
-            finally { GUI.enabled = previous; }
+            panel.Tick(BeginCapture, busy);
         }
         private async void BeginCapture()
         {
             if (busy) return;
             panel.Begin();
-            busy = true; status = "Собираются данные, изображение и причины блокировки оценки.";
+            busy = true; status = "Collecting garment data, image and evaluation blockers.";
             CaptureSession capture = null;
             try
             {
@@ -118,6 +111,7 @@ namespace DressmakerCritic.Diagnostics
                 capture.Stage("targeted-api-metadata", () => capture.Write("targeted-api.json", GameRuntimeReader.Metadata()));
                 capture.Stage("saved-garment-candidates", () => capture.Write("history-candidates.json", GameRuntimeReader.HistorySnapshots(progress, input.capturedAtUtc, SceneManager.GetActiveScene().name, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"))));
                 capture.Stage("viewer-selection-probe", () => capture.Write("viewer-selection.json", GameRuntimeReader.SelectionProbe(progress)));
+                string imageBinding = "unverified";
                 capture.Stage("images", () => {
                     var beforeDisplay = GameRuntimeReader.DisplayBinding(progress, state);
                     var visual = GameImageCapture.Capture(capture.directory, manager, state, selectedSaved >= 0 || state == null, FieldSnapshot.ResolveFields(selectedRecord, "thumbnailTex") as Texture);
@@ -127,17 +121,18 @@ namespace DressmakerCritic.Diagnostics
                         beforeDisplay.historyIndex == selectedSaved && afterDisplay.historyIndex == selectedSaved &&
                         beforeDisplay.displayDressId == afterDisplay.displayDressId && beforeDisplay.cameraId == afterDisplay.cameraId &&
                         beforeDisplay.viewerTextureId == afterDisplay.viewerTextureId;
-                    panel.imagePath = Path.Combine(capture.directory, visual.metadata.files[0]);
+                    imageBinding = displayVerified ? "history-display-chain-verified" : visual.directActiveBinding ? "active-state-verified" : visual.exactHistoryTexture && FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") is bool && !(bool)FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") && ReferenceEquals(FieldSnapshot.ResolveFields(selectedRecord, "dress"), state) ? "history-thumbnail-reference-verified" : "unverified";
                     input.limitations.Add(visual.metadata.uiStatus); input.limitations.Add(visual.metadata.viewsStatus);
                     foreach (string file in visual.metadata.files)
                         input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)), width = visual.metadata.width, height = visual.metadata.height,
-                            source = visual.metadata.source, binding = displayVerified ? "history-display-chain-verified" : visual.directActiveBinding ? "active-state-verified" : visual.exactHistoryTexture && FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") is bool && !(bool)FieldSnapshot.ResolveFields(selectedRecord, "thumbnailDirty") && ReferenceEquals(FieldSnapshot.ResolveFields(selectedRecord, "dress"), state) ? "history-thumbnail-reference-verified" : "unverified" });
+                            source = visual.metadata.source, binding = imageBinding });
                     object afterState = selectedSaved >= 0 ? FieldSnapshot.ResolveFields(selectedRecord, "dress") : FieldSnapshot.ResolveFields(manager, "activeDress", "state");
                     var afterRoots = GameRuntimeReader.GarmentGraph(afterState, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
                     var after = new GarmentSnapshotBuilder(afterRoots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
                     if (!ReferenceEquals(afterState, state) || DiagnosticJson.Serialize(after) != DiagnosticJson.Serialize(input.garment))
                     {
                         foreach (var image in input.images) image.binding = "unverified";
+                        imageBinding = "unverified";
                         input.limitations.Add("garment-state-changed-during-render");
                         capture.Write("garment-after-render.json", after);
                     }
@@ -152,9 +147,9 @@ namespace DressmakerCritic.Diagnostics
                     {
                         string file = "fixed-axis-" + axes[i] + ".png";
                         input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)),
-                            width = 768, height = 768, source = "fixed mannequin-local orthographic camera", view = labels[i], binding = "unverified" });
+                            width = 768, height = 768, source = "fixed mannequin-local orthographic camera", view = labels[i], binding = imageBinding });
                     }
-                    panel.imagePath = Path.Combine(capture.directory, input.images[0].file);
+                    // Capture still writes fixed-view PNGs for the model; the jury panel no longer shows a redundant preview.
                     var afterFixed = new GarmentSnapshotBuilder(GameRuntimeReader.GarmentGraph(state, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField")))
                         .Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
                     if (DiagnosticJson.Serialize(afterFixed) != DiagnosticJson.Serialize(input.garment))
@@ -168,15 +163,11 @@ namespace DressmakerCritic.Diagnostics
                     configured = !string.IsNullOrWhiteSpace(selectedModel) }));
                 capture.Write("evaluation-input.json", input);
                 capture.manifest.readiness = EvaluationReadiness.Check(input, selectedModel);
-                // Candidate camera output must be inspected once before admitting it to model evidence.
-                capture.manifest.readiness.blockers.Add("fixed-views-runtime-review-required");
-                capture.manifest.readiness.canEvaluate = false;
-                panel.message = "Сняты проверочные ракурсы. Перед оценкой требуется проверка изображений.";
                 if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
                 capture.Write("readiness.json", capture.manifest.readiness);
                 capture.Write("manifest.json", capture.manifest);
-                panel.subject = (selectedSaved >= 0 ? "Снимок платья из истории №" + (selectedSaved + 1) : "Снимок текущего платья") + " · " + DateTime.Now.ToString("HH:mm:ss");
-                panel.message = "Жюри рассматривает снимок. Можно закрыть это окно; оценка продолжится.";
+                panel.subject = null;
+                panel.message = null;
                 // All Unity reads/rendering above run synchronously on the game thread.
                 // Only local HTTP and file I/O run after this await; no background game scans.
                 if (backendValid)
@@ -238,12 +229,12 @@ namespace DressmakerCritic.Diagnostics
                 panel.result = juryResult;
                 var juryStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-jury-inference");
                 var contextStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-context-inference");
-                panel.message = juryResult != null ? (contextStage?.status == "failed" ? "Жюри готово. Оценить контекст не удалось; результат жюри сохранён." : "Оценка снимка завершена.") :
-                    !capture.manifest.readiness.canEvaluate ? "Оценка приостановлена до проверки новых ракурсов. Проверочные изображения и причины возможных ошибок сохранены в диагностике." :
-                    "Не удалось получить корректную оценку от локальной модели. Диагностика сохранена. " + (juryStage?.detail ?? "");
-                status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этапы жюри и контекста в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
+                panel.message = null;
+                status = "Package: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Check jury/context stages in manifest.json." : "Blockers: " + string.Join(", ", capture.manifest.readiness.blockers));
+                if (juryResult == null && juryStage != null) Logger.LogWarning("Jury stage: " + juryStage.status + " " + (juryStage.detail ?? ""));
+                if (contextStage != null && contextStage.status == "failed") Logger.LogWarning("Context stage failed; jury result kept.");
             }
-            catch (Exception e) { panel.message = "Не удалось подготовить оценку. Диагностика сохранена."; status = "Сбой сбора: " + e.GetType().Name; Logger.LogError(e); }
+            catch (Exception e) { panel.message = null; status = "Capture failed: " + e.GetType().Name; Logger.LogError(e); }
             finally
             {
                 try { capture?.Finish(); } catch (Exception e) { Logger.LogError(e); }

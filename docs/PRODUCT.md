@@ -89,8 +89,9 @@ screens use one text column. Preview is read from the same capture-local PNG
 used for inference, loaded on the GUI thread once per path, and destroyed when
 replaced/unloaded. It never follows a different current garment. Display names
 and Russian mottos do not enter the model prompt or change scoring IDs.
-Native notebook navigation integration, bespoke emblems, localized generated
-remarks and fixed multi-view capture remain separate unfinished work.
+House emblems and Sketchbook-native Unity UI (game TMP font / border sprites)
+ship in v0.14.0 with English chrome and an optional locale overlay. Localized
+model remarks remain separate unfinished work.
 
 ## Current runtime gate: v0.11.0
 

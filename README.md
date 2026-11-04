@@ -1,12 +1,12 @@
 # DressCritic
 
 Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
-5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.12.1**.
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.3**.
 
-**Current build is for rendering validation:** model inference is deliberately
-blocked until missing accessory geometry and preview lighting are resolved.
-Earlier single-view inference and four-house scores worked in game; that does
-not validate the current fixed-view pipeline. No final-mod readiness is claimed.
+Fixed-view capture and local jury inference work when a model is configured.
+History-only inline Jury UI is **in progress and currently broken in-game**
+(controls land on the book spine; house crests/remarks do not layout). See
+[docs/knowledge/CURRENT.md](docs/knowledge/CURRENT.md).
 
 ## Knowledge and evidence
 
@@ -40,11 +40,11 @@ core tests and syntax checks cannot establish native compilation/rendering.
 
 ## Current in-game check
 
-Open the same decorated saved dress, click **Жюри → Оценить платье**, wait for
-collection, then `bash pull-exports.sh`. Send one complete packet, especially
-accessory-render.json, fixed-views.json, targeted-api.json and PNGs. A second
-rotation is not needed for this diagnostic step. Model inference remains gated.
-No new garment, model download or config change is required.
+Until the left-page Jury layout is fixed, treat UI checks as blocked; inference
+captures via console `critic-export` / history Rate (if reachable) still produce
+packets for `bash pull-exports.sh`. Locale overlay sample:
+`DressmakerCritic-Diagnostics/locale.example.ru.json` →
+`BepInEx/config/DressmakerCritic/locale.json`.
 
 ## Local model configuration (for inference after the render gate is resolved)
 

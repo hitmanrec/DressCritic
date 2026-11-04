@@ -32,30 +32,33 @@ Dirty thumbnail, неоднозначность, смена state — невал
 +Z визуально подтверждён как перед, -Z как спина; +X/-X обозначаем side A/B,
 не объявляя анатомическую сторону. Bound includes mannequin/pole, не только ткань.
 
-## Текущая реализация v0.12.1
+## Текущая реализация v0.12.2
 
 [FixedViewCapture](../../DressmakerCritic-Diagnostics/FixedViewCapture.cs): временная
 additive scene без переключения active scene; собственные MeshFilter/MeshRenderer,
 sharedMesh/sharedMaterials read-only, копии property blocks; transform относительно
 манекена, проверка углов на неподдерживаемый shear. Skinned meshes отвергаются,
-не выдаются за static pose. Камера + четыре cardinal directions, fixed light rig,
-probes/shadows copies off. Cleanup отключает owned root, уничтожает объекты,
-выгружает сцену и восстанавливает render target. Ни одного поворота оригинала.
+не выдаются за static pose. Камера + четыре cardinal directions. Cleanup отключает
+owned root, уничтожает объекты, выгружает сцену, восстанавливает render target и
+RenderSettings ambient/sun. Ни одного поворота оригинала.
 
 **Camera.scene/layer/light culling пока не доказывают изоляцию в runtime.**
-Не считать собственную сцену автоматически свободной от глобального света,
-RenderSettings, custom shader effects. Нет измеренной цветовой калибровки.
+Нет измеренной цветовой калибровки.
 
-AccessoryBatchRenderer реально существует и referenced из Dress. Предположение,
-что пропущенные детали рисуются batched/instanced вне MeshRenderer, пока hypothesis.
-Никакие его недокументированные методы/поля для восстановления не придуманы.
-Наличие 20 accessoryStates не доказывает 20 корректно отрисованных объектов.
+Из IL подтверждено: `AccessoryBatchRenderer` регистрирует MeshRenderer аксессуаров,
+отключает их и рисует `Graphics.RenderMeshInstanced` с матрицами
+`mannequin.localToWorld * entry.local`. `AccessoryItemPath` в Register сразу
+выходит и остаётся на обычных MeshRenderer. v0.12.0 копировал только `enabled`
+renderer → батченный декор пропадал. v0.12.2 копирует disabled MeshRenderer из
+иерархии dress/mannequin, registration list и AccessoryItems; light rig
+balanced-rig-v2 + temporary flat ambient.
 
-Новый accessory-render.json снимает реальные поля batcher + первые4 аксессуара;
-fixed-views.json — lights/scenes/masks/направления/интенсивности, global sun/ambient,
-copied meshes/material shaders. Нужен полный новый пакет, не только screenshot.
+accessory-render.json: batcher fields, renderersLive/captureLive, counts
+enabled/disabled MeshRenderer, до 8 AccessoryItems. fixed-views.json добавляет
+copiedDisabledRenderers/copiedBatchedAccessories/batchGroups/batchEntries.
+Нужен пакет 0.12.2 для визуальной приёмки.
 
-Пока approvedForInference=false и readiness gate остаются. Оригинальный image.png
-сохраняется для сравнения, но не служит тихим fallback. Подготовлены четыре
-model image parts с подписями и общим лимитом4 MiB; неподтверждённые виды не отправляются.
+v0.13.0: `approvedForInference=true` после пакетов `220136`/`220146` (ortho≈1.135,
+декор на PNG). Оригинальный image.png сохраняется для сравнения, не как silent
+fallback. Четыре model image parts, лимит 4 MiB.
 [Подробная история с capture IDs](../FIXED-VIEWS.md).

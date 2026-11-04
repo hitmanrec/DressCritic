@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -181,15 +182,44 @@ namespace DressmakerCritic.Diagnostics
             var result = new List<ValueNode>();
             var books = Find("Sketchbook").Where(c => c.gameObject.activeInHierarchy).Take(2).ToArray();
             if (books.Length != 1) return result;
-            object dress = FieldSnapshot.ResolveFields(books[0], "_displayDress");
+            var dressComponent = FieldSnapshot.ResolveFields(books[0], "_displayDress") as Component;
+            object dress = dressComponent;
             var graph = new FieldSnapshot(2048);
             object batcher = FieldSnapshot.ResolveFields(dress, "<AccessoryBatcher>k__BackingField");
             var root = graph.Read(batcher); root.member = "Sketchbook._displayDress.<AccessoryBatcher>k__BackingField"; result.Add(root);
+            if (batcher != null)
+            {
+                result.Add(new ValueNode { member = "AccessoryBatchRenderer.renderersLive", status = "scalar",
+                    value = Convert.ToString(FieldSnapshot.ResolveFields(batcher, "renderersLive"), CultureInfo.InvariantCulture) });
+                result.Add(new ValueNode { member = "AccessoryBatchRenderer.captureLive", status = "scalar",
+                    value = Convert.ToString(FieldSnapshot.ResolveFields(batcher, "captureLive"), CultureInfo.InvariantCulture) });
+            }
             var items = FieldSnapshot.ResolveFields(dress, "<AccessoryItems>k__BackingField");
-            for (int i = 0; i < 4 && !graph.Exhausted; i++)
+            int itemCount = FieldSnapshot.ResolveFields(items, "_size") is int size ? size : -1;
+            result.Add(new ValueNode { member = "Dress.AccessoryItems._size", status = "scalar", value = itemCount.ToString(CultureInfo.InvariantCulture) });
+            int enabled = 0, disabled = 0;
+            if (dressComponent != null)
+                foreach (var renderer in dressComponent.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    if (renderer == null) continue;
+                    if (renderer.enabled) enabled++; else disabled++;
+                }
+            result.Add(new ValueNode { member = "Dress.MeshRenderer.enabledCount", status = "scalar", value = enabled.ToString(CultureInfo.InvariantCulture) });
+            result.Add(new ValueNode { member = "Dress.MeshRenderer.disabledCount", status = "scalar", value = disabled.ToString(CultureInfo.InvariantCulture) });
+            for (int i = 0; i < 8 && !graph.Exhausted; i++)
             {
                 object item = FieldSnapshot.ListItemAt(items, i); if (item == null) break;
                 var node = graph.Read(item); node.member = "Dress.AccessoryItems[" + i + "]"; result.Add(node);
+                var component = item as Component;
+                if (component == null) continue;
+                int itemEnabled = 0, itemDisabled = 0;
+                foreach (var renderer in component.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    if (renderer == null) continue;
+                    if (renderer.enabled) itemEnabled++; else itemDisabled++;
+                }
+                result.Add(new ValueNode { member = "Dress.AccessoryItems[" + i + "].MeshRenderer.enabled", status = "scalar", value = itemEnabled.ToString(CultureInfo.InvariantCulture) });
+                result.Add(new ValueNode { member = "Dress.AccessoryItems[" + i + "].MeshRenderer.disabled", status = "scalar", value = itemDisabled.ToString(CultureInfo.InvariantCulture) });
             }
             return result;
         }

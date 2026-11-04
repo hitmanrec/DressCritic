@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-05",
-  "pluginVersion": "0.12.1",
+  "pluginVersion": "0.12.2",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -165,12 +165,15 @@
     },
     {
       "id": "render.accessory_batch",
-      "status": "hypothesis",
-      "claim": "Missing accessories may be batched/instanced outside ordinary mesh renderers; actual fields needed",
+      "status": "confirmed",
+      "claim": "AccessoryBatchRenderer disables MeshRenderers and draws Graphics.RenderMeshInstanced; AccessoryItemPath is excluded from batching; v0.12.0 enabled-only copy dropped decor",
       "evidence": [
-        "docs/FIXED-VIEWS.md"
+        "docs/FIXED-VIEWS.md",
+        "DressmakerCritic-Diagnostics/exports/captures/20261104-211215-400-eef6480e/fixed-views.json",
+        "DressmakerCritic-Diagnostics/exports/captures/20261104-211215-400-eef6480e/image.png"
       ],
       "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs",
         "DressmakerCritic-Diagnostics/GameRuntimeReader.cs"
       ]
     },

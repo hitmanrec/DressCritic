@@ -87,13 +87,15 @@ Capture manifest содержит независимые stages, hashes/sizes. c
 
 ## UI / поставка
 
-Собственный paper overlay, закладка Жюри, Дома мод/Заказ, снимок и среднее слева
-на широком экране, scroll на узком. Это не настоящая вкладка игрового блокнота.
-Результат явно относится к snapshot; не становится оценкой следующего выбранного
-платья. English remarks сохранены, локализация generated text ещё не сделана.
-Полнота click shield/масштабирование на всех разрешениях не доказаны.
+Целевой UX (0.15+): history-only inline Jury на левой странице блокнота без
+закладки/оверлея; Rate + Houses/Order; гербы и ремарки после оценки; English UI
++ `locale.json`; WIP без Jury. Подробности и **текущий broken layout** —
+[CURRENT.md](CURRENT.md).
 
-BepInEx plugin остаётся net472. Для FontStyle нужна игровая TextRenderingModule;
-LoadImage выбирает byte[] API через точную reflection signature, избегая compile
-binding к Span/netstandard2.1 overloads. Это исправление, не смена target framework.
-Никакие game DLL не распространяются. Ollama пока запускается отдельно вручную.
+Код: Unity UI + TMP/sprites игры, `UiStrings`, `HouseEmblems`. На 0.15.3 в игре
+элементы всё ещё уезжают к корешку, домa/гербы не читаются — inference при этом
+живой. Результат — snapshot; English model remarks; локализация generated text
+не сделана.
+
+BepInEx plugin остаётся net472. Никакие game DLL не распространяются. Ollama
+пока запускается отдельно вручную.
