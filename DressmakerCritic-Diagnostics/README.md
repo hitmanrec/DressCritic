@@ -148,3 +148,15 @@ DTO JSON writer; schema version remains 0.2.0. Existing uploaded captures remain
 untouched as evidence. After updating, first make one capture and check that
 `runtime`, `objects` and `types` are present in their respective files before
 recording a longer session. See the findings document for the exact limitations.
+
+### v0.2.2 targeted current-state capture
+
+Real v0.2.1 files confirm nested JSON works, but scene traversal exhausted its
+budget before reaching activeDress. v0.2.2 captures known GameManager screen fields,
+current dress state and up to 32 panel fabric roots first, then generic graphs.
+Editor graphs have a 4096-node shared budget; event graphs remain at 512 nodes.
+All focused paths are instance fields proven in the real type metadata. Missing
+paths remain null; no singleton/property getter is called. Focused List<T> reading
+accepts only the exact BCL type and bounds reads by logical count and array length.
+After updating, compare before/after a single panel fabric change and at assembly;
+inspect labelled roots in editor-runtime.json. In-game validation remains required.

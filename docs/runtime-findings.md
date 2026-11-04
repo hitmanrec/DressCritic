@@ -107,3 +107,60 @@ before and after a garment/fabric change, and check that diagnostics.json contai
 `runtime.recentEvents` and graph roots, runtime-types.json contains `types`, and
 editor-runtime.json contains `objects`. Check limit statuses before making another
 long test sequence. The native array allocations and graph caps remain unchanged.
+
+## Three v0.2.1 captures: nested JSON is present
+
+Commit 0b9ead5 adds captures 20261104-115432-827-8abff4cd,
+20261104-115440-451-1846c2cc and 20261104-115447-867-202aafdc.
+All three contain runtime graphs, scene objects and 227 candidate type descriptions
+(99 game types plus 128 loader candidates). The serialization fix is confirmed
+for these actual captures. diagnostics.json is identical across them apart from
+timeUtc, as is runtime-types.json. Each event history still contains only four
+initial Selected events; fabricObservation is null. This does not establish that
+the player's fabric changes failed: callbacks are not an authoritative current
+state source. Editor JSON does differ, but does not reach activeDress.
+
+The shared 512-node scene graph budget is exhausted while reading GameManager's
+campaign/scene references after four utility components. This masks the state of
+interest. GameManager **is** present as a scene component; the earlier failed
+singleton lookup did not prove it was absent.
+
+New confirmed metadata (field existence/type, not verified current values):
+
+- GameManager.activeDress: Dress; GameManager.proposedQuest: QuestDefinition.
+- GameManager.<CurrentScene>k__BackingField and <LastScene>k__BackingField hold
+  GameManager.Scene values: potential sub-screen identity within PatternCutting.
+- Dress.state: DressState, containing four component definitions/variant indices,
+  panelStates, joinStates, accessoryStates, measurements, sewingComplete, finished.
+- PanelState.fabric: Fabric; flags include hasBeenCut, placedOnMannequin,
+  hasBeenStitched and grainQuality.
+- PatternPanel.definition, state, garmentComponent and dress link scene panels.
+- PlayerProgress.unlockedPatterns, unlockedFabrics, unlockedAccessories,
+  activeCommissions and activeCommissionIndex exist as instance fields.
+- QuestState.questDefinition and dress link commission state to its definition
+  and dress. Metadata alone does not identify the selected commission instance.
+
+### v0.2.2 targeted capture
+
+Before generic scene graphs, export the real GameManager screen backing fields,
+up to 32 panel fabric roots via activeDress.state.panelStates, activeDress.state
+itself and proposedQuest. Paths are resolved as instance fields only; no new game
+getters/static reads are introduced. Unknown/missing fields yield null. Exact BCL
+List<T> storage is read using its actual _size and _items fields, capped at 32,
+without custom enumeration or indexing. This runtime layout remains to be verified
+in-game; unsupported layouts yield no focused list items.
+
+The editor now collects at most 256 candidate components during bounded traversal,
+prioritizes GameManager/relevant game types, uses 4096 shared graph nodes and reads
+large campaign fields after activeDress. Normal event graphs retain 512 nodes.
+Depth/array/string/field caps are unchanged; exhaustion and traversal caps still
+mean that output can be incomplete. Reference IDs remain shared within each graph
+capture. Focus paths are recorded in ValueNode.member. These are exploratory paths,
+not verified normalized state adapters. PlayerProgress access/values and semantic
+commission requirements remain unresolved; no singleton getter is invoked.
+
+Next test: install v0.2.2 and compare one panel before/after fabric change, then
+capture at assembly. Check editor-runtime.objects for member labels identifying
+CurrentScene, activeDress.state, and panelStates[i].fabric. These should reveal
+actual state even if the event history stays unchanged. Do not infer constraints
+or unlocks until their live values and meaning are independently verified.

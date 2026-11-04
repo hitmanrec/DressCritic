@@ -26,8 +26,13 @@ namespace DressmakerCritic.Diagnostics
     {
         public const int MaxNodes = 512, MaxDepth = 4, MaxItems = 32, MaxFields = 64, MaxString = 512;
         private int nodes;
+        private readonly int nodeLimit;
+        public FieldSnapshot(int nodeLimit = MaxNodes)
+        {
+            this.nodeLimit = Math.Max(1, Math.Min(nodeLimit, 4096));
+        }
         private readonly Dictionary<object, int> seen = new Dictionary<object, int>(new Identity());
-        public bool Exhausted => nodes >= MaxNodes;
+        public bool Exhausted => nodes >= nodeLimit;
         private sealed class Identity : IEqualityComparer<object>
         {
             public new bool Equals(object a, object b) => ReferenceEquals(a, b);
@@ -49,6 +54,53 @@ namespace DressmakerCritic.Diagnostics
             }
             return d;
         }
+        private static int Priority(string type, string field)
+        {
+            if (type == "GameManager")
+            {
+                if (field == "activeDress" || field == "<CurrentScene>k__BackingField" || field == "<LastScene>k__BackingField") return 0;
+                if (field == "campaign" || field == "demoCampaign") return 10;
+            }
+            if (type == "Dress" && field == "state") return 0;
+            if (type == "PanelState" && field == "fabric") return 0;
+            if (type == "DressState" && (field.EndsWith("Variant") || field == "finished" || field == "sewingComplete")) return 0;
+            return 1;
+        }
+
+        // Resolve only explicit instance field paths established in runtime metadata.
+        // No properties, static fields or arbitrary method calls are accepted.
+        public static object ResolveFields(object root, params string[] path)
+        {
+            foreach (string name in path)
+            {
+                if (ReferenceEquals(root, null)) return null;
+                FieldInfo found = null;
+                foreach (var type in Hierarchy(root.GetType()))
+                {
+                    found = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                    if (found != null) break;
+                }
+                if (found == null) return null;
+                try { root = found.GetValue(root); } catch { return null; }
+            }
+            return root;
+        }
+
+        public static object[] ListItems(object value)
+        {
+            if (value == null) return new object[0];
+            Type type = value.GetType();
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(List<>)) return new object[0];
+            // Exact BCL List<T> layout only; no custom enumerators or indexers.
+            var items = ResolveFields(value, "_items") as Array;
+            var size = ResolveFields(value, "_size");
+            if (items == null || !(size is int)) return new object[0];
+            int count = Math.Max(0, Math.Min(Math.Min((int)size, items.Length), MaxItems));
+            var result = new object[count];
+            for (int i = 0; i < count; i++) result[i] = items.GetValue(i);
+            return result;
+        }
+
         public ValueNode Read(object value, int depth = 0)
         {
             var n = new ValueNode();
@@ -85,7 +137,7 @@ namespace DressmakerCritic.Diagnostics
             int fields = 0;
             foreach (var t in Hierarchy(type))
             {
-                foreach (var f in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                foreach (var f in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).OrderBy(f => Priority(t.Name, f.Name)))
                 {
                     if (fields++ >= MaxFields || Exhausted) { n.status = Exhausted ? "node-limit" : "field-limit"; return n; }
                     ValueNode child;

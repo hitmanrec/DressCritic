@@ -24,6 +24,12 @@ class Program
         Check(n.status == "depth-limit", "depth bound");
         var graph = new FieldSnapshot(); for(int i=0;i<512;i++) graph.Read(i);
         Check(graph.Read(t).status == "node-limit", "shared global node budget");
+        var list = new System.Collections.Generic.List<int> { 7, 9 };
+        Check(FieldSnapshot.ListItems(list).Length == 2 && (int)FieldSnapshot.ListItems(list)[1] == 9, "exact BCL list uses logical count");
+        Check(FieldSnapshot.ListItems(t).Length == 0, "custom enumerator not used for focused lists");
+        Check(ReferenceEquals(FieldSnapshot.ResolveFields(t, "self"), t) && FieldSnapshot.ResolveFields(t, "Property") == null, "focused path accepts fields only");
+        var expanded = new FieldSnapshot(4096); for (int i=0;i<600;i++) expanded.Read(i);
+        Check(!expanded.Exhausted, "editor budget can exceed event graph budget");
         var escaped = "quotes\" slash\\ newline\n русский \ud83d\udc57";
         var json = DiagnosticJson.Serialize(new FieldSnapshot().Read(new object[]{escaped, t}));
         using (var document = System.Text.Json.JsonDocument.Parse(json))

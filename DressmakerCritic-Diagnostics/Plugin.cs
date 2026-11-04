@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.2")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -32,7 +32,7 @@ namespace DressmakerCritic.Diagnostics
         {
             showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.1 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.2 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -199,20 +199,42 @@ namespace DressmakerCritic.Diagnostics
                 var report = new Exploration { timeUtc = DateTime.UtcNow.ToString("O"), scene = SceneManager.GetActiveScene().name };
                 if (editor)
                 {
-                    var graph = new FieldSnapshot();
+                    var graph = new FieldSnapshot(4096);
+                    var candidates = new List<Component>();
                     var queue = new Queue<Transform>();
                     // Unity returns the roots as an array; traversal after this allocation is bounded.
                     foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects().Take(128)) queue.Enqueue(root.transform);
                     int visited = 0;
-                    while (queue.Count > 0 && visited++ < 128 && !graph.Exhausted)
+                    while (queue.Count > 0 && visited++ < 128)
                     {
                         var t = queue.Dequeue();
                         foreach (var component in t.gameObject.GetComponents<Component>().Take(32))
                             if (component != null && component.GetType().Assembly.GetName().Name == "Assembly-CSharp")
-                                report.objects.Add(graph.Read(component));
+                                if (candidates.Count < 256) candidates.Add(component);
                         for (int i = 0; i < t.childCount && i < 64 && queue.Count < 128; i++) queue.Enqueue(t.GetChild(i));
                     }
-                    report.note = "Candidate scene components only; not an authoritative current garment or commission. Traversal capped at 128 objects/32 components/64 children; native array allocations are not bounded. " + (graph.Exhausted ? "Graph budget exhausted." : "");
+                    // Capture proven paths before generic graphs can consume the budget.
+                    var manager = candidates.FirstOrDefault(c => c.GetType().FullName == "GameManager");
+                    if (manager != null)
+                    {
+                        AddFocused(report, graph, manager, "GameManager.<CurrentScene>k__BackingField", "<CurrentScene>k__BackingField");
+                        AddFocused(report, graph, manager, "GameManager.<LastScene>k__BackingField", "<LastScene>k__BackingField");
+                        var state = FieldSnapshot.ResolveFields(manager, "activeDress", "state");
+                        var panels = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(state, "panelStates"));
+                        for (int i = 0; i < panels.Length && !graph.Exhausted; i++)
+                            AddFocused(report, graph, panels[i], "GameManager.activeDress.state.panelStates[" + i + "].fabric", "fabric");
+                        AddFocused(report, graph, manager, "GameManager.activeDress.state", "activeDress", "state");
+                        AddFocused(report, graph, manager, "GameManager.proposedQuest", "proposedQuest");
+                    }
+                    foreach (var component in candidates.OrderBy(c => c.GetType().FullName == "GameManager" ? 0 : Candidate(c.GetType().Name) ? 1 : 2))
+                    {
+                        if (graph.Exhausted) break;
+                        report.objects.Add(graph.Read(component));
+                    }
+                    report.note = "Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. " +
+                        "Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. " +
+                        "Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. " +
+                        (graph.Exhausted ? "Graph budget exhausted." : "Graph budget available.");
                 }
                 else
                 {
@@ -233,6 +255,14 @@ namespace DressmakerCritic.Diagnostics
                 return "Exported " + name;
             }
             catch (Exception e) { Logger.LogError(e); return "Exploration failed: " + e.GetType().Name; }
+        }
+
+        private static void AddFocused(Exploration report, FieldSnapshot graph, object root, string label, params string[] path)
+        {
+            if (graph.Exhausted) return;
+            var node = graph.Read(FieldSnapshot.ResolveFields(root, path));
+            node.member = label;
+            report.objects.Add(node);
         }
 
         private static bool Candidate(string name)
