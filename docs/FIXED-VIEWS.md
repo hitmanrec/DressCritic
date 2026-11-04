@@ -69,3 +69,28 @@ inference, attach explicit orientation labels, extend the image contract from
 three to four views with unchanged byte bounds, and compare behaviour on these
 existing dresses. Four views by themselves do not prove construction/comfort or
 resolve obscured details; those must still remain uncertain.
+
+## First runtime pair and v0.11.1
+
+User captures 20261104-205543-739-ca5c6923 and 20261104-205645-784-b610e7da
+both pass all artifact checks and complete four StandardRequest renders. Both
+select history record 0. The returned reference images show the same green dress
+at different viewer rotations. Fixed views are unusably small, near the bottom.
+Metadata gives world center Y=-10.45 and extent Y=10.45 (max Y=0), framing radius
+about 11 and orthographic size about 12.3. The renderer list includes 15 ordinary
+panel meshes and 15 AnimationMesh entries plus mannequin body/pole. Which entry
+contributed bad bounds was not recorded individually, so attributing it to a
+specific animation renderer is still a hypothesis.
+
+v0.11.1 derives geometry bounds from MeshFilter.sharedMesh.bounds (or a skinned
+renderer's localBounds), skips missing/empty/degenerate meshes, transforms all
+corners into mannequin-local coordinates and forms a common bound there. The
+center is transformed back to world space; framing radius is computed from the
+same local box transformed to world, avoiding world-AABB rotation dependence.
+No vertex arrays, mesh baking or game object mutation. Renderer diagnostics now
+include mesh vertex count, local geometry bounds and world transform position.
+The extents in fixed-views.json are mannequin-local from this version onward.
+
+The native pipeline/API is now confirmed on this runtime. Framing and coverage
+remain unverified until another image pair. Repeat the same two-rotation test on
+the existing green dress after updating/installing. Model generation stays blocked.
