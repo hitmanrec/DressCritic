@@ -52,7 +52,13 @@ namespace DressmakerCritic.Diagnostics
                 var bytes = System.IO.File.ReadAllBytes(imagePath);
                 if (bytes.Length > 4 * 1024 * 1024) return;
                 preview = new Texture2D(2, 2, TextureFormat.RGB24, false);
-                if (!ImageConversion.LoadImage(preview, bytes)) { UnityEngine.Object.Destroy(preview); preview = null; }
+                // Unity 6 also exposes Span-based overloads. Resolve only the byte[]
+                // API so the net472 compiler does not bind netstandard 2.1 signatures.
+                var conversion = Type.GetType("UnityEngine.ImageConversion, UnityEngine.ImageConversionModule", false);
+                var load = conversion?.GetMethod("LoadImage", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
+                    null, new[] { typeof(Texture2D), typeof(byte[]), typeof(bool) }, null);
+                if (load == null || !(bool)load.Invoke(null, new object[] { preview, bytes, true }))
+                { UnityEngine.Object.Destroy(preview); preview = null; }
             }
             catch { if (preview != null) UnityEngine.Object.Destroy(preview); preview = null; }
         }
