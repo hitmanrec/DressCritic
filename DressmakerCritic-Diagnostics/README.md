@@ -171,3 +171,13 @@ paths remain null; no singleton/property getter is called. Focused List<T> readi
 accepts only the exact BCL type and bounds reads by logical count and array length.
 After updating, compare before/after a single panel fabric change and at assembly;
 inspect labelled roots in editor-runtime.json. In-game validation remains required.
+
+### v0.2.3 loaded-object discovery
+
+The v0.2.2 captures confirm internal screens CuttingRoom/Mannequin, but activeDress
+is null. Export now searches loaded Dress and PatternPanel components directly,
+including inactive objects, and reads their proven state fields. Inspection is
+capped at 8 dresses/32 panels; native search allocates its results before caps.
+Fallback component graphs are shallow. No game getters or static values are read.
+After updating, one mannequin capture is sufficient to check whether these objects
+exist. Inactive/historical objects are candidates, not authoritative current state.

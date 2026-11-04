@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.2")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.2.3")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -32,7 +32,7 @@ namespace DressmakerCritic.Diagnostics
         {
             showExportButton = Config.Bind("Diagnostics", "ShowExportButton", true,
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.2 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.2.3 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);
@@ -226,12 +226,39 @@ namespace DressmakerCritic.Diagnostics
                         AddFocused(report, graph, manager, "GameManager.activeDress.state", "activeDress", "state");
                         AddFocused(report, graph, manager, "GameManager.proposedQuest", "proposedQuest");
                     }
+                    // These types/instance fields are proven by the uploaded metadata.
+                    // Native search excludes assets and includes inactive loaded scene objects;
+                    // array allocation is not bounded, but inspection is capped on explicit export.
+                    foreach (string typeName in new[] { "Dress", "PatternPanel" })
+                    {
+                        Type gameType = AppDomain.CurrentDomain.GetAssemblies()
+                            .Where(a => a.GetName().Name == "Assembly-CSharp")
+                            .Select(a => a.GetType(typeName, false)).FirstOrDefault(t => t != null);
+                        if (gameType == null || !typeof(Component).IsAssignableFrom(gameType)) continue;
+                        var loaded = UnityEngine.Object.FindObjectsOfType(gameType, true);
+                        int count = Math.Min(loaded.Length, typeName == "Dress" ? 8 : 32);
+                        for (int i = 0; i < count && !graph.Exhausted; i++)
+                        {
+                            var component = loaded[i] as Component;
+                            if (component == null) continue;
+                            string label = "loaded." + typeName + "[" + i + "]";
+                            report.objects.Add(new ValueNode { member = label + ".scene", type = "System.String",
+                                value = component.gameObject.scene.name, status = "scalar" });
+                            AddFocused(report, graph, component, label + ".state", "state");
+                            if (typeName == "PatternPanel")
+                            {
+                                AddFocused(report, graph, component, label + ".state.fabric", "state", "fabric");
+                                AddFocused(report, graph, component, label + ".definition", "definition");
+                            }
+                        }
+                        report.note += typeName + " loaded=" + loaded.Length + ", inspected up to " + count + ". ";
+                    }
                     foreach (var component in candidates.OrderBy(c => c.GetType().FullName == "GameManager" ? 0 : Candidate(c.GetType().Name) ? 1 : 2))
                     {
                         if (graph.Exhausted) break;
-                        report.objects.Add(graph.Read(component));
+                        report.objects.Add(graph.Read(component, FieldSnapshot.MaxDepth - 1));
                     }
-                    report.note = "Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. " +
+                    report.note += "Focused field paths from real v0.2.1 metadata precede candidate components; 4096 shared nodes. " +
                         "Scene traversal capped at 128 objects/32 components/64 children/256 candidates; list focus capped at 32 panels. " +
                         "Native result arrays are allocated before caps. Missing focused paths yield null; null does not prove absence. " +
                         (graph.Exhausted ? "Graph budget exhausted." : "Graph budget available.");
@@ -267,7 +294,7 @@ namespace DressmakerCritic.Diagnostics
 
         private static bool Candidate(string name)
         {
-            return new[] { "garment", "pattern", "panel", "fabric", "color", "colour", "accessor", "quest", "commission", "progress", "unlock", "editor", "dress", "manager" }
+            return new[] { "garment", "pattern", "panel", "fabric", "color", "colour", "accessor", "quest", "commission", "progress", "unlock", "editor", "dress", "manager", "cuttingroom", "frontdesk", "mannequin" }
                 .Any(term => name.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0);
         }
 

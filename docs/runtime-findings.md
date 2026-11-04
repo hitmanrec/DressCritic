@@ -164,3 +164,33 @@ capture at assembly. Check editor-runtime.objects for member labels identifying
 CurrentScene, activeDress.state, and panelStates[i].fabric. These should reveal
 actual state even if the event history stays unchanged. Do not infer constraints
 or unlocks until their live values and meaning are independently verified.
+
+## Three v0.2.2 captures: sub-screen identity confirmed
+
+Commit 9bfe595 contains three captures ending 121053, 121058 and 121102.
+The first two CurrentScene backing values are CuttingRoom; the third is Mannequin.
+LastScene is FrontDesk in all three, while the Unity scene remains PatternCutting.
+GameManager.activeDress is an actual null field in the generic graph, not merely a
+failed path lookup. Focused state and proposedQuest are null. No panel fabric roots
+were produced, and the four initial selection events remain unchanged. Therefore
+these captures do not establish which fabric was selected or which commission is
+active. A null activeDress does not prove there are no other dress/panel objects.
+The generic graph again exhausts its budget in unrelated scene references.
+
+v0.2.3 adds on-demand Unity loaded-object searches for the confirmed component
+types Dress and PatternPanel (including inactive loaded objects, excluding assets),
+inspecting at most 8 dresses and 32 panels. It exports their actual state fields,
+panel definition/fabric and Unity scene identity. Native search result allocations
+are not bounded; this occurs only during explicit export. No getter/property of
+a game type is invoked. Generic component fallback now reads only one field level
+so it cannot recursively consume the remaining budget in unrelated UI references.
+Metadata discovery also includes CuttingRoom, FrontDesk and Mannequin types.
+Loaded object labels/indices are local to a capture, not stable identities, and
+can include inactive or historical objects; no object is claimed to be the current
+design until state/UI correspondence is verified. Static PlayerProgress fields
+remain unread, avoiding possible type-initializer side effects.
+
+Next verification: a single capture at the mannequin should first show whether
+any loaded.Dress or loaded.PatternPanel objects exist and have populated state.
+If no live objects appear, use the expanded type metadata and shallow scene roots
+to choose the next evidence-based access path. v0.2.3 is not yet game-validated.
