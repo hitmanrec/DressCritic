@@ -31,7 +31,7 @@ namespace DressmakerCritic.Diagnostics
     }
     [Serializable] public sealed class JuryAssessment
     {
-        public string schemaVersion = "2.0.0", rubricVersion = "1.0.0", captureId;
+        public string schemaVersion = "2.0.0", rubricVersion = "1.1.0", captureId;
         public List<CriticVote> jury = new List<CriticVote>();
         public JurySummary summary;
         public ContextJudgement orderCompliance = new ContextJudgement { scope = "provided-summary-only", remarks = new List<string> { "Order context has not been evaluated." } };
@@ -45,7 +45,7 @@ namespace DressmakerCritic.Diagnostics
         public static readonly IReadOnlyList<string> HouseIds = Array.AsReadOnly(ids);
         public const string Rubric = "All four judge the whole garment on a shared 0-10 scale. Harmony prioritizes composition, color/material balance and coherent details. " +
             "Character prioritizes expressive mood and a legible, distinctive idea. Avant-garde prioritizes boldness and unconventional combinations, not provable worldwide originality. " +
-            "Atelier prioritizes elegance, proportions and real-clothing plausibility within the game's editing limits. Never demand unavailable edits. " +
+            "Atelier prioritizes elegance, proportions and visual plausibility as clothing within the game's editing limits. Judge only visible silhouette, proportions and apparent balance. Do not infer physical layers, comfort, weight, sewing feasibility, functionality or designer intent from an image. Seams and zigzags may be decoration or game rendering; never treat them as proof of faulty construction. Never demand unavailable edits. " +
             "Different tastes must be explained by visible evidence, not random bonuses, fixed offsets or forced disagreement. " +
             "Anchors: 0-2 severely unresolved, 3-4 uneven, 5-6 competent, 7-8 strong, 9 exceptional, 10 rare outstanding work. " +
             "Use at most one decimal. Each remarks array contains one or two short sentences, one sentence per item. No edit advice. Use unknown/null if evidence is insufficient.";

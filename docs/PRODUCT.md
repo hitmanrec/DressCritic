@@ -62,8 +62,19 @@ the model to invent an average. No advice/action-recommendation field is accepte
 
 ## Current implementation boundary
 
-v0.8.0 implements the rubric, isolated requests, strict response contracts and
-application-owned aggregate in the existing local pipeline. Native historical
-image binding and a genuine local model run remain the blockers documented in
-CAPTURE-700.md. No new diagnostic card or score-display UI is added before that
-end-to-end run works.
+v0.9.0 adds the Evaluate/result flow to the existing real local pipeline. The
+first real saved-garment evaluation succeeded in v0.8.5 (17.3 seconds, mean 6.25).
+Rubric 1.1.0 limits Atelier to visual plausibility; physical construction,
+comfort, functionality and intent cannot be established from the captured view.
+
+The result panel shows a captured snapshot, its history record number/time,
+four votes, app-owned mean/verdict, optional context and evidence limitations.
+It never claims to follow the current live garment: changing the garment requires
+a new evaluation. Starting another evaluation clears the previous display;
+closing the panel does not cancel an ongoing request. No reflection is performed
+by the panel or per frame. Snapshot/results remain available for diagnostics.
+
+Manual Ollama is still required. Customer evidence, context runtime testing,
+repeatability/calibration, active/URP capture outside the history viewer and
+packaging/model lifecycle remain unfinished. Native result UI needs in-game
+verification; no native build is claimed without the proprietary game references.

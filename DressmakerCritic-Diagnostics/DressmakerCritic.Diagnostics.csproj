@@ -31,6 +31,14 @@
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.JSONSerializeModule.dll</HintPath>
       <Private>false</Private>

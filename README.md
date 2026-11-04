@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.5**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.9.0**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -24,14 +24,13 @@ Install the game and appropriate Proton/Steam Deck ModLoader, then from this rep
 .NET SDK and authorized game assemblies are required. Restart after installation.
 No proprietary DLLs are included. Runtime state/saves are never edited.
 
-## One diagnostic iteration
+## Evaluate a garment
 
 Open the garment in the game's saved viewer, or the active garment on mannequin /
-photo. Click **Диагностика оценщика** (console alias: `critic-export`), wait for
+photo. Click **Оценить платье** (console alias: `critic-export`), wait for
 completion, then run `./pull-exports.sh`. A single folder under
 BepInEx/config/DressmakerCritic/captures contains JSON, image(s), readiness codes,
-stage failures/timings, identity evidence, hardware and hashes. No separate text,
-image or inspection buttons; no human reports are generated.
+stage failures/timings, identity evidence, hardware and hashes. The same command preserves machine diagnostics; the result panel shows the actual jury assessment.
 
 Local inference runs only if image identity is verified, facts are present and a
 model is explicitly configured. The loopback OpenAI-compatible client and strict
@@ -89,3 +88,9 @@ votes, and rejects the observed placeholder strings. See [capture findings](docs
 First real four-house evaluation confirmed on a saved garment: mean **6.25/10**,
 17.3 seconds. This validates the end-to-end path on one example; quality and
 repeatability remain to be tested. See [findings and next priorities](docs/CAPTURE-805.md).
+
+In v0.9.0 **Оценить платье** opens the jury result panel. **Закрыть** hides it
+without cancelling inference; **Открыть результат** brings it back. Results are
+explicitly labeled as a snapshot with record number/time, not a live evaluation
+of a subsequently selected dress. English model remarks are preserved verbatim.
+See [v0.9.0 validation and in-game check](docs/RESULT-UI.md).

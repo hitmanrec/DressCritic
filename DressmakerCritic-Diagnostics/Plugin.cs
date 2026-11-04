@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.5")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.9.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -20,6 +20,7 @@ namespace DressmakerCritic.Diagnostics
         private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
         private IDisposable command;
         private volatile bool busy;
+        private readonly EvaluationPanel panel = new EvaluationPanel();
         private volatile string status = "";
         private void Awake()
         {
@@ -28,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.8.5: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.9.0: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -40,14 +41,18 @@ namespace DressmakerCritic.Diagnostics
             try
             {
                 GUI.enabled = previous && !busy;
-                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 12, 300, 36), busy ? "Сбор пакета…" : "Диагностика оценщика")) BeginCapture();
-                if (!string.IsNullOrEmpty(status)) GUI.Label(new Rect(Math.Max(0, Screen.width - 412), 52, 400, 100), status);
+                if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 12, 300, 36), busy ? "Жюри оценивает…" : "Оценить платье")) BeginCapture();
+                GUI.enabled = previous;
+                if (!panel.open && (busy || panel.result != null || !string.IsNullOrEmpty(status)))
+                    if (GUI.Button(new Rect(Math.Max(0, Screen.width - 312), 52, 300, 30), "Открыть результат")) panel.open = true;
+                panel.Draw();
             }
             finally { GUI.enabled = previous; }
         }
         private async void BeginCapture()
         {
             if (busy) return;
+            panel.Begin();
             busy = true; status = "Собираются данные, изображение и причины блокировки оценки.";
             CaptureSession capture = null;
             try
@@ -147,6 +152,8 @@ namespace DressmakerCritic.Diagnostics
                 if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
                 capture.Write("readiness.json", capture.manifest.readiness);
                 capture.Write("manifest.json", capture.manifest);
+                panel.subject = (selectedSaved >= 0 ? "Снимок платья из истории №" + (selectedSaved + 1) : "Снимок текущего платья") + " · " + DateTime.Now.ToString("HH:mm:ss");
+                panel.message = "Жюри рассматривает снимок. Можно закрыть это окно; оценка продолжится.";
                 // All Unity reads/rendering above run synchronously on the game thread.
                 // Only local HTTP and file I/O run after this await; no background game scans.
                 if (backendValid)
@@ -205,15 +212,21 @@ namespace DressmakerCritic.Diagnostics
                     });
                 }
                 else capture.manifest.stages.Add(new CaptureStage { name = "local-context-inference", status = "skipped", detail = juryResult == null ? "Jury assessment unavailable" : "No verified order or customer context; jury remains independent" });
+                panel.result = juryResult;
+                var juryStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-jury-inference");
+                var contextStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-context-inference");
+                panel.message = juryResult != null ? (contextStage?.status == "failed" ? "Жюри готово. Оценить контекст не удалось; результат жюри сохранён." : "Оценка снимка завершена.") :
+                    !capture.manifest.readiness.canEvaluate ? "Оценка недоступна. Откройте готовое платье в истории. Для оценки нужна настроенная локальная модель и подтверждённое изображение." :
+                    "Не удалось получить корректную оценку от локальной модели. Диагностика сохранена. " + (juryStage?.detail ?? "");
                 status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этапы жюри и контекста в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
             }
-            catch (Exception e) { status = "Сбой сбора: " + e.GetType().Name; Logger.LogError(e); }
+            catch (Exception e) { panel.message = "Не удалось подготовить оценку. Диагностика сохранена."; status = "Сбой сбора: " + e.GetType().Name; Logger.LogError(e); }
             finally
             {
                 try { capture?.Finish(); } catch (Exception e) { Logger.LogError(e); }
                 busy = false;
             }
         }
-        private void OnDestroy() { lifetime.Cancel(); command?.Dispose(); }
+        private void OnDestroy() { lifetime.Cancel(); command?.Dispose(); panel.Dispose(); }
     }
 }
