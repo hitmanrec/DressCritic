@@ -83,6 +83,17 @@ namespace DressmakerCritic.Diagnostics
                 var progress = ProgressSnapshotBuilder.Build(CaptureContext(time, garment.unityScene, orderIndex), orderIndex);
                 inspectedGarment = garment; inspectedProgress = selectedOrder == null ? null : progress;
                 cardText = "Источник: " + (savedChoice == null ? "Текущее платье" : savedChoice.label + " (история)") + "\n" + GarmentCardText.Build(garment, progress, selectedOrder != null);
+                if (selectedOrder != null)
+                {
+                    var definition = FieldSnapshot.ResolveFields(selectedOrder.record, "questDefinition") as UnityEngine.Object;
+                    try
+                    {
+                        var catalog = BriefReferenceCatalog.Bundled;
+                        cardText += catalog.Describe(catalog.Find(progress.order?.guid, definition == null ? null : definition.name,
+                            progress.order?.prettyName, Application.version));
+                    }
+                    catch (Exception error) { cardText += "\nАнглийский справочник недоступен; остальные данные карточки сохранены.\n"; Logger.LogError(error); }
+                }
                 historyVisible = false; ordersVisible = false;
                 cardScroll = Vector2.zero;
             }

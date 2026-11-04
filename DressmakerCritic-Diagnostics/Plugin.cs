@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.6.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic Diagnostics", "0.6.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed partial class Plugin : BaseUnityPlugin
     {
@@ -35,7 +35,7 @@ namespace DressmakerCritic.Diagnostics
                 "Show the diagnostic export overlay in every scene. Writes diagnostic files only.");
             showInspectButton = Config.Bind("Interface", "ShowInspectButton", true,
                 "Show the read-only garment facts card button across scenes.");
-            Logger.LogInfo("Dressmaker Critic Diagnostics 0.6.0 loaded (read-only).");
+            Logger.LogInfo("Dressmaker Critic Diagnostics 0.6.1 loaded (read-only).");
             try
             {
                 context = ModLoaderApi.Register(this);

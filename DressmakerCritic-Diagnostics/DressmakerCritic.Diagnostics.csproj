@@ -9,6 +9,8 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
+    <EmbeddedResource Include="Reference/brief-reference.en.json" LogicalName="DressmakerCritic.BriefReference.en.json" WithCulture="false" />
     <!-- Needed when compiling .NET Framework plugins with dotnet on Linux. -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <Reference Include="BepInEx">

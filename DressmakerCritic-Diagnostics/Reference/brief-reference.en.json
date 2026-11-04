@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "language": "en",
+  "gameVersion": "0.7.0",
+  "coverage": "Five manually researched quests; no full-game or full-dialogue coverage.",
+  "entries": [
+    {
+      "assetKey": "PrudenceModest",
+      "englishTitle": "Undercover Servant",
+      "client": "Prudence",
+      "verifiedGuid": "f205a54432cf7a4bda9bf1ab59049a6d",
+      "summary": "A restrained daytime outfit should serve routine household work while remaining refined enough for a formal social setting.",
+      "requests": [
+        "Keep the design simple and elegant.",
+        "Make the overall character suitable for daytime use.",
+        "Balance practical activity with social presentability."
+      ],
+      "prohibitions": [],
+      "uncertainties": [
+        "The public page contains an excerpt rather than the complete conversation.",
+        "No particular pattern, silhouette or fabric is established by this summary."
+      ],
+      "sourceUrl": "https://dressmakerwiki.com/commissions/undercover-servant",
+      "sourceKind": "public quest page and excerpt; original English paraphrase",
+      "reviewedAt": "2026-11-04",
+      "dialogueCoverage": "excerpt-only; no complete transcript",
+      "mappingEvidence": "Public asset key verified through the supported /dbdata endpoint; GUID verified against local runtime exports only when present."
+    },
+    {
+      "assetKey": "RoseWork",
+      "englishTitle": "Librarian Workwear",
+      "client": "Rose",
+      "verifiedGuid": null,
+      "summary": "Rose wants an unobtrusive professional outfit for her library work.",
+      "requests": [
+        "Present a professional appearance.",
+        "Avoid making the wearer the centre of attention."
+      ],
+      "prohibitions": [],
+      "uncertainties": [
+        "No specific colour, fabric or silhouette is established by the cited dialogue excerpt."
+      ],
+      "sourceUrl": "https://dressmakerwiki.com/commissions/librarian-workwear",
+      "sourceKind": "public quest page and excerpt; original English paraphrase",
+      "reviewedAt": "2026-11-04",
+      "dialogueCoverage": "excerpt-only; no complete transcript",
+      "mappingEvidence": "Public asset key verified through the supported /dbdata endpoint; GUID verified against local runtime exports only when present."
+    },
+    {
+      "assetKey": "PrudenceFuneral",
+      "englishTitle": "Flamboyant Funeral",
+      "client": "Prudence",
+      "verifiedGuid": null,
+      "summary": "Prudence wants a conspicuous, polished outfit for a funeral, with an emphasis on attracting the Duke's attention rather than blending into conventional mourning dress.",
+      "requests": [
+        "Create a noticeable and glamorous impression.",
+        "Retain a refined appearance appropriate to the client's social ambition."
+      ],
+      "prohibitions": [
+        "Black is excluded by the published game requirement."
+      ],
+      "uncertainties": [
+        "The colour exclusion is a deterministic requirement, not an independently inferred aesthetic rule.",
+        "No specific garment construction is required by the available excerpt."
+      ],
+      "sourceUrl": "https://dressmakerwiki.com/commissions/flamboyant-funeral",
+      "sourceKind": "public quest page and excerpt; original English paraphrase",
+      "reviewedAt": "2026-11-04",
+      "dialogueCoverage": "excerpt-only; no complete transcript",
+      "mappingEvidence": "Public asset key verified through the supported /dbdata endpoint; GUID verified against local runtime exports only when present."
+    },
+    {
+      "assetKey": "PriyaFuneral",
+      "englishTitle": "Fierce Funeral",
+      "client": "Priya",
+      "verifiedGuid": null,
+      "summary": "Priya wants a forceful, imposing funeral look with a dark and formal character.",
+      "requests": [
+        "Convey confidence and intensity.",
+        "Maintain a formal, gothic visual direction."
+      ],
+      "prohibitions": [
+        "Only black is allowed by the published game requirement."
+      ],
+      "uncertainties": [
+        "The all-black restriction is a deterministic requirement.",
+        "No specific cut or accessory is established by the available excerpt."
+      ],
+      "sourceUrl": "https://dressmakerwiki.com/commissions/fierce-funeral",
+      "sourceKind": "public quest page and excerpt; original English paraphrase",
+      "reviewedAt": "2026-11-04",
+      "dialogueCoverage": "excerpt-only; no complete transcript",
+      "mappingEvidence": "Public asset key verified through the supported /dbdata endpoint; GUID verified against local runtime exports only when present."
+    },
+    {
+      "assetKey": "DorothyBerty",
+      "englishTitle": "Pigeon Adoption",
+      "client": "Dorothy",
+      "verifiedGuid": null,
+      "summary": "Dorothy needs a warm, unconventional outfit for time spent feeding park birds, with sparkling decoration as part of its personality.",
+      "requests": [
+        "Convey warmth and an eclectic character.",
+        "Include a sparkling decorative element."
+      ],
+      "prohibitions": [],
+      "uncertainties": [
+        "Jewel and brooch counts belong to the game requirements and should be read from the live order.",
+        "No particular fabric or pattern is prescribed by the available excerpt."
+      ],
+      "sourceUrl": "https://dressmakerwiki.com/commissions/pigeon-adoption",
+      "sourceKind": "public quest page and excerpt; original English paraphrase",
+      "reviewedAt": "2026-11-04",
+      "dialogueCoverage": "excerpt-only; no complete transcript",
+      "mappingEvidence": "Public asset key verified through the supported /dbdata endpoint; GUID verified against local runtime exports only when present."
+    }
+  ]
+}

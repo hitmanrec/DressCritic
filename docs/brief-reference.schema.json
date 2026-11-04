@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "language",
+    "gameVersion",
+    "coverage",
+    "entries"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "language": {
+      "const": "en"
+    },
+    "gameVersion": {
+      "type": "string"
+    },
+    "coverage": {
+      "type": "string"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "assetKey",
+          "englishTitle",
+          "client",
+          "summary",
+          "sourceUrl",
+          "sourceKind",
+          "reviewedAt",
+          "dialogueCoverage",
+          "mappingEvidence",
+          "verifiedGuid",
+          "requests",
+          "prohibitions",
+          "uncertainties"
+        ],
+        "properties": {
+          "assetKey": {
+            "type": "string"
+          },
+          "englishTitle": {
+            "type": "string"
+          },
+          "client": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "sourceKind": {
+            "type": "string"
+          },
+          "reviewedAt": {
+            "type": "string"
+          },
+          "dialogueCoverage": {
+            "type": "string"
+          },
+          "mappingEvidence": {
+            "type": "string"
+          },
+          "verifiedGuid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibitions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "uncertainties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

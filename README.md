@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.6.0** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.6.1** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.6.0`.
+2. Log should show `Dressmaker Critic Diagnostics 0.6.1`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the in-game export/inspection UI. v0.5+ writes readable reports to
    `BepInEx/config/DressmakerCritic/reports/inspection-*.txt`; full diagnostic
@@ -136,3 +136,11 @@ object. Saved-history access still requires live verification.
 неподдерживаемые случаи сообщаются явно. Новые пути ещё требуют проверки в игре.
 Файлы сохраняются в captures/brief-* и captures/image-* и копируются pull-exports.sh.
 См. [подтверждённые результаты, ограничения и отдельные проверки](docs/phase-three-inputs.md).
+
+## Встроенный английский справочник (v0.6.1)
+
+После выбора заказа карточка показывает краткое английское описание из встроенной
+базы: смысл, пожелания, ограничения, неопределённости и источник. Сейчас проверены
+пять заданий; неизвестные задания не получают выдуманного текста. Данные входят
+в DLL, интернет во время игры не нужен. Это собственные краткие описания по
+публичным источникам, не полные диалоги. [Источники и точное покрытие](docs/english-brief-reference.md).
