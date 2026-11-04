@@ -50,9 +50,10 @@ Restart the game after installing.
 After exporting in-game (game can stay open or closed):
 
 ```bash
-./pull-exports.sh              # only NEW capture folders + LogOutput.log
+./pull-exports.sh              # NEW captures + log, then delete them from the game folder
 ./pull-exports.sh --commit     # same, then git commit
 ./pull-exports.sh --all        # refresh every capture from the game folder
+./pull-exports.sh --keep-source  # copy without cleaning the game captures dir
 ```
 
 ## Repository layout
