@@ -13,6 +13,7 @@ class Program
     static void Check(bool ok, string label) { if (!ok) throw new Exception(label); Console.WriteLine("PASS " + label); }
     static void Main(string[] args)
     {
+        SelectionProbeTests.Run();
         EvidenceTests.Run();
         PipelineTests.Run().GetAwaiter().GetResult();
         BriefCatalogTests.Run();

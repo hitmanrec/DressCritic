@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.7.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.7.1")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -27,7 +27,7 @@ namespace DressmakerCritic.Diagnostics
             orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
-            Logger.LogInfo("Dressmaker Critic 0.7.0: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.7.1: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -109,9 +109,10 @@ namespace DressmakerCritic.Diagnostics
                     }
                 });
                 capture.Stage("targeted-api-metadata", () => capture.Write("targeted-api.json", GameRuntimeReader.Metadata()));
+                capture.Stage("saved-garment-candidates", () => capture.Write("history-candidates.json", GameRuntimeReader.HistorySnapshots(progress, input.capturedAtUtc, SceneManager.GetActiveScene().name, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"))));
+                capture.Stage("viewer-selection-probe", () => capture.Write("viewer-selection.json", GameRuntimeReader.SelectionProbe(progress)));
                 capture.Stage("images", () => {
-                    if (state == null || manager == null) throw new InvalidOperationException("No selected garment state");
-                    var visual = GameImageCapture.Capture(capture.directory, manager, state, selectedSaved >= 0, FieldSnapshot.ResolveFields(selectedRecord, "thumbnailTex") as Texture);
+                    var visual = GameImageCapture.Capture(capture.directory, manager, state, selectedSaved >= 0 || state == null, FieldSnapshot.ResolveFields(selectedRecord, "thumbnailTex") as Texture);
                     input.limitations.Add(visual.metadata.uiStatus); input.limitations.Add(visual.metadata.viewsStatus);
                     foreach (string file in visual.metadata.files)
                         input.images.Add(new EvaluationImage { file = file, sha256 = CaptureSession.Hash(Path.Combine(capture.directory, file)), width = visual.metadata.width, height = visual.metadata.height,

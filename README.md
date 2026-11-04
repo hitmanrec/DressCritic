@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.7.0**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.7.1**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -49,3 +49,5 @@ Tests cover production data/inference code on saved fixtures and an injected HTT
 handler, not a real local model or the game's Unity rendering. Old versioned docs
 and committed captures remain research history; their removed UI instructions are
 not the current workflow.
+
+Latest real packet findings and model setup: [capture-700 analysis](docs/CAPTURE-700.md). The viewer uses shared URP render output; 0.7.1 collects it even while its garment identity is unresolved.

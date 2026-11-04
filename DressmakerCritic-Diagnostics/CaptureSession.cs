@@ -24,15 +24,25 @@ namespace DressmakerCritic.Diagnostics
         {
             var timer = Stopwatch.StartNew(); var stage = new CaptureStage { name = name };
             try { action(); stage.status = "ok"; return true; }
-            catch (Exception e) { stage.status = "failed"; stage.detail = e.GetType().Name + ": " + e.Message; return false; }
+            catch (Exception e) { stage.status = "failed"; stage.detail = Error(e); return false; }
             finally { stage.elapsedMs = timer.Elapsed.TotalMilliseconds; manifest.stages.Add(stage); }
         }
         public async Task StageAsync(string name, Func<Task> action)
         {
             var timer = Stopwatch.StartNew(); var stage = new CaptureStage { name = name };
             try { await action(); stage.status = "ok"; }
-            catch (Exception e) { stage.status = "failed"; stage.detail = e.GetType().Name + ": " + e.Message; }
+            catch (Exception e) { stage.status = "failed"; stage.detail = Error(e); }
             finally { stage.elapsedMs = timer.Elapsed.TotalMilliseconds; manifest.stages.Add(stage); }
+        }
+        private static string Error(Exception error)
+        {
+            var parts = new System.Collections.Generic.List<string>();
+            for (int i = 0; error != null && i < 4; i++, error = error.InnerException)
+            {
+                string message = error.Message ?? "";
+                parts.Add(error.GetType().Name + ": " + message.Substring(0, Math.Min(message.Length, 1024)));
+            }
+            return string.Join(" <- ", parts);
         }
         public static string Hash(string file)
         { using (var hash = SHA256.Create()) using (var stream = File.OpenRead(file)) return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "").ToLowerInvariant(); }

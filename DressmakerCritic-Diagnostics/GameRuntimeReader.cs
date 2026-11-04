@@ -18,6 +18,13 @@ namespace DressmakerCritic.Diagnostics
         public int? thumbnailTextureId;
         public bool? finished, thumbnailDirty;
     }
+    [Serializable] public sealed class HistoryCandidates
+    {
+        public int recordLimit = 16;
+        public int? declaredCount;
+        public string status;
+        public List<GarmentSnapshot> garments = new List<GarmentSnapshot>();
+    }
     [Serializable] public sealed class ViewerProbe
     {
         public string objectName, scene, textureName, textureType;
@@ -114,10 +121,34 @@ namespace DressmakerCritic.Diagnostics
             }
             return evidence;
         }
+        public static HistoryCandidates HistorySnapshots(object progress, string time, string scene, object screen)
+        {
+            var result = new HistoryCandidates();
+            object history = FieldSnapshot.ResolveFields(progress, "completedQuests");
+            result.declaredCount = FieldSnapshot.ResolveFields(history, "_size") as int?;
+            result.status = result.declaredCount == null ? "unavailable" : result.declaredCount > 16 ? "partial-first-16-records" : "all-declared-records-inspected";
+            for (int i = 0; i < Math.Min(Math.Max(result.declaredCount ?? 0, 0), result.recordLimit); i++)
+            {
+                object record = FieldSnapshot.ListItemAt(history, i);
+                object state = FieldSnapshot.ResolveFields(record, "dress");
+                if (state == null) continue;
+                string source = "PlayerProgress.completedQuests[" + i + "].dress";
+                result.garments.Add(new GarmentSnapshotBuilder(GarmentGraph(state, source, screen)).Build(time, scene, source));
+            }
+            return result;
+        }
+        public static List<SelectionOwnerEvidence> SelectionProbe(object progress)
+        {
+            var result = new List<SelectionOwnerEvidence>();
+            foreach (string name in new[] { "Sketchbook", "PhotoScene", "MannequinScene", "Mannequin", "Dress", "OldDressView" })
+                foreach (var component in Find(name).Take(8))
+                    result.Add(DressmakerCritic.Diagnostics.SelectionProbe.Read(component, progress, name + "#" + component.GetInstanceID() + ":active=" + component.gameObject.activeInHierarchy));
+            return result;
+        }
         public static List<TypeProbe> Metadata()
         {
             var result = new List<TypeProbe>();
-            foreach (string name in new[] { "OldDressView", "DressHistoryItemUI", "PhotoScene", "QuestState", "PlayerProgress", "AccessoryItemState" })
+            foreach (string name in new[] { "OldDressView", "DressHistoryItemUI", "Sketchbook", "MannequinScene", "Mannequin", "Dress", "PhotoScene", "QuestState", "PlayerProgress", "AccessoryItemState" })
             {
                 var type = GameType(name); if (type == null) continue;
                 var probe = new TypeProbe { members = FieldSnapshot.Describe(type) };

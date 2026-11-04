@@ -131,3 +131,7 @@ assessment is useful. No final-mod readiness is claimed.
    run the existing transport and inspect its structured result/latency.
 3. Only then replace the diagnostic launcher with Evaluate + the final assessment
    result view. Add supported recommendations only with verified capability rules.
+
+## Follow-up: real 0.7.0 packet
+
+[CAPTURE-700.md](CAPTURE-700.md) records the shared RenderTexture mismatch, the premature image-stage guard corrected in 0.7.1, confirmed RTX 5070/12 GB hardware and URP, and concrete local model setup. Native compilation/load of 0.7.0 is now confirmed by the user packet; the new 0.7.1 selector probe is not yet game-verified.

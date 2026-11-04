@@ -1,4 +1,4 @@
-# Dressmaker Critic 0.7.0
+# Dressmaker Critic 0.7.1
 
 The plugin now has one capture/evaluation path. Temporary facts UI, readable
 reports and per-feature buttons have been removed. Existing captured data remains
@@ -18,3 +18,5 @@ is owned and destroyed by the mod; original cameras are not changed.
 One command/button captures the complete machine-readable diagnostic transaction.
 No inference is sent for an unpaired historical viewer image or unconfigured model.
 Native integration still needs game verification; no game DLLs are shipped.
+
+See [the 0.7.0 real packet and 0.7.1 correction](../docs/CAPTURE-700.md) for shared-viewer identity evidence and the concrete local vision backend configuration.

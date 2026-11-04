@@ -24,6 +24,8 @@
     <Compile Include="BriefCatalogTests.cs" />
     <Compile Include="EvidenceTests.cs" />
     <Compile Include="PipelineTests.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/SelectionProbe.cs" Link="SelectionProbe.cs" />
+    <Compile Include="SelectionProbeTests.cs" />
     <Compile Include="Program.cs" />
     <EmbeddedResource Include="../DressmakerCritic-Diagnostics/Reference/brief-reference.en.json" LogicalName="DressmakerCritic.BriefReference.en.json" WithCulture="false" />
   </ItemGroup>
