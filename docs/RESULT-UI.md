@@ -35,3 +35,20 @@ and scrolling within the panel do not activate the game's controls behind it.
 If inference fails, import the diagnostic capture. Upload the next completed
 capture to review whether the new rubric reduced unsupported physical claims.
 No new garment needs to be made.
+
+## v0.9.1 readability correction
+
+User screenshots confirmed v0.9.0 inherited a translucent skin with small text.
+The garment behind the window obscured the assessment. The panel now draws its
+own fully opaque dark surface, sets and restores GUI tint explicitly, uses 18px
+body text, 21px bold house headings, a 28px mean and 26px title. Text wraps, remarks
+cannot inject rich text, and the scrollable viewport fits the current screen.
+Evidence limitations are collapsed by default with a clear expand button.
+No change to the scoring/model contract or English remarks.
+
+The two v0.9.0 user packets both passed all artifact hash/size checks and local
+jury inference: history dress 8 mean 6.25 in 18.6 seconds, history dress 1 mean
+6.625 in 12.0 seconds (display rounded to 6.63). This confirms two different
+saved garments can reach the UI; it is not a calibration/repeatability benchmark.
+The updated native source passes syntax verification; full Unity build and
+readability/input behavior at the user's display scale need an in-game check.

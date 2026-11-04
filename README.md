@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.9.0**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.9.1**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -94,3 +94,7 @@ without cancelling inference; **Открыть результат** brings it ba
 explicitly labeled as a snapshot with record number/time, not a live evaluation
 of a subsequently selected dress. English model remarks are preserved verbatim.
 See [v0.9.0 validation and in-game check](docs/RESULT-UI.md).
+
+v0.9.1 improves result readability with an opaque dark surface, explicit 18px
+body text, larger score/house headings and collapsible limitations, independent
+of the game's translucent IMGUI skin. No model/config changes required.

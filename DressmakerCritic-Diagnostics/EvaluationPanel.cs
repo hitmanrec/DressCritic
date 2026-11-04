@@ -12,6 +12,7 @@ namespace DressmakerCritic.Diagnostics
         public JuryAssessment result;
         public string subject, message;
         private Vector2 scroll;
+        private bool showLimitations;
         private GameObject inputShield;
         private RectTransform shieldRect;
         private void Shield(float width, float height)
@@ -37,53 +38,84 @@ namespace DressmakerCritic.Diagnostics
         private static string Number(double? value) => value.HasValue ? value.Value.ToString("0.##", CultureInfo.InvariantCulture) + " / 10" : "Недостаточно данных";
         private static string House(string id) => id == "harmony" ? "Дом Гармонии" : id == "character" ? "Дом Характера" : id == "avant_garde" ? "Дом Авангарда" : "Дом Ателье";
         private static string Verdict(string value) => value == "exceptional" ? "Выдающаяся работа" : value == "strong" ? "Сильная работа" : value == "competent" ? "Уверенная работа" : value == "uneven" ? "Неравномерная работа" : value == "weak" ? "Слабая работа" : "Недостаточно данных";
-        public void Begin() { open = true; result = null; subject = null; message = "Подготовка изображения и данных платья…"; scroll = Vector2.zero; }
-        private static GUIStyle label;
+        public void Begin() { open = true; result = null; subject = null; message = "Подготовка изображения и данных платья…"; scroll = Vector2.zero; showLimitations = false; }
+        private static GUIStyle label, heading, title, score, muted, button, area;
+        private static GUIStyle Style(int size, Color color, FontStyle weight = FontStyle.Normal)
+        {
+            var style = new GUIStyle(GUI.skin.label) { fontSize = size, fontStyle = weight, wordWrap = true, richText = false };
+            style.normal.textColor = color;
+            style.padding = new RectOffset(0, 0, 3, 3);
+            return style;
+        }
         private static void Text(string value) { GUILayout.Label(value, label); }
+        private static void InitStyles()
+        {
+            if (label != null) return;
+            label = Style(18, new Color(0.94f, 0.95f, 0.97f));
+            heading = Style(21, new Color(0.92f, 0.77f, 0.49f), FontStyle.Bold);
+            title = Style(26, Color.white, FontStyle.Bold);
+            score = Style(28, Color.white, FontStyle.Bold);
+            muted = Style(15, new Color(0.74f, 0.79f, 0.85f));
+            button = new GUIStyle(GUI.skin.button) { fontSize = 17, padding = new RectOffset(12, 12, 8, 8) };
+            area = new GUIStyle { padding = new RectOffset(24, 24, 18, 18) };
+        }
         public void Draw()
         {
             if (!open) { if (inputShield != null) inputShield.SetActive(false); return; }
-            if (label == null) label = new GUIStyle(GUI.skin.label) { wordWrap = true, richText = false };
-            float width = Math.Min(660, Math.Max(200, Screen.width - 32));
-            float height = Math.Min(740, Math.Max(180, Screen.height - 72));
+            InitStyles();
+            float width = Math.Min(780, Math.Max(200, Screen.width - 32));
+            float height = Math.Min(860, Math.Max(180, Screen.height - 72));
             Shield(width, height);
-            GUILayout.BeginArea(new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height), GUI.skin.box);
+            var rect = new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height);
+            Color oldColor = GUI.color, oldContent = GUI.contentColor, oldBackground = GUI.backgroundColor;
             try
             {
-                GUILayout.BeginHorizontal();
-                Text("Жюри домов мод");
-                if (GUILayout.Button("Закрыть", GUILayout.Width(90))) open = false;
-                GUILayout.EndHorizontal();
-                scroll = GUILayout.BeginScrollView(scroll);
+                // Do not inherit the game's transparent skin or tint for the result surface.
+                GUI.color = new Color(0.055f, 0.075f, 0.105f, 1f);
+                GUI.DrawTexture(rect, Texture2D.whiteTexture);
+                GUI.color = Color.white; GUI.contentColor = Color.white; GUI.backgroundColor = Color.white;
+                GUILayout.BeginArea(rect, area);
                 try
                 {
-                    if (!string.IsNullOrEmpty(subject)) Text(subject);
-                    Text("Оценка относится к снимку на момент запуска. После изменения или выбора другого платья запустите новую оценку.");
-                    if (!string.IsNullOrEmpty(message)) Text(message);
-                    if (result == null) return;
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Жюри домов мод", title);
+                    if (GUILayout.Button("Закрыть", button, GUILayout.Width(110))) open = false;
+                    GUILayout.EndHorizontal();
                     GUILayout.Space(8);
-                    Text("Среднее жюри: " + Number(result.summary.average));
-                    Text(Verdict(result.summary.verdict));
-                    if (result.summary.divided == true) Text("Мнения жюри разделились.");
-                    foreach (var vote in result.jury)
+                    scroll = GUILayout.BeginScrollView(scroll);
+                    try
                     {
-                        GUILayout.Space(10);
-                        Text(House(vote.houseId) + " — " + Number(vote.score));
-                        foreach (string remark in vote.remarks) Text(remark);
+                        if (!string.IsNullOrEmpty(subject)) GUILayout.Label(subject, muted);
+                        GUILayout.Label("Снимок на момент запуска. Для другого или изменённого платья нужна новая оценка.", muted);
+                        if (!string.IsNullOrEmpty(message)) GUILayout.Label(message, muted);
+                        if (result == null) return;
+                        GUILayout.Space(12);
+                        GUILayout.Label("Среднее жюри: " + Number(result.summary.average), score);
+                        GUILayout.Label(Verdict(result.summary.verdict), heading);
+                        if (result.summary.divided == true) Text("Мнения жюри разделились.");
+                        foreach (var vote in result.jury)
+                        {
+                            GUILayout.Space(20);
+                            GUILayout.Label(House(vote.houseId) + " — " + Number(vote.score), heading);
+                            foreach (string remark in vote.remarks) Text(remark);
+                        }
+                        GUILayout.Space(24);
+                        GUILayout.Label("Контекст заказа", heading);
+                        Context("Соответствие заказу", result.orderCompliance);
+                        Context("Предпочтения заказчицы", result.customerCompatibility);
+                        GUILayout.Label("Игровые требования не оценивались. Контекст не входит в среднее жюри.", muted);
+                        if (result.limitations.Count > 0)
+                        {
+                            GUILayout.Space(16);
+                            if (GUILayout.Button((showLimitations ? "Скрыть" : "Показать") + " ограничения оценки", button)) showLimitations = !showLimitations;
+                            if (showLimitations) foreach (string limit in result.limitations) GUILayout.Label(limit, muted);
+                        }
                     }
-                    GUILayout.Space(14);
-                    Context("Соответствие заказу", result.orderCompliance);
-                    Context("Предпочтения заказчицы", result.customerCompatibility);
-                    Text("Игровые требования: не оценивались. В среднее жюри не входят.");
-                    if (result.limitations.Count > 0)
-                    {
-                        GUILayout.Space(10); Text("Ограничения оценки");
-                        foreach (string limit in result.limitations) Text(limit);
-                    }
+                    finally { GUILayout.EndScrollView(); }
                 }
-                finally { GUILayout.EndScrollView(); }
+                finally { GUILayout.EndArea(); }
             }
-            finally { GUILayout.EndArea(); }
+            finally { GUI.color = oldColor; GUI.contentColor = oldContent; GUI.backgroundColor = oldBackground; }
         }
         private static void Context(string label, ContextJudgement value)
         {
