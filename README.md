@@ -45,13 +45,22 @@ Restart the game after installing.
 4. Or use the **Export diagnostics** button (upper right) — each click creates  
    `BepInEx/config/DressmakerCritic/captures/<timestamp>-<id>/`.
 
-Copy useful captures into `DressmakerCritic-Diagnostics/exports/` if you want them in git.
+### Pull captures into the repo
+
+After exporting in-game (game can stay open or closed):
+
+```bash
+./pull-exports.sh              # only NEW capture folders + LogOutput.log
+./pull-exports.sh --commit     # same, then git commit
+./pull-exports.sh --all        # refresh every capture from the game folder
+```
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
 | `install.sh` | **Unified** build + install (preferred entry point) |
+| `pull-exports.sh` | Copy new in-game captures into `exports/` (optional `--commit`) |
 | `DressmakerCritic-Diagnostics/` | Plugin source, lower-level `build.sh` / `build_and_install.sh` |
 | `DressmakerCritic-Diagnostics/exports/` | Captured JSON / logs kept for analysis |
 | `docs/` | Export schema and runtime findings |

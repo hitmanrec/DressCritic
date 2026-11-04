@@ -21,15 +21,15 @@
 [Info   :Dressmaker Mods] Deferred accessory loading enabled for 9 game methods.
 [Info   :Dressmaker Mods] Cutting-table layer-mask cache replaced 4 repeated calls.
 [Info   :Dressmaker Mods] Registered Modded fabric tag.
-[Info   :Dressmaker Mods] Asset headers ready: 0 reused, 0 read, 0 files checked in 1 ms; waited 0 ms.
+[Info   :Dressmaker Mods] Asset headers ready: 0 reused, 0 read, 0 files checked in 4 ms; waited 0 ms.
 [Info   :Dressmaker Mods] Registered 0 custom fabric(s) in 0.8 ms.
 [Info   :Dressmaker Mods] Registered 0 custom accessory(s) in 0.2 ms.
 [Info   :Dressmaker Mods] Registered 0 dress template(s) in 0.0 ms.
-[Info   :Dressmaker Mods] Registered 0 custom garment component(s) in 1.2 ms.
+[Info   :Dressmaker Mods] Registered 0 custom garment component(s) in 1.3 ms.
 [Info   :Dressmaker Mods] Registered 0 custom client(s), 0 commission(s), and 0 story dialogue(s) in 0.4 ms.
 [Info   :Dressmaker Mods] Main packs ready. 0 packs loaded in 11.1 ms.
-[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.3.1]
-[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.3.1 loaded (read-only).
+[Info   :   BepInEx] Loading [Dressmaker Critic Diagnostics 0.3.2]
+[Info   :Dressmaker Critic Diagnostics] Dressmaker Critic Diagnostics 0.3.2 loaded (read-only).
 [Message:   BepInEx] Chainloader startup complete
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: Splash; event observation cleared.
 [Info   :Dressmaker Critic Diagnostics] ModLoader content ready; use critic-status or critic-export in the console.
@@ -47,19 +47,10 @@
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Cap Sleeve; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=No Collar; variant=0; fabric=(none)
 [Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Princess Skirt; variant=0; fabric=(none)
-[Warning:  HarmonyX] AccessTools.Field: Could not find field for type GameManager and name isInIntro
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-124653-858-b665a5ea\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-124653-858-b665a5ea
+[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-125434-693-79d9b746\diagnostics.json
+[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-125434-693-79d9b746
 Exported to BepInEx/config/DressmakerCritic/diagnostics.json
-Exported editor-runtime.json and garment-snapshot.json, context-runtime.json
+Exported editor-runtime.json and garment-snapshot.json, context-runtime.json, progress-snapshot.json
 Exported runtime-types.json
-[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Waistcoat Bodice; variant=0; fabric=(none)
-[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Peasant Sleeve; variant=0; fabric=(none)
-[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Pussybow Collar; variant=0; fabric=(none)
-[Info   :Dressmaker Critic Diagnostics] Garment event: Selected; component=Flare Skirt; variant=0; fabric=(none)
-[Info   :Dressmaker Critic Diagnostics] Read-only diagnostic snapshot written: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-124817-488-cd75ebd1\diagnostics.json
-[Info   :Dressmaker Critic Diagnostics] Button export: S:\steamapps\common\Dressmaker\BepInEx\config\DressmakerCritic\captures\20261104-124817-488-cd75ebd1
-Exported to BepInEx/config/DressmakerCritic/diagnostics.json
-Exported editor-runtime.json and garment-snapshot.json, context-runtime.json
-Exported runtime-types.json
+[Info   :Dressmaker Mods] Made automatic save backup C:\users\steamuser\Documents\Dressmaker Save Backups\Automatic-save-20261104-175438-c9742d.zip.
 [Info   :Dressmaker Critic Diagnostics] Scene loaded: TitleScreen; event observation cleared.
