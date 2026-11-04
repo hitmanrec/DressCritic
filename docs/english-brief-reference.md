@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Bundled English brief reference — v0.6.1
 
 The plugin embeds Reference/brief-reference.en.json inside its DLL. Installation

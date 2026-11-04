@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Nine-stage garment workflow: confirmed runtime evidence
 
 Sources: nine v0.2.3 captures uploaded in commit 04a94ed, ordered by capture UTC

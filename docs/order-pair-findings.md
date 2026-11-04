@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Before and after accepting a story order
 
 Real v0.3.1 captures in commit 5d53199:

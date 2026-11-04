@@ -1,0 +1,426 @@
+{
+  "schemaVersion": "1.0.0",
+  "asOf": "2026-11-05",
+  "pluginVersion": "0.12.1",
+  "statusDefinitions": {
+    "confirmed": "Observed in the stated evidence; limited to that scope",
+    "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
+    "hypothesis": "Proposed explanation requiring evidence",
+    "unknown": "Insufficient evidence"
+  },
+  "facts": [
+    {
+      "id": "runtime.environment",
+      "status": "confirmed",
+      "claim": "Observed game0.7.0 Unity6000.3.4f1 URP BepInEx5.4.23.5 loader0.7.8 on Linux/Proton",
+      "evidence": [
+        "docs/CAPTURE-700.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GameRuntimeReader.cs"
+      ]
+    },
+    {
+      "id": "runtime.screen",
+      "status": "confirmed",
+      "claim": "PatternCutting does not distinguish editor sub-screens; use CurrentScene backing enum",
+      "evidence": [
+        "docs/nine-stage-findings.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GameRuntimeReader.cs"
+      ]
+    },
+    {
+      "id": "runtime.active_state",
+      "status": "confirmed",
+      "claim": "activeDress.state available from cutting in nine-stage test; absent in empty early screens",
+      "evidence": [
+        "docs/nine-stage-findings.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GarmentSnapshot.cs"
+      ]
+    },
+    {
+      "id": "runtime.progress",
+      "status": "confirmed",
+      "claim": "Guarded initializer-free PlayerProgress._current route works in observed runtime",
+      "evidence": [
+        "docs/order-pair-findings.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/ProgressAccess.cs"
+      ]
+    },
+    {
+      "id": "runtime.unlocks",
+      "status": "confirmed",
+      "claim": "Observed complete compact membership72 patterns212 fabrics182 accessories in one save; not owned stock",
+      "evidence": [
+        "docs/order-pair-findings.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/ProgressSnapshot.cs"
+      ]
+    },
+    {
+      "id": "runtime.completion",
+      "status": "confirmed",
+      "claim": "sewingComplete and finished differ; panel stitched flags alone not authoritative completion rule",
+      "evidence": [
+        "docs/nine-stage-findings.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GarmentSnapshot.cs"
+      ]
+    },
+    {
+      "id": "runtime.editor_operations",
+      "status": "unknown",
+      "claim": "Full supported editing operations, affordability and catalog GUID mapping unresolved",
+      "evidence": [
+        "docs/knowledge/RUNTIME.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/EvaluationContract.cs"
+      ]
+    },
+    {
+      "id": "render.shared_texture",
+      "status": "confirmed",
+      "claim": "Viewer uses shared RenderTexture not history thumbnail texture",
+      "evidence": [
+        "docs/CAPTURE-700.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/HistoryImageBinding.cs"
+      ]
+    },
+    {
+      "id": "render.identity",
+      "status": "confirmed",
+      "claim": "Unique display-state history reference plus assigned mannequin and camera texture chain verified before/after",
+      "evidence": [
+        "docs/CAPTURE-801.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GameRuntimeReader.cs"
+      ]
+    },
+    {
+      "id": "render.urp_requests",
+      "status": "confirmed",
+      "claim": "Four StandardRequest renders work in actual URP runtime",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs"
+      ]
+    },
+    {
+      "id": "render.empty_meshes",
+      "status": "confirmed",
+      "claim": "15 empty animation meshes polluted prior framing; mesh-local bounds corrected full-dress framing",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs"
+      ]
+    },
+    {
+      "id": "render.rotation_geometry",
+      "status": "confirmed",
+      "claim": "Three captures agree mannequin-local extents approximately1e-7 while viewer rotated",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs"
+      ]
+    },
+    {
+      "id": "render.rotation_light",
+      "status": "confirmed",
+      "claim": "Lighting changes strongly despite stable canonical geometry in live scene",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs"
+      ]
+    },
+    {
+      "id": "render.scene_isolation",
+      "status": "implemented-unverified",
+      "claim": "Temporary scene, static copies and own lights implemented; feedback shows remaining lighting defects",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/FixedViewCapture.cs"
+      ]
+    },
+    {
+      "id": "render.accessory_batch",
+      "status": "hypothesis",
+      "claim": "Missing accessories may be batched/instanced outside ordinary mesh renderers; actual fields needed",
+      "evidence": [
+        "docs/FIXED-VIEWS.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GameRuntimeReader.cs"
+      ]
+    },
+    {
+      "id": "render.active_urp",
+      "status": "unknown",
+      "claim": "Production fixed-view coverage outside historical viewer unresolved",
+      "evidence": [
+        "docs/knowledge/CURRENT.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/GameImageCapture.cs"
+      ]
+    },
+    {
+      "id": "model.variant",
+      "status": "confirmed",
+      "claim": "Default4b registry referenced Thinking; explicit4b-instruct-q4_K_M produced full final replies",
+      "evidence": [
+        "docs/CAPTURE-803.md"
+      ],
+      "code": [
+        "model/Modelfile"
+      ]
+    },
+    {
+      "id": "model.template_echo",
+      "status": "confirmed",
+      "claim": "First Instruct reply copied literal example; removing template enabled real four votes",
+      "evidence": [
+        "docs/CAPTURE-804.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/ModelRequest.cs"
+      ]
+    },
+    {
+      "id": "model.first_result",
+      "status": "confirmed",
+      "claim": "First genuine four-house result6.5/7/6/5.5; app mean6.25 in17.3s",
+      "evidence": [
+        "docs/CAPTURE-805.md"
+      ],
+      "code": [
+        "tests/fixtures/capture-805/jury-content.json"
+      ]
+    },
+    {
+      "id": "model.calibration",
+      "status": "unknown",
+      "claim": "Scores not calibrated; repeatability and unsupported physical claims remain concerns",
+      "evidence": [
+        "docs/CAPTURE-805.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/JuryContract.cs"
+      ]
+    },
+    {
+      "id": "model.context_isolation",
+      "status": "implemented-unverified",
+      "claim": "Separate context request enforced and core-tested; actual semantic context generation not yet validated",
+      "evidence": [
+        "docs/PRODUCT.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/ModelRequest.cs"
+      ]
+    },
+    {
+      "id": "brief.coverage",
+      "status": "confirmed",
+      "claim": "Five original sourced English paraphrases bundled, not full dialogues/all quests",
+      "evidence": [
+        "docs/english-brief-reference.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/Reference/brief-reference.en.json"
+      ]
+    },
+    {
+      "id": "brief.customer_profiles",
+      "status": "unknown",
+      "claim": "No verified comprehensive sourced customer preference profiles",
+      "evidence": [
+        "docs/PRODUCT.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/EvaluationContract.cs"
+      ]
+    },
+    {
+      "id": "product.readiness_gate",
+      "status": "implemented-unverified",
+      "claim": "v0.12.1 keeps explicit fixed-view runtime review gate; latest diagnostic changes need next native packet",
+      "evidence": [
+        "docs/knowledge/CURRENT.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/Plugin.cs"
+      ]
+    },
+    {
+      "id": "product.ui",
+      "status": "confirmed",
+      "claim": "Readable result overlay observed; paper layout implemented later, not native notebook integration",
+      "evidence": [
+        "docs/RESULT-UI.md"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/EvaluationPanel.cs"
+      ]
+    },
+    {
+      "id": "deployment.lifecycle",
+      "status": "unknown",
+      "claim": "Automatic local model installation/process management not implemented; manual Ollama required",
+      "evidence": [
+        "docs/knowledge/CURRENT.md"
+      ],
+      "code": [
+        "README.md"
+      ]
+    }
+  ],
+  "observedEnvironment": {
+    "scope": "capture-700 user machine, not minimum requirements",
+    "game": "0.7.0",
+    "unity": "6000.3.4f1",
+    "pipeline": "URP",
+    "bepInEx": "5.4.23.5",
+    "modLoader": "0.7.8",
+    "gpu": "RTX 5070",
+    "gpuMemoryMB": 12227,
+    "cpu": "i7-14700KF",
+    "systemMemoryMB": 31902,
+    "evidence": "docs/CAPTURE-700.md"
+  },
+  "evidenceRegistry": [
+    {
+      "captureId": "20261104-182433-869-c1721003",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-700.md",
+      "reducedFixture": "tests/fixtures/capture-700"
+    },
+    {
+      "captureId": "20261104-194051-125-28428ddd",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-800.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-194102-761-4a069d5d",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-800.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-194716-102-b6fddc29",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-801.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-195439-869-4b2977d5",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-802.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-200023-297-2e2492e8",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-803.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-200828-774-d455f3c3",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-804.md",
+      "reducedFixture": "tests/fixtures/capture-804"
+    },
+    {
+      "captureId": "20261104-201159-031-73a8b9c2",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/CAPTURE-805.md",
+      "reducedFixture": "tests/fixtures/capture-805"
+    },
+    {
+      "captureId": "20261104-202234-438-085a7c52",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/RESULT-UI.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-202434-931-ec79c904",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/RESULT-UI.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-205543-739-ca5c6923",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-205645-784-b610e7da",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-210119-876-6a56b304",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-210534-044-69572427",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-210541-604-4ddb08c3",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    },
+    {
+      "captureId": "20261104-210557-306-229632f0",
+      "fullOriginalCommitted": false,
+      "manifestVerifiedDuringAnalysis": true,
+      "analysis": "docs/FIXED-VIEWS.md",
+      "reducedFixture": null
+    }
+  ]
+}

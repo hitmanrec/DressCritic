@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Export contract 0.2.0
 
 All three exports use public-field DTOs and the bounded DiagnosticJson writer (since plugin v0.2.1), with `schemaVersion`

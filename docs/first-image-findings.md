@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # First real image capture and v0.6.2 evidence classification
 
 Source commit 9c43ffa adds one PNG/metadata pair, two brief evidence captures and

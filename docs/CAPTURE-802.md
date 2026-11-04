@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # First local model response: v0.8.2
 
 User upload: `20261104-195439-869-4b2977d5.tar.xz`. Manifest hash/size checks pass.

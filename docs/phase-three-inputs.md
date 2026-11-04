@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # v0.6.0: three independent input tracks
 
 ## 1. Saved garment state: real usage evidence

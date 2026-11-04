@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # First verified history request: v0.8.1
 
 User upload: `20261104-194716capture.tar.xz`, capture

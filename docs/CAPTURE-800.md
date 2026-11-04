@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # v0.8.0 history/main-screen captures
 
 Source: user-uploaded `20261104-194captures.tar.xz`, captures

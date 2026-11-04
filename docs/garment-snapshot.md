@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Unified garment snapshot 1.0.0
 
 Plugin v0.3.0 writes `garment-snapshot.json` whenever `critic-editor` or the export

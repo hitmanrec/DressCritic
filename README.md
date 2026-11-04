@@ -1,46 +1,79 @@
 # DressCritic
 
-Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.12.1**.
+Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.12.1**.
 
-The current objective is one real local multimodal assessment, not a diagnostics
-viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
+**Current build is for rendering validation:** model inference is deliberately
+blocked until missing accessory geometry and preview lighting are resolved.
+Earlier single-view inference and four-house scores worked in game; that does
+not validate the current fixed-view pipeline. No final-mod readiness is claimed.
 
-The target is [four independent fashion houses](docs/PRODUCT.md): harmony, character,
-avant-garde and atelier. Each returns 0–10 and a short remark; the mod computes
-the mean and verdict. Order compliance and customer compatibility are separate,
-optional channels. The jury receives neither the brief nor customer preferences.
-This contract is implemented; real-model calibration and the final score UI remain pending.
+## Knowledge and evidence
 
-## Install
+[Structured knowledge base](docs/knowledge/README.md) is the current entry point:
 
-Install the game and appropriate Proton/Steam Deck ModLoader, then from this repo:
+- [Status, blockers and next test](docs/knowledge/CURRENT.md)
+- [Runtime/game data](docs/knowledge/RUNTIME.md)
+- [Image identity, geometry and lighting](docs/knowledge/RENDERING.md)
+- [Model, jury, briefs and UI](docs/knowledge/EVALUATOR.md)
+- [Evidence registry](docs/knowledge/EVIDENCE.md) and [machine facts](docs/knowledge/facts.json)
+- [Product contract](docs/PRODUCT.md)
+
+Historical reports preserve evidence but may contain superseded installation or
+next-test instructions. Some chat-uploaded source archives are not stored in Git;
+the registry identifies that distinction explicitly.
+
+## Build and install
+
+Requires .NET SDK and an authorized local game installation with the loader.
+Close the game, then from the repository:
 
 ```bash
-./install.sh
-# or: ./install.sh "/actual/path/to/Dressmaker"
+git pull --ff-only
+bash install.sh
+# Or: bash install.sh "/actual/path/to/Dressmaker"
 ```
 
-.NET SDK and authorized game assemblies are required. Restart after installation.
-No proprietary DLLs are included. Runtime state/saves are never edited.
+No proprietary DLLs are included. Game saves, quests and garments are never
+written. Unity API changes must be verified against installed game assemblies;
+core tests and syntax checks cannot establish native compilation/rendering.
 
-## Evaluate a garment
+## Current in-game check
 
-Open the garment in the game's saved viewer, or the active garment on mannequin /
-photo. Click **Оценить платье** (console alias: `critic-export`), wait for
-completion, then run `./pull-exports.sh`. A single folder under
-BepInEx/config/DressmakerCritic/captures contains JSON, image(s), readiness codes,
-stage failures/timings, identity evidence, hardware and hashes. The same command preserves machine diagnostics; the result panel shows the actual jury assessment.
+Open the same decorated saved dress, click **Жюри → Оценить платье**, wait for
+collection, then `bash pull-exports.sh`. Send one complete packet, especially
+accessory-render.json, fixed-views.json, targeted-api.json and PNGs. A second
+rotation is not needed for this diagnostic step. Model inference remains gated.
+No new garment, model download or config change is required.
 
-Local inference runs only if image identity is verified, facts are present and a
-model is explicitly configured. The loopback OpenAI-compatible client and strict
-assessment validation are implemented; actual model quality/in-game integration
-remain unverified. Without a model, the same capture records the blockers and local
-server metadata so the next step is concrete.
+## Local model configuration (for inference after the render gate is resolved)
 
-Configuration: [audit](docs/AUDIT.md#configuration-and-exactly-one-next-in-game-test).
-English brief data is partial and source-backed; missing semantic context remains
-unknown. Recommendations are disabled until real editor operations are mapped.
+Current recipe: **qwen3-vl:4b-instruct-q4_K_M**, alias dresscritic-vision.
+Ollama >=0.12.7, context16384, temperature0.2. For a first installation or migration
+from the old Thinking variant, with Ollama running:
+
+```bash
+ollama pull qwen3-vl:4b-instruct-q4_K_M
+ollama create dresscritic-vision -f model/Modelfile
+```
+
+The game's BepInEx/config/community.dressmakercritic.diagnostics.cfg:
+
+```ini
+[Inference]
+Model = dresscritic-vision
+Endpoint = http://127.0.0.1:11434/v1/chat/completions
+TimeoutSeconds = 300
+```
+
+Existing configured installations need no model change now. A browser GET to
+/chat/completions returning405 is expected; that API requires POST. /api/tags
+lists models. Manual Ollama is a development dependency, not final packaging.
+
+Selection.SavedDressIndex=-2 uses exact display/history identity then active
+fallback; -1 explicitly selects active; >=0 is a zero-based history record.
+Selection.OrderIndex=-1 means no associated order; >=0 explicitly selects an
+accepted order. Do not derive either index from viewer siblingIndex.
 
 ## Validation
 
@@ -50,78 +83,7 @@ python3 tests/test_capture_importer.py
 python3 tools/review_capture.py /path/to/capture
 ```
 
-Tests cover production data/inference code on saved fixtures and an injected HTTP
-handler, not a real local model or the game's Unity rendering. Old versioned docs
-and committed captures remain research history; their removed UI instructions are
-not the current workflow.
-
-Latest real packet findings and model setup: [capture-700 analysis](docs/CAPTURE-700.md). The viewer uses shared URP render output; 0.7.1 collects it even while its garment identity is unresolved.
-
-Latest iteration: [two v0.8.0 captures and the preview identity fix](docs/CAPTURE-800.md).
-
-The first verified saved-garment request reached local inference but hit its old
-90-second deadline. v0.8.2 uses `[Inference] TimeoutSeconds = 300` (30–600 allowed);
-see [capture findings and next test](docs/CAPTURE-801.md).
-
-The first model reply exhausted its output budget without final JSON. v0.8.3
-requests `reasoning_effort=none`, rejects truncated/empty replies explicitly, and
-positions the JSON reader before parsing. See [the findings](docs/CAPTURE-802.md).
-
-The current model recipe explicitly selects **qwen3-vl:4b-instruct-q4_K_M**.
-The old `qwen3-vl:4b` tag resolves to Thinking weights; the no-thinking request
-option alone did not yield a final reply in the user's runtime. After updating,
-rebuild the existing alias (the config name stays unchanged):
-
-```bash
-ollama pull qwen3-vl:4b-instruct-q4_K_M
-ollama stop dresscritic-vision
-ollama create dresscritic-vision -f model/Modelfile
-ollama show --modelfile dresscritic-vision
-```
-
-Verify its base is the Instruct model. See [the variant findings](docs/CAPTURE-803.md).
-
-The first Instruct reply completed in 10.9 seconds but copied the old prompt
-template verbatim. v0.8.5 removes answer examples, explicitly describes assessed
-votes, and rejects the observed placeholder strings. See [capture findings](docs/CAPTURE-804.md).
-
-First real four-house evaluation confirmed on a saved garment: mean **6.25/10**,
-17.3 seconds. This validates the end-to-end path on one example; quality and
-repeatability remain to be tested. See [findings and next priorities](docs/CAPTURE-805.md).
-
-In v0.9.0 **Оценить платье** opens the jury result panel. **Закрыть** hides it
-without cancelling inference; **Открыть результат** brings it back. Results are
-explicitly labeled as a snapshot with record number/time, not a live evaluation
-of a subsequently selected dress. English model remarks are preserved verbatim.
-See [v0.9.0 validation and in-game check](docs/RESULT-UI.md).
-
-v0.9.1 improves result readability with an opaque dark surface, explicit 18px
-body text, larger score/house headings and collapsible limitations, independent
-of the game's translucent IMGUI skin. No model/config changes required.
-
-In v0.10.0 the **Жюри** bookmark opens a paper-styled overlay with an internal
-**Оценить платье** button. Wide layouts show the captured photo and mean beside
-house remarks. **Дома мод / Заказ** tabs separate jury and context. Display names:
-Maison Orvelle, Bellombre, Virelai, Maison Aveline; model IDs/rubrics are unchanged.
-This is the mod's overlay, not a patch to the game's actual notebook tabs.
-
-**v0.11.0 is a fixed-view validation build.** The Evaluate action captures four
-candidate orthographic views and diagnostics; inference is deliberately blocked
-until their native rendering/coverage has been reviewed. The existing single-angle
-viewer image is retained only as a reference. See [the required runtime check](docs/FIXED-VIEWS.md).
-
-v0.11.1 corrects fixed-view framing: mesh-derived mannequin-local bounds replace
-renderer world bounds, skipping empty/degenerate geometry. Runtime review is still required.
-
-v0.11.2 prepares four labeled model image parts (same 4 MiB byte budget) and
-uses the fixed front image for the snapshot preview. The runtime review gate
-remains until camera-rotation invariance and accessory coverage are checked.
-
-v0.12.0 snapshots static meshes/property blocks into a temporary scene with a
-fixed neutral light rig and canonical object orientation. It no longer renders
-the rotated live mannequin for evaluation views. Native lighting/material fidelity
-is awaiting review; inference remains gated. See FIXED-VIEWS.md for the next test.
-
-v0.12.1 adds bounded accessory-batcher/item field evidence and scene/light
-diagnostics after screenshots showed missing accessory geometry and back-biased
-lighting. These defects are not yet fixed; inference remains blocked.
+Schemas and real-response fixtures test protocol/unknowns/isolation/aggregation;
+HTTP tests use an injected handler. Real local inference was separately observed,
+but score calibration, repeatability, full context evaluation and final deployment
+remain unfinished. UI is a mod-owned overlay, not a native notebook tab.

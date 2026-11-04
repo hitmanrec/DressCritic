@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # First complete Instruct response: v0.8.4
 
 Upload `20261104-200828-774-d455f3c3.tar.xz`, all artifact hashes/sizes pass.

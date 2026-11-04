@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # First genuine four-house result: v0.8.5
 
 Capture `20261104-201159-031-73a8b9c2` from the user-uploaded archive of the same

@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # v0.8.3: no-thinking option did not resolve the model variant
 
 Upload `20261104-200023-297-2e2492e8.tar.xz`; all artifact hashes/sizes pass.

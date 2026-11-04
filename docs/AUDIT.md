@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Product audit and execution plan — 2026-11-04 / v0.7.0
 
 ## Target, not a diagnostics product

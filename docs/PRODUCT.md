@@ -1,3 +1,6 @@
+> Текущая версия/блокеры: [CURRENT](knowledge/CURRENT.md). Разделы с номерами
+> старых версий ниже описывают историю реализации, не текущий следующий тест.
+
 # DressCritic product contract — jury MVP (2026-11-05)
 
 This document fixes the product direction. It supersedes the single 0–100 visual
@@ -7,8 +10,7 @@ no multi-garment comparison are planned for this MVP.
 ## Always available jury
 
 One local vision-language model plays four fictional fashion-house roles, not four
-independent models or agents. House IDs are stable; final fictional brand names
-can be chosen later without changing the contract.
+independent models or agents. House IDs are stable; display names are chosen independently of the model contract.
 
 | ID | Display name | Preference |
 | --- | --- | --- |

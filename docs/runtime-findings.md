@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Runtime evidence and remaining questions
 
 The committed v0.1 exports are real historical game evidence, not output from the

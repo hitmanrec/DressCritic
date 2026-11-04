@@ -1,3 +1,6 @@
+> Исторический отчёт: выводы и команды относятся к описанным версиям.
+> Актуальное состояние и следующий тест: [база знаний](knowledge/README.md).
+
 # Garment facts card — v0.4.0
 
 After installing and restarting, click **Inspect garment** in the upper-right
