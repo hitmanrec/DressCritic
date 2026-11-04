@@ -16,6 +16,12 @@ namespace DressmakerCritic.Diagnostics
         public string status = "candidate-text-only";
         public string meaning = "Visible/stored UI text fields; not a complete brief and not automatically assigned to any order";
         public List<TextEvidence> observations = new List<TextEvidence>();
+        public void ClassifyDialogueCoverage()
+        {
+            if (status == "text-limit") return;
+            status = observations.Any(o => o.source != null && o.source.StartsWith("FrontDesk.dialogueText.", StringComparison.Ordinal))
+                ? "candidate-text-only" : "no-dialogue-text";
+        }
         public void ReadTextFields(object component, string source)
         {
             if (component == null) return;

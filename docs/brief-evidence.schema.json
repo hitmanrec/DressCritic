@@ -22,7 +22,8 @@
     "status": {
       "enum": [
         "candidate-text-only",
-        "text-limit"
+        "text-limit",
+        "no-dialogue-text"
       ]
     },
     "meaning": {

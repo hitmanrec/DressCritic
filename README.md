@@ -2,7 +2,7 @@
 
 Experimental **read-only** diagnostics for [Dressmaker](https://store.steampowered.com/app/2498800/Dressmaker/) on Linux/Proton with [Yuuma's Dressmaker ModLoader](https://www.nexusmods.com/dressmaker/mods/1) 0.7.8.
 
-Current plugin: **Diagnostics 0.6.1** (`DressmakerCritic-Diagnostics/`).
+Current plugin: **Diagnostics 0.6.2** (`DressmakerCritic-Diagnostics/`).
 It does **not** change dresses, commissions, or saves. It only writes diagnostic JSON under `BepInEx/config/DressmakerCritic/`.
 
 ## Quick start (build + install)
@@ -40,7 +40,7 @@ Restart the game after installing.
 ## In-game check
 
 1. Launch Dressmaker through Steam (Proton).
-2. Log should show `Dressmaker Critic Diagnostics 0.6.1`.
+2. Log should show `Dressmaker Critic Diagnostics 0.6.2`.
 3. Console (**Ctrl + \`**): `critic-status`, `critic-export`, `critic-types`, `critic-editor`.
 4. Or use the in-game export/inspection UI. v0.5+ writes readable reports to
    `BepInEx/config/DressmakerCritic/reports/inspection-*.txt`; full diagnostic
@@ -144,3 +144,10 @@ object. Saved-history access still requires live verification.
 пять заданий; неизвестные задания не получают выдуманного текста. Данные входят
 в DLL, интернет во время игры не нужен. Это собственные краткие описания по
 публичным источникам, не полные диалоги. [Источники и точное покрытие](docs/english-brief-reference.md).
+
+### Проверен первый PNG (v0.6.2)
+
+Захват изображения из игрового просмотра подтверждён: 2048×2048, платье видно
+целиком, меню в кадре нет. Привязка к выбранной записи пока не подтверждена.
+Текстовые захваты содержали только имя Rose; теперь это помечается как отсутствие
+текста диалога. [Подробные результаты](docs/first-image-findings.md).

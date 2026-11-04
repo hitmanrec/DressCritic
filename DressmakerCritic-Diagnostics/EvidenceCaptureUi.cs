@@ -29,11 +29,14 @@ namespace DressmakerCritic.Diagnostics
                 var evidence = new BriefEvidence { capturedAtUtc = DateTime.UtcNow.ToString("O") };
                 evidence.ReadTextFields(FieldSnapshot.ResolveFields(desks[0], "dialogueText"), "FrontDesk.dialogueText");
                 evidence.ReadTextFields(FieldSnapshot.ResolveFields(desks[0], "nameText"), "FrontDesk.nameText");
+                evidence.ClassifyDialogueCoverage();
                 if (evidence.observations.Count == 0) { reportStatus = "Текстовых полей не найдено. Откройте диалог и повторите."; return; }
                 string directory = EvidenceDirectory("brief");
                 File.WriteAllText(Path.Combine(directory, "brief-evidence.json"), DiagnosticJson.Serialize(evidence), System.Text.Encoding.UTF8);
                 File.WriteAllText(Path.Combine(directory, "brief-evidence.txt"), "Текстовые свидетельства; привязка к заказу не подтверждена.\n\n" + string.Join("\n\n", evidence.observations.Select(o => o.source + "\n" + o.text)), System.Text.Encoding.UTF8);
-                reportStatus = "Текст сохранён: " + directory + ". Может содержать предыдущий диалог; это не подтверждённое задание.";
+                reportStatus = evidence.status == "no-dialogue-text"
+                    ? "Сохранено только имя или служебный текст, не задание: " + directory
+                    : "Текст сохранён: " + directory + ". Может содержать предыдущий диалог; это не подтверждённое задание.";
             }
             catch (Exception e) { reportStatus = "Ошибка чтения текста — см. журнал."; Logger.LogError(e); }
         }

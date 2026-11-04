@@ -17,6 +17,7 @@ class Program
         OrderChoiceTests.Run();
         EvidenceTests.Run();
         BriefCatalogTests.Run();
+        ImageFixtureTests.Run();
         CardTests.Run();
         SnapshotTests.Run(args);
         ProgressTests.Run();
