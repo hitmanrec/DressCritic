@@ -1,6 +1,0 @@
-{
-    "schemaVersion": "0.2.0",
-    "timeUtc": "2026-11-04T11:27:18.2467154Z",
-    "scene": "PatternCutting",
-    "note": " Metadata only; at most 128 candidate types per assembly. Static values and property getters are never read."
-}

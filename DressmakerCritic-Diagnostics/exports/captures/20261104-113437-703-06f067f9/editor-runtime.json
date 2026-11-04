@@ -1,6 +1,0 @@
-{
-    "schemaVersion": "0.2.0",
-    "timeUtc": "2026-11-04T11:34:37.7050305Z",
-    "scene": "PatternCutting",
-    "note": "Candidate scene components only; not an authoritative current garment or commission. Traversal capped at 128 objects/32 components/64 children; native array allocations are not bounded. Graph budget exhausted."
-}
