@@ -13,11 +13,21 @@ namespace DressmakerCritic.Diagnostics
         public string file, axis;
         public double x, y, z;
     }
+    [Serializable] public sealed class LightEvidence
+    {
+        public string name, scene, type;
+        public bool enabled;
+        public int mask;
+        public double intensity, forwardX, forwardY, forwardZ;
+    }
     [Serializable] public sealed class FixedViewEvidence
     {
         public string status = "not-started", reason;
         public string lighting = "isolated-scene-fixed-directional-rig-v1";
         public int copiedMeshes;
+        public string previewScene, cameraScene, globalSun, ambientMode;
+        public double ambientIntensity;
+        public List<LightEvidence> lights = new List<LightEvidence>();
         public int sourceCameraMask;
         public bool approvedForInference = false;
         public int rendererCount, cameraMask, width = 768, height = 768;
@@ -127,6 +137,13 @@ namespace DressmakerCritic.Diagnostics
                 AddLight(previewRoot, "Key", new Vector3(-3, 4, 4), 0.9f);
                 AddLight(previewRoot, "Fill", new Vector3(3, 2, 2), 0.5f);
                 AddLight(previewRoot, "Back", new Vector3(0, 3, -4), 0.7f);
+                report.previewScene = previewScene.name; report.cameraScene = camera.scene.name;
+                report.globalSun = RenderSettings.sun == null ? null : RenderSettings.sun.name;
+                report.ambientMode = RenderSettings.ambientMode.ToString(); report.ambientIntensity = RenderSettings.ambientIntensity;
+                foreach (var light in UnityEngine.Object.FindObjectsOfType<Light>(true).Take(64))
+                    report.lights.Add(new LightEvidence { name = light.name, scene = light.gameObject.scene.name,
+                        type = light.type.ToString(), enabled = light.isActiveAndEnabled, mask = light.cullingMask,
+                        intensity = light.intensity, forwardX = light.transform.forward.x, forwardY = light.transform.forward.y, forwardZ = light.transform.forward.z });
                 camera.rect = new Rect(0, 0, 1, 1); camera.aspect = 1;
                 camera.orthographic = true; camera.orthographicSize = radius * 1.12f;
                 camera.nearClipPlane = 0.01f; camera.farClipPlane = radius * 8 + 1;

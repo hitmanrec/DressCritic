@@ -176,10 +176,27 @@ namespace DressmakerCritic.Diagnostics
                     result.Add(DressmakerCritic.Diagnostics.SelectionProbe.Read(component, progress, name + "#" + component.GetInstanceID() + ":active=" + component.gameObject.activeInHierarchy));
             return result;
         }
+        public static List<ValueNode> AccessoryRenderProbe(object progress)
+        {
+            var result = new List<ValueNode>();
+            var books = Find("Sketchbook").Where(c => c.gameObject.activeInHierarchy).Take(2).ToArray();
+            if (books.Length != 1) return result;
+            object dress = FieldSnapshot.ResolveFields(books[0], "_displayDress");
+            var graph = new FieldSnapshot(2048);
+            object batcher = FieldSnapshot.ResolveFields(dress, "<AccessoryBatcher>k__BackingField");
+            var root = graph.Read(batcher); root.member = "Sketchbook._displayDress.<AccessoryBatcher>k__BackingField"; result.Add(root);
+            var items = FieldSnapshot.ResolveFields(dress, "<AccessoryItems>k__BackingField");
+            for (int i = 0; i < 4 && !graph.Exhausted; i++)
+            {
+                object item = FieldSnapshot.ListItemAt(items, i); if (item == null) break;
+                var node = graph.Read(item); node.member = "Dress.AccessoryItems[" + i + "]"; result.Add(node);
+            }
+            return result;
+        }
         public static List<TypeProbe> Metadata()
         {
             var result = new List<TypeProbe>();
-            foreach (string name in new[] { "OldDressView", "DressHistoryItemUI", "Sketchbook", "MannequinScene", "Mannequin", "Dress", "PhotoScene", "QuestState", "PlayerProgress", "AccessoryItemState" })
+            foreach (string name in new[] { "OldDressView", "DressHistoryItemUI", "Sketchbook", "MannequinScene", "Mannequin", "Dress", "PhotoScene", "QuestState", "PlayerProgress", "AccessoryItemState", "AccessoryItem", "AccessoryBatchRenderer" })
             {
                 var type = GameType(name); if (type == null) continue;
                 var probe = new TypeProbe { members = FieldSnapshot.Describe(type) };

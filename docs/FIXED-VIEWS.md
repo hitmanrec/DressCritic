@@ -160,3 +160,25 @@ different normal-viewer rotations, import/send both captures. Check neutral
 appearance, intact patterns/accessories and pixel/visual consistency of each
 canonical view. No model/config change. Native APIs use existing Unity core
 references, but compilation must still be checked with the installed assemblies.
+
+## v0.12.0 screenshot feedback / v0.12.1 diagnostic boundary
+
+User reports stable but back-biased light and missing accessory meshes. Screenshots
+show a darker front and brighter back. They do not prove which source light was
+used, scene culling isolation, or how the missing decorations are drawn.
+AccessoryBatchRenderer is a confirmed game type referenced by Dress's backing
+field, but its internal rendering representation is undocumented. Ordinary mesh
+renderer copies can miss separately batched/instanced decorations; that remains a
+hypothesis until its fields are examined. Do not invent a batch mesh API.
+
+v0.12.1 exports accessory-render.json: bounded fields of the selected display
+Dress's actual AccessoryBatcher and first four accessory objects (2048 total graph
+nodes, existing depth/collection limits). Type metadata now includes AccessoryItem
+and AccessoryBatchRenderer. No getters, batching methods or asset mesh data are
+invoked/exported. Fixed-view metadata records preview/camera scene names, global
+sun and ambient settings, and up to 64 lights with scene, mask, direction and
+intensity after the owned rig exists. None of these settings is modified.
+
+One full v0.12.1 capture of this same decorated dress is needed to identify the
+actual draw data and lighting context. Screenshots alone are insufficient. This
+version intentionally improves evidence rather than claims a geometry/light fix.
