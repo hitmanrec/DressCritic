@@ -31,6 +31,10 @@
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
