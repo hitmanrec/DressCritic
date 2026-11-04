@@ -119,3 +119,44 @@ check rotation invariance and accessory coverage; repeating an undecorated dress
 alone would leave the latter unknown. No model/config changes, no new garment.
 Compare actual fixed images before approving inference; pipeline success flags
 alone are not sufficient.
+
+## Lighting regression: three v0.11.2 captures / v0.12.0
+
+Captures 20261104-210534-044-69572427, 20261104-210541-604-4ddb08c3 and
+20261104-210557-306-229632f0 all pass artifact hashes/sizes and select the same
+20-accessory dress. Mannequin-local extents agree within about 1e-7; size is
+1.135005. Front geometry/framing visually agree while illumination changes
+strongly. Front/back/profile views contain decorative vines/trim. Exact coverage
+of every accessory is not established just by its presence in structured data.
+The source mannequin rotates relative to world lighting. Fixed camera directions
+alone did not fix lighting invariance. Do not open inference on this evidence.
+
+v0.12.0 creates a temporary additive scene and a mod-owned hierarchy. Each nonempty
+static mesh renderer is copied as a MeshFilter/MeshRenderer pair using read-only
+shared meshes/materials and copied global/per-material property blocks. No game
+scripts or GameObject hierarchies are cloned. Relative matrix is mannequin inverse
+world matrix multiplied by renderer world matrix. Corner checks reject transforms
+that cannot be represented faithfully (e.g. shear/mirrored decomposition).
+Skinned meshes are explicitly unsupported pending pose baking rather than copied
+incorrectly. Source meshes/materials/lights/renderers are never modified.
+
+Camera.scene selects the preview scene; layer 30 and matching light culling masks
+restrict mod geometry. New camera settings do not inherit source camera exposure
+or transform. Fixed white key/fill/back directional lights use intensities
+0.9/0.5/0.7; shadows, light probes and reflection probes are disabled on copies.
+No game RenderSettings, active-scene switches, material setters or game light
+mutations. Preview root is disabled immediately on cleanup, objects destroyed and
+scene unloaded asynchronously; render target is restored. This is the intended
+isolation mechanism, not a claim that URP honors it correctly before testing.
+
+The native scene/camera isolation, shader/material fidelity, accessory batches
+and property blocks need runtime review. Some shaders can depend on world space
+or custom runtime data. If those are not reproduced, block rather than silently
+fall back or change source garment appearance. Camera mask metadata now separates
+sourceCameraMask from actual cameraMask; copiedMeshes identifies snapshot coverage.
+
+Next test: update/install with game closed; same decorated dress, two substantially
+different normal-viewer rotations, import/send both captures. Check neutral
+appearance, intact patterns/accessories and pixel/visual consistency of each
+canonical view. No model/config change. Native APIs use existing Unity core
+references, but compilation must still be checked with the installed assemblies.
