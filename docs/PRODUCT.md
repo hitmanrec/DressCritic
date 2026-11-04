@@ -89,3 +89,10 @@ replaced/unloaded. It never follows a different current garment. Display names
 and Russian mottos do not enter the model prompt or change scoring IDs.
 Native notebook navigation integration, bespoke emblems, localized generated
 remarks and fixed multi-view capture remain separate unfinished work.
+
+## Current runtime gate: v0.11.0
+
+Fixed-view candidate capture is implemented but awaits native compile/render and
+coverage review. Inference is paused in this validation build until that evidence
+exists. See [FIXED-VIEWS.md](FIXED-VIEWS.md). The prior single-angle results remain
+research history and are not a calibrated final evaluator.

@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.10.0")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.11.0")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.10.0: evaluation pipeline; read-only game access.");
+            Logger.LogInfo("Dressmaker Critic 0.11.0: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -142,11 +142,25 @@ namespace DressmakerCritic.Diagnostics
                         capture.Write("garment-after-render.json", after);
                     }
                 });
+                capture.Stage("fixed-view-rendering", () => {
+                    FixedViewCapture.Capture(capture.directory, state, progress);
+                    var afterFixed = new GarmentSnapshotBuilder(GameRuntimeReader.GarmentGraph(state, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField")))
+                        .Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
+                    if (DiagnosticJson.Serialize(afterFixed) != DiagnosticJson.Serialize(input.garment))
+                    {
+                        capture.Write("garment-after-fixed-views.json", afterFixed);
+                        throw new InvalidOperationException("Garment fields changed during fixed-view rendering");
+                    }
+                });
                 bool backendValid = capture.Stage("backend-configuration", () => capture.Write("backend.json", new BackendDiagnostic {
                     model = selectedModel, endpoint = LocalEvaluator.ValidateEndpoint(selectedEndpoint).AbsoluteUri,
                     configured = !string.IsNullOrWhiteSpace(selectedModel) }));
                 capture.Write("evaluation-input.json", input);
                 capture.manifest.readiness = EvaluationReadiness.Check(input, selectedModel);
+                // Candidate camera output must be inspected once before admitting it to model evidence.
+                capture.manifest.readiness.blockers.Add("fixed-views-runtime-review-required");
+                capture.manifest.readiness.canEvaluate = false;
+                panel.message = "Сняты проверочные ракурсы. Перед оценкой требуется проверка изображений.";
                 if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
                 capture.Write("readiness.json", capture.manifest.readiness);
                 capture.Write("manifest.json", capture.manifest);
@@ -214,7 +228,7 @@ namespace DressmakerCritic.Diagnostics
                 var juryStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-jury-inference");
                 var contextStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-context-inference");
                 panel.message = juryResult != null ? (contextStage?.status == "failed" ? "Жюри готово. Оценить контекст не удалось; результат жюри сохранён." : "Оценка снимка завершена.") :
-                    !capture.manifest.readiness.canEvaluate ? "Оценка недоступна. Откройте готовое платье в истории. Для оценки нужна настроенная локальная модель и подтверждённое изображение." :
+                    !capture.manifest.readiness.canEvaluate ? "Оценка приостановлена до проверки новых ракурсов. Проверочные изображения и причины возможных ошибок сохранены в диагностике." :
                     "Не удалось получить корректную оценку от локальной модели. Диагностика сохранена. " + (juryStage?.detail ?? "");
                 status = "Пакет: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Проверьте этапы жюри и контекста в manifest.json." : "Блокеры: " + string.Join(", ", capture.manifest.readiness.blockers));
             }

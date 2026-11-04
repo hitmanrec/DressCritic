@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.10.0**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.11.0**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -104,3 +104,8 @@ In v0.10.0 the **Жюри** bookmark opens a paper-styled overlay with an intern
 house remarks. **Дома мод / Заказ** tabs separate jury and context. Display names:
 Maison Orvelle, Bellombre, Virelai, Maison Aveline; model IDs/rubrics are unchanged.
 This is the mod's overlay, not a patch to the game's actual notebook tabs.
+
+**v0.11.0 is a fixed-view validation build.** The Evaluate action captures four
+candidate orthographic views and diagnostics; inference is deliberately blocked
+until their native rendering/coverage has been reviewed. The existing single-angle
+viewer image is retained only as a reference. See [the required runtime check](docs/FIXED-VIEWS.md).
