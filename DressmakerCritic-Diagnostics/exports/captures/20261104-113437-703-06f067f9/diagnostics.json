@@ -1,0 +1,15 @@
+{
+    "schemaVersion": "0.2.0",
+    "timeUtc": "2026-11-04T11:34:37.7050305Z",
+    "scene": "PatternCutting",
+    "gameVersion": "0.7.0",
+    "unityVersion": "6000.3.4f1",
+    "garmentReferenceFound": true,
+    "questDefinitions": [],
+    "activeCommissionSummary": [
+        "Unresolved: inspect scene candidate fields; no commission getter invoked"
+    ],
+    "gameManagerSummary": [
+        "Unresolved: static singleton getters disabled"
+    ]
+}
