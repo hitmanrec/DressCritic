@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator in development for Dressmaker / Linux-Proton,
-BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.4**.
+BepInEx 5.4.23.5 and Yuuma's ModLoader 0.7.8. Current plugin: **0.8.5**.
 
 The current objective is one real local multimodal assessment, not a diagnostics
 viewer. See [the audit, concrete blockers and next work](docs/AUDIT.md).
@@ -81,3 +81,7 @@ ollama show --modelfile dresscritic-vision
 ```
 
 Verify its base is the Instruct model. See [the variant findings](docs/CAPTURE-803.md).
+
+The first Instruct reply completed in 10.9 seconds but copied the old prompt
+template verbatim. v0.8.5 removes answer examples, explicitly describes assessed
+votes, and rejects the observed placeholder strings. See [capture findings](docs/CAPTURE-804.md).

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2.0.0",
+  "jury": [
+    {
+      "houseId": "harmony",
+      "status": "unknown",
+      "score": null,
+      "remarks": [
+        "One short evidence-based sentence."
+      ]
+    },
+    {
+      "houseId": "character",
+      "status": "unknown",
+      "score": null,
+      "remarks": [
+        "Why evidence is insufficient."
+      ]
+    },
+    {
+      "houseId": "avant_garde",
+      "status": "unknown",
+      "score": null,
+      "remarks": [
+        "Why evidence is insufficient."
+      ]
+    },
+    {
+      "houseId": "atelier",
+      "status": "unknown",
+      "score": null,
+      "remarks": [
+        "Why evidence is insufficient."
+      ]
+    }
+  ],
+  "limitations": []
+}

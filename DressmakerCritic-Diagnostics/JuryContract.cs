@@ -73,6 +73,8 @@ namespace DressmakerCritic.Diagnostics
             if (element?.Attribute("type")?.Value != "array" || element.Elements().Count() < min || element.Elements().Count() > max) throw new InvalidDataException("Invalid remark count");
             var values = element.Elements().Select(Text).ToList();
             if (values.Any(v => string.IsNullOrWhiteSpace(v) || v.Length > length)) throw new InvalidDataException("Invalid remark length");
+            if (values.Any(v => new[] { "One short evidence-based sentence.", "Why evidence is insufficient.", "Reason." }.Contains(v.Trim(), StringComparer.OrdinalIgnoreCase)))
+                throw new InvalidDataException("Model copied prompt placeholder text instead of assessing the garment");
             return values;
         }
         internal static double? Score(XElement element, string status)

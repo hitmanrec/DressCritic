@@ -56,11 +56,14 @@ namespace DressmakerCritic.Diagnostics
             if (task == EvaluationTask.Jury)
             {
                 instruction = common + "You represent four fictional fashion houses, not independent models. The jury must ignore orders and clients; none are provided. " + JuryContract.Rubric +
-                    " Return exactly {\"schemaVersion\":\"2.0.0\",\"jury\":[{\"houseId\":\"harmony\",\"status\":\"unknown\",\"score\":null,\"remarks\":[\"One short evidence-based sentence.\"]}," +
-                    "{\"houseId\":\"character\",\"status\":\"unknown\",\"score\":null,\"remarks\":[\"Why evidence is insufficient.\"]}," +
-                    "{\"houseId\":\"avant_garde\",\"status\":\"unknown\",\"score\":null,\"remarks\":[\"Why evidence is insufficient.\"]}," +
-                    "{\"houseId\":\"atelier\",\"status\":\"unknown\",\"score\":null,\"remarks\":[\"Why evidence is insufficient.\"]}],\"limitations\":[]}. " +
-                    "The example demonstrates the shape, not a suggested outcome. All four IDs exactly once. Do not calculate an average or verdict; the application owns aggregation.";
+                    " Produce an actual assessment of the attached garment, not a template. Return one JSON object with exactly three keys: " +
+                    "schemaVersion (string 2.0.0), jury (array of four votes), limitations (array of concrete evidence limitations, empty if none). " +
+                    "Each vote has exactly houseId, status, score, remarks. The houseId values are harmony, character, avant_garde, atelier, each exactly once. " +
+                    "For a garment you can judge from the image, use status assessed and a numeric score from 0 to 10. " +
+                    "Use status unknown and score null only when that critic truly lacks enough evidence; remarks must explain the specific missing evidence. " +
+                    "remarks contains one or two short sentences about this garment's visible design choices. Never output placeholder or instruction text. " +
+                    "Materials are a per-panel list, not an ordered description of visible regions; names do not override visible colors and panel positions are not supplied. " +
+                    "Do not calculate an average or verdict; the application owns aggregation.";
                 evidence = visual;
             }
             else
@@ -68,9 +71,10 @@ namespace DressmakerCritic.Diagnostics
                 if (!JuryContract.NeedsContext(input)) throw new InvalidOperationException("No verified order or customer context");
                 instruction = common + "Evaluate context separately from the fashion jury; no jury votes are provided. Order: assess only the explicitly selected order's sourced summary, never unseen dialogue. " +
                     "Customer: assess only verified preferences with a source, never infer them from client name or order requirements. " +
-                    "Return exactly {\"schemaVersion\":\"2.0.0\",\"orderCompliance\":{\"status\":\"unknown\",\"scope\":\"provided-summary-only\",\"score\":null,\"remarks\":[\"Reason.\"]}," +
-                    "\"customerCompatibility\":{\"status\":\"unknown\",\"scope\":\"verified-customer-preferences-only\",\"score\":null,\"remarks\":[\"Reason.\"]},\"limitations\":[]}. " +
-                    "Each status can be consistent, inconsistent or unknown; known status requires a 0-10 score with at most one decimal, unknown requires null. One or two short sentences per remarks array. " +
+                    "Return one JSON object with exactly schemaVersion (string 2.0.0), orderCompliance, customerCompatibility and limitations (array of concrete limitations). " +
+                    "Each contextual judgement has exactly status, scope, score, remarks. Order scope is provided-summary-only; customer scope is verified-customer-preferences-only. " +
+                    "Each status can be consistent, inconsistent or unknown; known status requires a 0-10 score with at most one decimal, unknown requires null. " +
+                    "One or two short evidence-based sentences per remarks array, never placeholder or instruction text. " +
                     "If order brief.status is not verified-guid or asset-key, orderCompliance must be unknown/null. If customer.status is not verified or preferences/source are absent, customerCompatibility must be unknown/null. " +
                     "Do not evaluate deterministic game requirements; do not return jury scores, averages or advice.";
                 evidence = new ContextEvidence { garment = visual,

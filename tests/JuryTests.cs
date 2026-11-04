@@ -33,6 +33,7 @@ static class JuryTests
         Refuse(()=>JuryContract.ReadJury(Reply(7.25,6,8,7),"fixture"),"jury scores restricted to one decimal");
         Refuse(()=>JuryContract.ReadJury(Good.Replace("\"character\"","\"harmony\""),"fixture"),"duplicate/missing house rejected");
         Refuse(()=>JuryContract.ReadJury(Good.Replace("\"limitations\":[","\"average\":99,\"limitations\":["),"fixture"),"model cannot supply or alter aggregate");
+        Refuse(()=>JuryContract.ReadJury(Good.Replace("Fixture observation of a visible design decision.", "One short evidence-based sentence."),"fixture"), "copied real-capture placeholder is not a valid assessment");
         var input=new EvaluationInput();
         Check(!JuryContract.NeedsContext(input),"sale garment needs no order or customer request");
         Refuse(()=>JuryContract.ApplyContext(Context("consistent",9),input,result),"unknown order cannot receive contextual score");
@@ -45,11 +46,15 @@ static class JuryTests
         JuryContract.ApplyContext(Context("inconsistent",2,"consistent",8),input,result);
         Check(result.customerCompatibility.score==8 && result.summary.average==7,"customer compatibility never changes jury mean");
         string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
+        Refuse(()=>JuryContract.ReadJury(File.ReadAllText(Path.Combine(root,"tests/fixtures/capture-804/jury-content.json")),"real-fixture"), "exact first Instruct response with copied placeholders is rejected");
         string png=Path.Combine(root,"DressmakerCritic-Diagnostics/exports/captures/image-20261104-141507-684-23ac5b7e/image.png");
         byte[] bytes=File.ReadAllBytes(png);
         input.garment=new GarmentSnapshot{garmentStatus="available",source="PlayerProgress.completedQuests[SECRET_INDEX].dress"};
         input.images.Add(new EvaluationImage{file="image.png",sha256=CaptureSession.Hash(png),width=2048,height=2048,binding="active-state-verified"});
         var jury=ModelRequest.Build(input,"fixture-model",_=>bytes);
+        Check(!jury.messages[0].content[0].text.Contains("One short evidence-based sentence.") &&
+              !jury.messages[0].content[0].text.Contains("Return exactly {") &&
+              jury.messages[0].content[0].text.Contains("status assessed"), "jury prompt states assessed status and contains no copyable answer template");
         string juryFacts=jury.messages[1].content[0].text;
         Check(new[]{"ORDER_SECRET","BRIEF_SECRET","SOURCE_SECRET","CUSTOMER_SECRET","CUSTOMER_ID_SECRET","SECRET_INDEX"}.All(secret=>!juryFacts.Contains(secret)),"jury request structurally excludes order, client and history context");
         input.order.budget=424242;input.order.deterministicRequirements.Add(new OrderRequirement{type="GAME_RULE_SECRET"});
