@@ -75,7 +75,7 @@ namespace DressmakerCritic.Diagnostics
         public string source, progressStatus, stateType;
     }
     [Serializable] public sealed class BackendDiagnostic { public string model, endpoint; public bool configured; }
-    [Serializable] public sealed class RequestDiagnostic { public string model, systemPrompt; public int imageCount, requestBytes; }
+    [Serializable] public sealed class RequestDiagnostic { public string model, systemPrompt; public int imageCount, requestBytes, timeoutSeconds; }
     [Serializable] public sealed class CaptureStage
     {
         public string name, status, detail;
@@ -89,7 +89,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class CaptureManifest
     {
         public string schemaVersion = "1.0.0", captureId, startedAtUtc, finishedAtUtc;
-        public string pluginVersion = "0.8.1";
+        public string pluginVersion = "0.8.2";
         public bool complete;
         public List<CaptureStage> stages = new List<CaptureStage>();
         public List<CaptureFile> files = new List<CaptureFile>();

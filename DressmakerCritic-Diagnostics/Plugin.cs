@@ -11,11 +11,11 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.1")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.8.2")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
-        private ConfigEntry<int> savedRecord, orderIndex;
+        private ConfigEntry<int> savedRecord, orderIndex, inferenceTimeout;
         private ConfigEntry<string> model, endpoint;
         private readonly CancellationTokenSource lifetime = new CancellationTokenSource();
         private IDisposable command;
@@ -27,7 +27,8 @@ namespace DressmakerCritic.Diagnostics
             orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
-            Logger.LogInfo("Dressmaker Critic 0.8.1: evaluation pipeline; read-only game access.");
+            inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
+            Logger.LogInfo("Dressmaker Critic 0.8.2: evaluation pipeline; read-only game access.");
         }
         private void Start()
         {
@@ -59,6 +60,7 @@ namespace DressmakerCritic.Diagnostics
                 string selectedModel = model.Value, selectedEndpoint = endpoint.Value;
                 int selectedSaved = savedRecord.Value, selectedOrder = orderIndex.Value;
                 int requestedSaved = selectedSaved;
+                int timeoutSeconds = Math.Min(600, Math.Max(30, inferenceTimeout.Value));
                 capture.Stage("runtime", () => capture.Write("runtime.json", GameRuntimeReader.Environment()));
                 capture.Stage("selection-and-identity", () => {
                     progress = ProgressAccess.TryRead(GameRuntimeReader.GameType("PlayerProgress"), out progressStatus);
@@ -167,12 +169,12 @@ namespace DressmakerCritic.Diagnostics
                         var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)));
                         string json = DiagnosticJson.Serialize(request);
                         capture.Write("jury-request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
-                            requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
+                            timeoutSeconds = timeoutSeconds, requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
                         using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
-                        using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) })
+                        using (var client = new HttpClient(handler) { Timeout = System.Threading.Timeout.InfiniteTimeSpan })
                         using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
                         {
-                            timeout.CancelAfter(TimeSpan.FromSeconds(90));
+                            timeout.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
                             string assessment = await LocalEvaluator.Run(client, selectedEndpoint, json, input, timeout.Token,
                                 response => File.WriteAllText(Path.Combine(capture.directory, "jury-model-response.json"), response));
                             juryResult = JuryContract.ReadJury(assessment, input.captureId);
@@ -187,12 +189,12 @@ namespace DressmakerCritic.Diagnostics
                         var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)), EvaluationTask.Context);
                         string json = DiagnosticJson.Serialize(request);
                         capture.Write("context-request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
-                            requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
+                            timeoutSeconds = timeoutSeconds, requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });
                         using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseProxy = false })
-                        using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) })
+                        using (var client = new HttpClient(handler) { Timeout = System.Threading.Timeout.InfiniteTimeSpan })
                         using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
                         {
-                            timeout.CancelAfter(TimeSpan.FromSeconds(90));
+                            timeout.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
                             string response = await LocalEvaluator.Run(client, selectedEndpoint, json, input, timeout.Token,
                                 raw => File.WriteAllText(Path.Combine(capture.directory, "context-model-response.json"), raw), EvaluationTask.Context);
                             JuryContract.ApplyContext(response, input, juryResult);
