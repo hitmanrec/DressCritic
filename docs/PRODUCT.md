@@ -7,6 +7,38 @@ This document fixes the product direction. It supersedes the single 0–100 visu
 score and the temporary diagnostics/facts UI. No encoder-only scoring branch and
 no multi-garment comparison are planned for this MVP.
 
+## Product goal and release acceptance
+
+Deliver a working, self-contained, fully local mod that quickly reviews saved
+dresses on demand from the game's history screen and integrates seamlessly with
+the existing notebook interface. External setup is limited to downloading the
+supported computer-vision model. The player must not need to install, configure
+or manually start a separate inference service, edit endpoint settings, or use
+a terminal to obtain a review.
+
+The mod distribution must supply and manage its compatible inference runtime:
+model discovery, startup, readiness, shutdown of owned processes, and useful
+in-game failure states. Capture, analysis and results remain on the player's
+computer; no hosted API or network dependency is allowed during evaluation.
+The existing manually configured Ollama endpoint is a development adapter, not
+completion of this requirement. The production runtime is not yet selected or
+packaged; automatic launching of a user's unrelated Ollama installation alone
+would not satisfy self-contained delivery.
+
+Release acceptance requires:
+
+- A downloaded supported model and installed mod suffice to evaluate a history
+  dress without other software setup or a manually running server.
+- Rate dress, progress, four house reviews and failures appear within the native
+  history interface; controls remain readable, scrollable and correctly bound to
+  the selected dress across switching and leaving history.
+- Canonical images include visible accessories and give consistent framing and
+  lighting independent of the viewer's rotation.
+- Reviews keep the game responsive. Cold startup and warm review latency are
+  measured separately on the documented target machine; previous timings alone
+  do not establish a production latency guarantee.
+- Fully offline evaluation and runtime cleanup are verified on Linux/Proton.
+
 ## Always available jury
 
 One local vision-language model plays four fictional fashion-house roles, not four
