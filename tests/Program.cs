@@ -14,6 +14,7 @@ class Program
     static void Main(string[] args)
     {
         EvaluationSelectionTests.Run();
+        HistoryOrderTests.Run();
         SelectionProbeTests.Run();
         JuryTests.Run();
         EvidenceTests.Run();

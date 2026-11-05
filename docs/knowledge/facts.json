@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-05",
-  "pluginVersion": "0.15.4",
+  "pluginVersion": "0.15.5",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,20 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "runtime.history_order",
+      "status": "confirmed",
+      "claim": "Capture 230842 contains 12 historical records: ten quest GUIDs/titles and two Off rack dress records sharing GUID 33dec54894f06e245bb3006dfd0174c0. QuestState.questDefinition provides the saved association; current active commission is not that association.",
+      "evidence": ["DressmakerCritic-Diagnostics/exports/captures/20261104-230842-469-86722d39/identity-evidence.json", "DressmakerCritic-Diagnostics/exports/captures/20261104-230842-469-86722d39/targeted-api.json"],
+      "code": ["DressmakerCritic-Diagnostics/HistoryOrder.cs"]
+    },
+    {
+      "id": "product.history_context",
+      "status": "implemented-unverified",
+      "claim": "v0.15.5 uses the selected history record for requirements and sourced brief lookup, ignores active OrderIndex for saved dresses and skips commission context for known off-rack records. Core tests pass; native packet pending.",
+      "evidence": ["docs/knowledge/CURRENT.md", "tests/HistoryOrderTests.cs"],
+      "code": ["DressmakerCritic-Diagnostics/Plugin.cs", "DressmakerCritic-Diagnostics/HistoryOrder.cs"]
+    },
     {
       "id": "runtime.environment",
       "status": "confirmed",

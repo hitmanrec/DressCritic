@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
-5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.4**.
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.5**.
 
 The existing history-only inline Jury, house crests, English UI and optional
 locale overlay are retained. v0.15.4 fixes the latest model response rejection,
@@ -78,8 +78,14 @@ lists models. Manual Ollama is a development dependency, not final packaging.
 
 Selection.SavedDressIndex=-2 uses exact display/history identity then active
 fallback; -1 explicitly selects active; >=0 is a zero-based history record.
-Selection.OrderIndex=-1 means no associated order; >=0 explicitly selects an
-accepted order. Do not derive either index from viewer siblingIndex.
+History dresses now use their own saved quest record automatically. Known
+commission/off-rack origins are classified by version-scoped IDs; unseen IDs stay
+unknown. `history-order.json` records origin, historical requirements, recipient
+and quest giver separately. Sourced brief lookup uses the historical definition;
+off-rack dresses receive the independent jury without a commission request.
+Selection.OrderIndex only applies to active dresses (-1: no associated order;
+>=0: explicit accepted-order index); history ignores it. Do not derive either
+index from viewer siblingIndex. Full dialogue/customer preferences remain unknown.
 
 ## Validation
 

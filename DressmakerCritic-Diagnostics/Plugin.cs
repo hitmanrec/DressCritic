@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.4")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.5")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -25,11 +25,11 @@ namespace DressmakerCritic.Diagnostics
         private void Awake()
         {
             savedRecord = Config.Bind("Selection", "SavedDressIndex", -2, "-2: unique display-state or thumbnail reference then active fallback; -1: active dress; otherwise zero-based completedQuests record index. Does not modify the game.");
-            orderIndex = Config.Bind("Selection", "OrderIndex", -1, "-1: visual assessment without order association; otherwise explicit zero-based accepted-order index.");
+            orderIndex = Config.Bind("Selection", "OrderIndex", -1, "Active dress only: -1 means no order; otherwise explicit accepted-order index. Ignored for history dresses, which use their own saved quest record.");
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.4: history-bound results, measured page layout and model response compatibility.");
+            Logger.LogInfo("Dressmaker Critic 0.15.5: historical order association and explicit garment origin.");
         }
         private void Start()
         {
@@ -94,14 +94,35 @@ namespace DressmakerCritic.Diagnostics
                     input.assetNames = GameRuntimeReader.AssetNames(state);
                     capture.Write("garment.json", input.garment);
                 });
-                if (selectedOrder >= 0) input.order.association = "explicit accepted-order index " + selectedOrder;
+                if (selectedSaved >= 0)
+                {
+                    capture.Stage("historical-order", () => {
+                        var historical = HistoryOrder.Capture(selectedRecord, state, selectedSaved, Application.version);
+                        var definition = FieldSnapshot.ResolveFields(selectedRecord, "questDefinition") as UnityEngine.Object;
+                        historical.assetKey = definition == null ? null : definition.name;
+                        capture.Write("history-order.json", historical);
+                        panel.SetHistoryOrigin(displayTicket, state, historical);
+                        if (historical.status != "record-state-verified") throw new InvalidOperationException(historical.status);
+                        if (historical.origin == "off-rack") return;
+                        input.order.association = historical.association;
+                        input.order.definition = historical.definition;
+                        input.order.budget = historical.budget;
+                        input.order.deterministicRequirements = historical.requirements;
+                        input.customer.customerId = historical.recipientId ?? historical.questGiverId;
+                        input.order.brief = EvaluationBrief.From(BriefReferenceCatalog.Bundled.Find(historical.definition?.guid,
+                            historical.assetKey, historical.definition?.prettyName, Application.version));
+                    });
+                }
+                if (selectedSaved < 0 && selectedOrder >= 0) input.order.association = "explicit accepted-order index " + selectedOrder;
                 capture.Stage("orders-and-inventory", () => {
                     var context = RuntimeContextCapture.Capture(GameRuntimeReader.GameType("PlayerProgress"), input.capturedAtUtc, SceneManager.GetActiveScene().name, selectedOrder >= 0 ? (int?)selectedOrder : null);
-                    capture.Write("order-raw.json", context);
+                    capture.Write(selectedSaved >= 0 ? "active-orders-raw.json" : "order-raw.json", context);
                     var normalized = ProgressSnapshotBuilder.Build(context, selectedOrder >= 0 ? (int?)selectedOrder : null);
-                    capture.Write("order.json", normalized);
+                    capture.Write(selectedSaved >= 0 ? "active-order.json" : "order.json", normalized);
                     capture.Write("inventory.json", normalized.unlocked);
-                    if (selectedOrder >= 0)
+                    // Active commissions are only an explicit development option for an active dress.
+                    // A saved dress always uses its own historical record, never today's commission.
+                    if (selectedSaved < 0 && selectedOrder >= 0)
                     {
                         input.order.association = "explicit accepted-order index " + selectedOrder;
                         if (normalized.orderStatus != "selected") throw new InvalidOperationException("Explicit order unavailable");

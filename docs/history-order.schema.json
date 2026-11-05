@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dresscritic:history-order:1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "origin", "association", "historyIndex", "definition", "questGiverId", "recipientId", "assetKey", "budget", "requirementsStatus", "requirements", "objects", "limitation"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "status": {"enum": ["unavailable", "record-state-mismatch", "definition-unavailable", "record-state-verified"]},
+    "origin": {"enum": ["unknown", "off-rack", "commission"]},
+    "association": {"type": ["string", "null"]},
+    "historyIndex": {"type": "integer"},
+    "definition": {"type": ["object", "null"]},
+    "questGiverId": {"type": ["string", "null"]},
+    "recipientId": {"type": ["string", "null"]},
+    "assetKey": {"type": ["string", "null"]},
+    "budget": {"type": ["integer", "null"]},
+    "requirementsStatus": {"type": ["string", "null"]},
+    "requirements": {"type": "array", "maxItems": 32},
+    "objects": {"type": "array", "maxItems": 33},
+    "limitation": {"type": "string"}
+  }
+}

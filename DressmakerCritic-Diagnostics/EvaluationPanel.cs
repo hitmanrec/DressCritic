@@ -15,6 +15,7 @@ namespace DressmakerCritic.Diagnostics
     {
         public JuryAssessment result;
         private string message;
+        private string originLabel;
         private bool contextTab;
         private bool busy;
         private bool disposed;
@@ -79,6 +80,13 @@ namespace DressmakerCritic.Diagnostics
         }
 
         public UiLayoutReport CaptureLayout() => UiLayoutProbe.Capture(cachedBook, layoutStatus, rootRt, briefRt, scoreRt, photoRt);
+        public void SetHistoryOrigin(long ticket, object state, HistoryOrderEvidence evidence)
+        {
+            if (disposed || !selection.Accepts(ticket, state)) return;
+            originLabel = evidence.origin == "off-rack" ? UiStrings.Get("origin.off-rack") :
+                evidence.origin == "commission" ? UiStrings.Get("origin.commission") + ": " + evidence.definition?.prettyName : UiStrings.Get("origin.unknown");
+            RefreshContent();
+        }
         public UiLayoutReport OriginalLayout() => originalLayout ?? new UiLayoutReport { status = "not-bound" };
 
         public void Dispose()
@@ -126,6 +134,7 @@ namespace DressmakerCritic.Diagnostics
                 RestoreLayout();
                 result = null;
                 message = null;
+                originLabel = null;
                 contextTab = false;
             }
             return visible;
@@ -628,6 +637,7 @@ namespace DressmakerCritic.Diagnostics
             }
             else
             {
+                if (!string.IsNullOrEmpty(originLabel)) y = AddLine(orderContent, originLabel, 15, Cocoa, y);
                 if (result != null)
                 {
                     y = AddLine(orderContent, UiStrings.Get("order.compliance") + ": " + Number(result.orderCompliance.score), 15, Cocoa, y);

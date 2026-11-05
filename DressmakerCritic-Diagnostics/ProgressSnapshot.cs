@@ -43,10 +43,10 @@ namespace DressmakerCritic.Diagnostics
             foreach (var value in values) section.items.Add(graph.Identity(value));
             return section;
         }
-        public static ProgressSnapshot Build(ContextRuntime source, int? explicitOrderIndex = null)
+        public static ProgressSnapshot Build(ContextRuntime source, int? explicitOrderIndex = null, string definitionPath = "PlayerProgress.selectedCommission.questDefinition")
         {
             var graph = new GarmentSnapshotBuilder(source.objects);
-            var definition = graph.Root("PlayerProgress.selectedCommission.questDefinition");
+            var definition = graph.Root(definitionPath);
             int? count; string status;
             graph.Items(graph.Root("PlayerProgress.activeCommissions"), out count, out status);
             int index;
