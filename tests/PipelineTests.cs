@@ -48,7 +48,7 @@ static class PipelineTests
     public static async Task Run()
     {
         string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
-        string png = Path.Combine(root, "DressmakerCritic-Diagnostics/exports/captures/image-20261104-141507-684-23ac5b7e/image.png");
+        string png = Path.Combine(root, "tests/fixtures/transport.png");
         byte[] image = File.ReadAllBytes(png);
         var input = Input(); input.images[0].sha256 = CaptureSession.Hash(png);
         Check(!EvaluationReadiness.Check(input, "").canEvaluate, "unconfigured model blocks evaluation");
@@ -73,6 +73,11 @@ static class PipelineTests
             string raw = null;
             string result = await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None, value => raw = value);
             Check(result == Good && handler.calls == 1 && raw.Contains("choices"), "end-to-end injected local server response is preserved and validated");
+            handler.response = File.ReadAllText(Path.Combine(root, "tests/fixtures/jury-string-remarks.json"));
+            string recovered = await LocalEvaluator.Run(client, "http://127.0.0.1:11434/v1/chat/completions", request, input, CancellationToken.None, value => raw = value);
+            Check(JuryContract.ReadJury(recovered, "http").summary.average == 6.625 &&
+                JsonDocument.Parse(raw).RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() == handler.response,
+                "HTTP normalizes real response while audit retains original model output");
             input.order.association = "explicit accepted-order index 0";
             input.order.definition = new AssetIdentity { status = "fields", prettyName = "Fixture order" };
             input.order.brief.status = "asset-key"; input.order.brief.summary = "Fixture brief"; input.order.brief.sourceUrl = "https://source.invalid/fixture";

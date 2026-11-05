@@ -1,0 +1,80 @@
+[
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-121624-528-9eb760a5/editor-runtime.json",
+    "sha256": "365362f36a6e3531daa7558462a048ab3b6d93940aa267e98810e9b3a2e518ab",
+    "fixture": "20261104-121624-528-9eb760a5/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-121657-374-a582b085/editor-runtime.json",
+    "sha256": "d47f4e404e6a2c2316171c48ac062f1f0a7e99684731b5b7158a7bf3873244bd",
+    "fixture": "20261104-121657-374-a582b085/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-121720-867-7446d013/editor-runtime.json",
+    "sha256": "b44d9418aa465a6c1b6c70818ffab61c3a48effc96786cb185d8c1079ae5034c",
+    "fixture": "20261104-121720-867-7446d013/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-121813-979-aec1a71f/editor-runtime.json",
+    "sha256": "d87c64ab5832a410c0b346d96c8a5009b405ca3b027664d1ebea20d002a886d2",
+    "fixture": "20261104-121813-979-aec1a71f/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-122000-894-6f5474fd/editor-runtime.json",
+    "sha256": "f2e8214ce49bfc1fc8855f4405f54385e6580c5875997df065bed8e312045201",
+    "fixture": "20261104-122000-894-6f5474fd/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-122006-727-a30a745d/editor-runtime.json",
+    "sha256": "397e43ad8f3ae35dd403977b59edead37248ee84fc4993668f1cfdb1ef44e987",
+    "fixture": "20261104-122006-727-a30a745d/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-122108-178-1e6bac1a/editor-runtime.json",
+    "sha256": "ca3bd0df7511b724c60f2b955d27eb9fb58c8287c81cc53f32e20d2207ad08a1",
+    "fixture": "20261104-122108-178-1e6bac1a/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-122413-989-5c2e58b6/editor-runtime.json",
+    "sha256": "fc8e7a814d98d070610f7f3d1adbf0609954a6969a8834e3c6855bef96176d85",
+    "fixture": "20261104-122413-989-5c2e58b6/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-122434-315-f7e1a777/editor-runtime.json",
+    "sha256": "5fad540f70a7141de4fbf5ce48810c6b3ce50c098ddd7127f10e5e1bc43eebd5",
+    "fixture": "20261104-122434-315-f7e1a777/editor-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-124653-858-b665a5ea/context-runtime.json",
+    "sha256": "192197607c032814f25a073127eee627a3f4c58359857b87506f7a18b11a11fc",
+    "fixture": "20261104-124653-858-b665a5ea/context-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-124817-488-cd75ebd1/context-runtime.json",
+    "sha256": "5810b26836f13105411aa635fa310ca642ae57ac795c367094c1f19dc588e9b8",
+    "fixture": "20261104-124817-488-cd75ebd1/context-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-125434-693-79d9b746/context-runtime.json",
+    "sha256": "f5a421ad71c3e1d374103774ac7cbdc902e4eff15f8f70009e57f6f931d71924",
+    "fixture": "20261104-125434-693-79d9b746/context-runtime.json.gz"
+  },
+  {
+    "sourceCommit": "d322691",
+    "sourcePath": "DressmakerCritic-Diagnostics/exports/captures/20261104-125434-693-79d9b746/progress-snapshot.json",
+    "sha256": "44c394d99699c935431325f22a95e77eea611fc5c04ff7973b402fde86b0ee0b",
+    "fixture": "20261104-125434-693-79d9b746/progress-snapshot.json.gz"
+  }
+]

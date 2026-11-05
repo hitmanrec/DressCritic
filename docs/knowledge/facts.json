@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-05",
-  "pluginVersion": "0.12.2",
+  "pluginVersion": "0.15.4",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -268,7 +268,7 @@
     {
       "id": "product.readiness_gate",
       "status": "implemented-unverified",
-      "claim": "v0.12.1 keeps explicit fixed-view runtime review gate; latest diagnostic changes need next native packet",
+      "claim": "Fixed-view review gate was removed in v0.13; v0.15.3 capture 230842 reaches inference but fails strict remarks-array validation. v0.15.4 adds bounded remarks-string compatibility; native run pending.",
       "evidence": [
         "docs/knowledge/CURRENT.md"
       ],
@@ -279,7 +279,7 @@
     {
       "id": "product.ui",
       "status": "confirmed",
-      "claim": "Readable result overlay observed; paper layout implemented later, not native notebook integration",
+      "claim": "History-only inline notebook UI in v0.15.3 has broken placement per user feedback. v0.15.4 implements measured page placement, scroll input and selection-bound completion; native layout acceptance pending.",
       "evidence": [
         "docs/RESULT-UI.md"
       ],

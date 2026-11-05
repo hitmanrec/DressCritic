@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "2.0.0",
+  "jury": [
+    {
+      "houseId": "harmony",
+      "status": "assessed",
+      "score": 6.5,
+      "remarks": "The color palette is unified but lacks contrast between materials. The silhouette is balanced but the fabric transitions are visually flat."
+    },
+    {
+      "houseId": "character",
+      "status": "assessed",
+      "score": 7.0,
+      "remarks": "The dress conveys a serious, elegant mood through its structured form and muted tones, but lacks a distinctive expressive element."
+    },
+    {
+      "houseId": "avant_garde",
+      "status": "assessed",
+      "score": 5.5,
+      "remarks": "The combination of wool and tweed is conventional; the design lacks boldness or unconventional juxtapositions to qualify as avant-garde."
+    },
+    {
+      "houseId": "atelier",
+      "status": "assessed",
+      "score": 7.5,
+      "remarks": "The proportions are well-defined with a natural waist and fitted skirt. The seam lines and paneling suggest a clean, structured construction."
+    }
+  ],
+  "limitations": [
+    "Only visible garment and supplied material facts; hidden views, real construction, originality across other dresses and unsupported editor actions are unknown."
+  ]
+}

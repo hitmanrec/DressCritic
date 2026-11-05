@@ -5,7 +5,25 @@ IDs ниже — UTC capture IDs/суффиксы, не индексы UI. У п
 притворяется, что оригинал лежит по временному /tmp. Для повторного побайтового
 анализа такого архива нужен оригинал из пользовательского архива/чата.
 
-## Ранние данные, сохранённые в репозитории
+## Последний пакет и доступность оригиналов
+
+`2d0e51e` удалил старые captures из рабочего дерева, сохранив
+[20261104-230842-469-86722d39](../../DressmakerCritic-Diagnostics/exports/captures/20261104-230842-469-86722d39).
+Его manifest hashes и размеры проверены. v0.15.3, history record 0, 15 panels,
+0 accessories; 4 fixed views приняты. Jury HTTP ответ получен за 10.8 с, но stage
+failed: `Invalid remark count`. Все четыре `remarks` — строки. Сами оценки
+6.5 / 7 / 5.5 / 7.5, расчётное среднее 6.625. Это **не** успешная отображённая
+оценка 0.15.3. v0.15.4 принимает эту форму на границе модели, сохраняя строгий
+канонический формат и исходный ответ. Регрессия:
+[исходный content](../../tests/fixtures/jury-string-remarks.json).
+
+Старые файлы из таблицы ниже искать в истории Git, например:
+`git show d322691:DressmakerCritic-Diagnostics/exports/captures/<id>/<file>`.
+13 JSON, необходимых для существующих тестов, сохранены отдельно в gzip без
+изменения байтов: [provenance/hashes](../../tests/fixtures/runtime/sources.json).
+Тесты больше не требуют старых папок captures. Полные архивы не восстановлены.
+
+## Ранние данные, сохранённые в истории репозитория
 
 | Доказательство | Результат | Где искать |
 | --- | --- | --- |
@@ -18,7 +36,7 @@ IDs ниже — UTC capture IDs/суффиксы, не индексы UI. У п
 | 125434-693-79d9b746 | Полный unlocked membership и resolved tag requirements | order-pair-findings |
 | 9c43ffa, image141507 + brief141325/141420 | Чистый single PNG; speaker-only не brief | [first-image-findings](../first-image-findings.md) |
 
-Raw committed exports искать в [exports](../../DressmakerCritic-Diagnostics/exports),
+Последний raw export искать в [exports](../../DressmakerCritic-Diagnostics/exports),
 регрессионные данные — в [tests/fixtures](../../tests/fixtures). Не все тестовые
 fixtures — полные исходные пакеты; часть специально сокращена. Объём fixtures
 не является мерой полноты исследованных game данных.

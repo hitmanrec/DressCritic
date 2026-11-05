@@ -14,12 +14,15 @@ namespace DressmakerCritic.Diagnostics
     internal sealed class EvaluationPanel
     {
         public JuryAssessment result;
-        public string subject, message; // kept for Plugin; not drawn
+        private string message;
         private bool contextTab;
         private bool busy;
+        private bool disposed;
         private Action evaluate;
         private Component boundBook;
-        private int boundQuestIndex = int.MinValue;
+        private Component cachedBook;
+        private float nextBookSearch;
+        private readonly EvaluationSelection selection = new EvaluationSelection();
         private GameObject root;
         private RectTransform rootRt, scrollContent, housesContent, orderContent;
         private TextMeshProUGUI evaluateLabel, housesTabLabel, orderTabLabel, meanLabel;
@@ -30,6 +33,11 @@ namespace DressmakerCritic.Diagnostics
         private Material fontMaterial;
         private Sprite buttonBorder;
         private JuryAssessment paintedResult;
+        private string paintedMessage;
+        private Rect placedRect;
+        private bool hasPlacedRect;
+        private string layoutStatus = "not-bound";
+        private UiLayoutReport originalLayout;
         private bool paintedContext, paintedBusy;
         private bool layoutApplied;
         private RectTransform pageRt; // left notebook page when available
@@ -49,65 +57,92 @@ namespace DressmakerCritic.Diagnostics
         private static readonly Color Paper = new Color32(241, 231, 222, 255);
         private static readonly Color Line = new Color32(176, 155, 142, 255);
 
-        public void Begin()
+        public long Begin()
         {
+            ObserveHistory(out _, out _, out _, true);
             result = null;
-            subject = null;
-            message = null;
+            message = UiStrings.Get("status.preparing");
             contextTab = false;
+            RefreshContent();
+            return selection.Revision;
+        }
+
+        public void Complete(long ticket, object evaluatedState, JuryAssessment assessment, string statusKey)
+        {
+            if (disposed) return;
+            // Resolve again on completion: Update may not yet have seen a page change.
+            ObserveHistory(out _, out _, out _, true);
+            if (!selection.IsCurrent(ticket) || (assessment != null && !selection.Accepts(ticket, evaluatedState))) return;
+            result = assessment;
+            message = assessment == null || statusKey == "status.done.context-failed" ? UiStrings.Get(statusKey) : null;
             RefreshContent();
         }
 
+        public UiLayoutReport CaptureLayout() => UiLayoutProbe.Capture(cachedBook, layoutStatus, rootRt, briefRt, scoreRt, photoRt);
+        public UiLayoutReport OriginalLayout() => originalLayout ?? new UiLayoutReport { status = "not-bound" };
+
         public void Dispose()
         {
+            disposed = true;
             RestoreLayout();
             TearDown();
             HouseEmblems.Release();
+            if (whiteSprite != null) UnityEngine.Object.Destroy(whiteSprite);
             if (whitePixel != null) { UnityEngine.Object.Destroy(whitePixel); whitePixel = null; }
             whiteSprite = null;
         }
 
         public void Tick(Action evaluateAction, bool isBusy)
         {
+            if (disposed) return;
             evaluate = evaluateAction;
             busy = isBusy;
-            if (!TryHistory(out Component book, out RectTransform spread, out int questIndex))
+            if (!ObserveHistory(out Component book, out RectTransform spread, out _))
             {
                 RestoreLayout();
                 TearDown();
                 return;
             }
-            if (questIndex != boundQuestIndex)
-            {
-                RestoreLayout();
-                boundQuestIndex = questIndex;
-                result = null;
-                subject = null;
-                message = null;
-                contextTab = false;
-                layoutApplied = false;
-            }
             if (!ReferenceEquals(boundBook, book) || root == null || !ReferenceEquals(pageRt, spread))
             {
+                RestoreLayout();
                 TearDown();
                 Build(book, spread);
             }
-            EnsureLayout(book, spread);
-            PlaceJury(spread);
-            bool dirty = !ReferenceEquals(paintedResult, result) || paintedContext != contextTab || paintedBusy != busy;
+            bool geometryChanged = PlaceJury(book, spread);
+            if (hasPlacedRect) EnsureLayout(book, spread);
+            else RestoreLayout();
+            bool dirty = geometryChanged || !ReferenceEquals(paintedResult, result) || paintedContext != contextTab || paintedBusy != busy || paintedMessage != message;
             if (dirty) RefreshContent();
             else SyncChrome();
         }
 
-        // History only. oldDressViewHolder is the active spread (left brief+stats AND right
-        // mannequin). Jury must be locked to the LEFT HALF of that spread — parenting to
-        // leftPage / full-width anchors parked controls on the spine with ~zero height.
-        private static bool TryHistory(out Component book, out RectTransform spread, out int questIndex)
+        private bool ObserveHistory(out Component book, out RectTransform spread, out int questIndex, bool refresh = false)
+        {
+            bool visible = TryHistory(out book, out spread, out questIndex, refresh);
+            object state = visible ? FieldSnapshot.ResolveFields(book, "_displayDress", "state") : null;
+            if (selection.Observe(visible ? book : null, state, visible ? questIndex : -1))
+            {
+                RestoreLayout();
+                result = null;
+                message = null;
+                contextTab = false;
+            }
+            return visible;
+        }
+
+        // Cache discovery; active status and field identity are cheap to check each frame.
+        private bool TryHistory(out Component book, out RectTransform spread, out int questIndex, bool refresh)
         {
             book = null; spread = null; questIndex = -1;
-            var books = GameRuntimeReader.Find("Sketchbook").Where(c => c != null && c.gameObject.activeInHierarchy).Take(2).ToArray();
-            if (books.Length != 1) return false;
-            book = books[0];
+            if (refresh || Time.unscaledTime >= nextBookSearch)
+            {
+                nextBookSearch = Time.unscaledTime + 0.5f;
+                var books = GameRuntimeReader.Find("Sketchbook").Where(c => c != null && c.gameObject.activeInHierarchy).Take(2).ToArray();
+                cachedBook = books.Length == 1 ? books[0] : null;
+            }
+            if (cachedBook == null || !cachedBook.gameObject.activeInHierarchy) return false;
+            book = cachedBook;
             var holder = FieldSnapshot.ResolveFields(book, "oldDressViewHolder") as GameObject;
             if (holder == null || !holder.activeInHierarchy) return false;
             spread = holder.GetComponent<RectTransform>() ?? holder.transform as RectTransform;
@@ -129,6 +164,9 @@ namespace DressmakerCritic.Diagnostics
             scroll = null;
             rows.Clear();
             paintedResult = null;
+            hasPlacedRect = false;
+            layoutStatus = "not-bound";
+            originalLayout = null;
         }
 
         private void Build(Component book, RectTransform spread)
@@ -195,14 +233,19 @@ namespace DressmakerCritic.Diagnostics
             scrollRt.anchorMax = Vector2.one;
             scrollRt.offsetMin = Vector2.zero;
             scrollRt.offsetMax = Vector2.zero;
-            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
+            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             viewport.transform.SetParent(scrollHost.transform, false);
+            // Transparent graphic is the scroll target; TMP labels deliberately do not raycast.
+            var scrollSurface = viewport.GetComponent<Image>();
+            scrollSurface.color = Color.clear;
+            scrollSurface.raycastTarget = true;
             Stretch(viewport.GetComponent<RectTransform>(), 0, 0, 0, 0);
             scrollContent = new GameObject("Content", typeof(RectTransform)).GetComponent<RectTransform>();
             scrollContent.SetParent(viewport.transform, false);
             scrollContent.anchorMin = new Vector2(0, 1);
             scrollContent.anchorMax = new Vector2(1, 1);
             scrollContent.pivot = new Vector2(0.5f, 1);
+            scrollContent.anchoredPosition = Vector2.zero;
             scrollContent.sizeDelta = new Vector2(0, 40);
             scroll = scrollHost.GetComponent<ScrollRect>();
             scroll.viewport = viewport.GetComponent<RectTransform>();
@@ -214,10 +257,10 @@ namespace DressmakerCritic.Diagnostics
 
             housesContent = new GameObject("Houses", typeof(RectTransform)).GetComponent<RectTransform>();
             housesContent.SetParent(scrollContent, false);
-            Stretch(housesContent, 0, 0, 0, 0);
+            TopContent(housesContent);
             orderContent = new GameObject("Order", typeof(RectTransform)).GetComponent<RectTransform>();
             orderContent.SetParent(scrollContent, false);
-            Stretch(orderContent, 0, 0, 0, 0);
+            TopContent(orderContent);
 
             StripLocalization(root);
             RefreshContent();
@@ -268,11 +311,12 @@ namespace DressmakerCritic.Diagnostics
 
         private void EnsureLayout(Component book, RectTransform page)
         {
-            if (layoutApplied && (scoreRt != null || briefRt != null)) return;
+            if (layoutApplied) return;
             RestoreLayout();
             briefRt = ResolveBriefCard(book, page);
             scoreRt = ResolveScoreCard(book);
             photoRt = FindPhotoButton(page);
+            originalLayout = UiLayoutProbe.Capture(book, "before-native-layout-changes", rootRt, briefRt, scoreRt, photoRt);
             if (briefRt != null)
             {
                 CaptureRect(briefRt, out briefAnchored0, out briefSize0, out briefScale0, out briefOffsetMin0, out briefOffsetMax0);
@@ -426,20 +470,54 @@ namespace DressmakerCritic.Diagnostics
             offsetMax = rt.offsetMax;
         }
 
-        private void PlaceJury(RectTransform spread)
+        private bool PlaceJury(Component book, RectTransform spread)
         {
-            if (rootRt == null || spread == null) return;
-            // LEFT HALF of the history spread only (right half is the mannequin page).
-            rootRt.SetParent(spread, false);
-            rootRt.anchorMin = new Vector2(0.045f, 0.06f);
-            rootRt.anchorMax = new Vector2(0.455f, 0.56f);
+            if (rootRt == null || spread == null) return false;
+            // Holder may be a zero-sized grouping transform. Measure the actual page
+            // in holder-local space instead of treating holder anchors as page geometry.
+            var leaf = FieldSnapshot.ResolveFields(book, "leftPage") as RectTransform;
+            if (leaf == null || leaf.rect.width < 80 || leaf.rect.height < 120)
+            {
+                layoutStatus = "left-page-geometry-unavailable";
+                hasPlacedRect = false;
+                root.SetActive(false);
+                return false;
+            }
+            var corners = new Vector3[4];
+            leaf.GetWorldCorners(corners);
+            Vector2 min = spread.InverseTransformPoint(corners[0]);
+            Vector2 max = min;
+            for (int i = 1; i < corners.Length; i++)
+            {
+                Vector2 point = spread.InverseTransformPoint(corners[i]);
+                min = Vector2.Min(min, point); max = Vector2.Max(max, point);
+            }
+            var area = new Rect(min.x + (max.x - min.x) * 0.05f, min.y + (max.y - min.y) * 0.06f,
+                (max.x - min.x) * 0.9f, (max.y - min.y) * 0.39f);
+            if (float.IsNaN(area.width) || float.IsInfinity(area.width) || float.IsNaN(area.height) ||
+                float.IsInfinity(area.height) || area.width < 80 || area.height < 80)
+            {
+                layoutStatus = "left-page-transform-invalid";
+                hasPlacedRect = false;
+                root.SetActive(false);
+                return false;
+            }
+            root.SetActive(true);
+            if (hasPlacedRect && placedRect == area) return false;
+            hasPlacedRect = true;
+            placedRect = area;
+            layoutStatus = "measured-left-page-runtime-review-required";
+            rootRt.anchorMin = rootRt.anchorMax = spread.pivot;
             rootRt.pivot = new Vector2(0.5f, 0.5f);
-            rootRt.offsetMin = new Vector2(8f, 8f);
-            rootRt.offsetMax = new Vector2(-8f, -8f);
-            rootRt.localScale = Vector3.one;
+            // Fit the existing toolbar into small notebook coordinate systems.
+            float scale = Math.Min(1f, area.width / 330f);
+            rootRt.anchoredPosition = area.center;
+            rootRt.sizeDelta = area.size / scale;
+            rootRt.localScale = Vector3.one * scale;
             rootRt.localRotation = Quaternion.identity;
             root.transform.SetAsLastSibling();
             LayoutRebuilder.ForceRebuildLayoutImmediate(rootRt);
+            return true;
         }
 
         private void RestoreLayout()
@@ -496,18 +574,8 @@ namespace DressmakerCritic.Diagnostics
                 if (score > bestScore) { bestScore = score; best = rt; }
             }
             if (best != null) return best;
-            // Fallback: lowest large button on the left page.
-            foreach (var button in page.GetComponentsInChildren<Button>(true))
-            {
-                if (button == null || !button.gameObject.activeInHierarchy) continue;
-                var rt = button.GetComponent<RectTransform>();
-                if (rt == null) continue;
-                float area = Math.Abs(rt.rect.width * rt.rect.height);
-                if (area < 2500f) continue;
-                float score = -rt.anchoredPosition.y + area * 0.01f;
-                if (score > bestScore) { bestScore = score; best = rt; }
-            }
-            return best;
+            // Do not shrink an unrelated button when the localized Photo label is unknown.
+            return null;
         }
 
         private void SyncChrome()
@@ -532,11 +600,12 @@ namespace DressmakerCritic.Diagnostics
             paintedResult = result;
             paintedContext = contextTab;
             paintedBusy = busy;
+            paintedMessage = message;
             if (root == null) return;
             SyncChrome();
             if (meanLabel != null)
             {
-                if (result == null) meanLabel.text = "";
+                if (result == null) meanLabel.text = busy ? UiStrings.Get("evaluating") : "";
                 else
                 {
                     string mean = Number(result.summary.average);
@@ -546,7 +615,11 @@ namespace DressmakerCritic.Diagnostics
             }
             foreach (var go in rows) if (go != null) UnityEngine.Object.Destroy(go);
             rows.Clear();
+            // Resolve final viewport width before measuring wrapped TMP text.
+            if (rootRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRt);
             float y = 0;
+            if (!string.IsNullOrEmpty(message))
+                y = AddLine(contextTab ? orderContent : housesContent, message, 14, Muted, y);
             if (!contextTab)
             {
                 if (result != null)
@@ -582,6 +655,7 @@ namespace DressmakerCritic.Diagnostics
             rowRt.anchorMin = new Vector2(0, 1);
             rowRt.anchorMax = new Vector2(1, 1);
             rowRt.pivot = new Vector2(0.5f, 1);
+            rowRt.sizeDelta = Vector2.zero;
             rowRt.anchoredPosition = new Vector2(0, -y);
             rows.Add(row);
 
@@ -606,11 +680,11 @@ namespace DressmakerCritic.Diagnostics
             nameRt.sizeDelta = new Vector2(-48, 20);
 
             float body = 38;
-            float width = Math.Max(280f, Math.Abs(parent.rect.width) > 40f ? parent.rect.width - 48f : 280f);
+            float width = Math.Max(1f, parent.rect.width - 48f);
             foreach (string remark in vote.remarks ?? Enumerable.Empty<string>())
             {
                 var line = MakeLabel(row.transform, "Remark", remark, 14, Ink, TextAlignmentOptions.Left);
-                float h = EstimateHeight(remark, 14, width);
+                float h = Math.Max(18, line.GetPreferredValues(remark, width, float.PositiveInfinity).y + 2);
                 var lineRt = line.rectTransform;
                 lineRt.anchorMin = new Vector2(0, 1);
                 lineRt.anchorMax = new Vector2(1, 1);
@@ -627,7 +701,7 @@ namespace DressmakerCritic.Diagnostics
         {
             var label = MakeLabel(parent, "Line", text, size, color, TextAlignmentOptions.Left);
             float width = Math.Max(120, parent.rect.width - 8);
-            float h = EstimateHeight(text, size, width);
+            float h = Math.Max(size + 4, label.GetPreferredValues(text, width, float.PositiveInfinity).y + 2);
             var rt = label.rectTransform;
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(1, 1);
@@ -647,12 +721,13 @@ namespace DressmakerCritic.Diagnostics
             ? value.Value.ToString("0.##", CultureInfo.InvariantCulture) + " / 10"
             : UiStrings.Get("insufficient");
 
-        private static float EstimateHeight(string text, float fontSize, float width)
+        private static void TopContent(RectTransform rt)
         {
-            if (string.IsNullOrEmpty(text)) return fontSize + 4;
-            float charsPerLine = Math.Max(8f, width / (fontSize * 0.52f));
-            int lines = Math.Max(1, Mathf.CeilToInt(text.Length / charsPerLine));
-            return lines * (fontSize + 4) + 2;
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = Vector2.one;
+            rt.pivot = new Vector2(0.5f, 1);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = Vector2.zero;
         }
 
         private Image MakeButton(Transform parent, string name, string text, float w, float h, Action click, out TextMeshProUGUI label)

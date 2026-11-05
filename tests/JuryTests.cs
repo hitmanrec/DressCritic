@@ -46,10 +46,36 @@ static class JuryTests
         JuryContract.ApplyContext(Context("inconsistent",2,"consistent",8),input,result);
         Check(result.customerCompatibility.score==8 && result.summary.average==7,"customer compatibility never changes jury mean");
         string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
+        string stringRemarks = File.ReadAllText(Path.Combine(root,"tests/fixtures/jury-string-remarks.json"));
+        Refuse(() => JuryContract.ReadJury(stringRemarks, "strict"), "canonical assessment schema still requires remarks arrays");
+        string normalized = LocalEvaluator.NormalizeRemarks(stringRemarks, EvaluationTask.Jury);
+        var recovered = JuryContract.ReadJury(normalized, "230842");
+        Check(recovered.summary.average == 6.625 && recovered.jury.All(v => v.remarks.Count == 1), "real 0.15.3 string remarks recover all four votes without changing their scores");
+        using (var original = JsonDocument.Parse(stringRemarks))
+            Check(recovered.jury.Select(v => v.remarks[0]).SequenceEqual(original.RootElement.GetProperty("jury").EnumerateArray().Select(v => v.GetProperty("remarks").GetString())), "normalization preserves complete remarks verbatim");
+        Check(LocalEvaluator.NormalizeRemarks(Good, EvaluationTask.Jury) == Good, "canonical response is returned unchanged");
+        foreach (string value in new[] { "", new string('x', 241), "One short evidence-based sentence." })
+        {
+            var bad = System.Text.Json.Nodes.JsonNode.Parse(stringRemarks);
+            bad["jury"][0]["remarks"] = value;
+            Refuse(() => JuryContract.ReadJury(LocalEvaluator.NormalizeRemarks(bad.ToJsonString(), EvaluationTask.Jury), "bad"), "string compatibility keeps length/nonempty/placeholder validation");
+        }
+        var numeric = System.Text.Json.Nodes.JsonNode.Parse(stringRemarks);
+        numeric["jury"][0]["remarks"] = 42;
+        Refuse(() => JuryContract.ReadJury(LocalEvaluator.NormalizeRemarks(numeric.ToJsonString(), EvaluationTask.Jury), "bad"), "numeric remarks are not coerced to text");
+        numeric["jury"][0]["remarks"] = "Visible detail.";
+        numeric["jury"][0]["score"] = 11;
+        Refuse(() => JuryContract.ReadJury(LocalEvaluator.NormalizeRemarks(numeric.ToJsonString(), EvaluationTask.Jury), "bad"), "normalization never repairs invalid scores");
+        var contextual = System.Text.Json.Nodes.JsonNode.Parse(UnknownContext);
+        contextual["orderCompliance"]["remarks"] = "No sourced order brief.";
+        contextual["customerCompatibility"]["remarks"] = "No verified preferences.";
+        var contextOnly = new JuryAssessment();
+        JuryContract.ApplyContext(LocalEvaluator.NormalizeRemarks(contextual.ToJsonString(), EvaluationTask.Context), new EvaluationInput(), contextOnly);
+        Check(contextOnly.orderCompliance.remarks.Single() == "No sourced order brief." && contextOnly.customerCompatibility.score == null, "context string remarks use same bounded compatibility without inventing scores");
         Refuse(()=>JuryContract.ReadJury(File.ReadAllText(Path.Combine(root,"tests/fixtures/capture-804/jury-content.json")),"real-fixture"), "exact first Instruct response with copied placeholders is rejected");
         var real = JuryContract.ReadJury(File.ReadAllText(Path.Combine(root,"tests/fixtures/capture-805/jury-content.json")),"real-success");
         Check(real.summary.average == 6.25 && real.summary.spread == 1.5 && real.summary.divided == false && real.summary.verdict == "competent", "first successful real model response preserves votes and computes correct aggregate");
-        string png=Path.Combine(root,"DressmakerCritic-Diagnostics/exports/captures/image-20261104-141507-684-23ac5b7e/image.png");
+        string png=Path.Combine(root,"tests/fixtures/transport.png");
         byte[] bytes=File.ReadAllBytes(png);
         input.garment=new GarmentSnapshot{garmentStatus="available",source="PlayerProgress.completedQuests[SECRET_INDEX].dress"};
         input.images.Add(new EvaluationImage{file="image.png",sha256=CaptureSession.Hash(png),width=2048,height=2048,binding="active-state-verified"});

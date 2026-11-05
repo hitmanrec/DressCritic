@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DressmakerCritic.Diagnostics
 {
@@ -23,6 +24,36 @@ namespace DressmakerCritic.Diagnostics
     }
     public static class LocalEvaluator
     {
+        // Compatibility only at the model boundary. Stored assessments still use the
+        // strict schema: no score coercion, missing-field defaults or text truncation.
+        // Some local models return a short remarks string even in JSON object mode.
+        public static string NormalizeRemarks(string json, EvaluationTask task)
+        {
+            var root = JuryContract.Parse(json);
+            var nodes = task == EvaluationTask.Jury
+                ? root.Elements("jury").Where(e => e.Attribute("type")?.Value == "array").Elements().Elements("remarks")
+                : root.Elements().Where(e => e.Name == "orderCompliance" || e.Name == "customerCompatibility").Elements("remarks");
+            bool changed = false;
+            foreach (var node in nodes.ToList())
+            {
+                if (node.Attribute("type")?.Value != "string") continue;
+                string value = node.Value;
+                node.SetAttributeValue("type", "array");
+                node.ReplaceNodes(new XElement("item", new XAttribute("type", "string"), value));
+                changed = true;
+            }
+            if (!changed) return json;
+            // XElement can retain an empty text node for JSON null; the JSON writer
+            // correctly rejects text under type=null, even when that text is empty.
+            foreach (var node in root.DescendantsAndSelf().Where(e => e.Attribute("type")?.Value == "null" && e.Value.Length == 0))
+                node.RemoveNodes();
+            using (var buffer = new MemoryStream())
+            {
+                using (var writer = JsonReaderWriterFactory.CreateJsonWriter(buffer, Encoding.UTF8, false))
+                    root.WriteTo(writer);
+                return Encoding.UTF8.GetString(buffer.ToArray());
+            }
+        }
         public static Uri ValidateEndpoint(string endpoint)
         {
             Uri uri;
@@ -72,6 +103,7 @@ namespace DressmakerCritic.Diagnostics
                         if (choice?.finish_reason == "length") throw new InvalidDataException("Model output token limit reached; no complete assessment accepted. Check the selected model variant and output budget; reasoning_effort=none is already requested.");
                         string result = choice?.message?.content;
                         if (string.IsNullOrWhiteSpace(result)) throw new InvalidDataException("Model returned no final assessment content; reasoning is not an assessment.");
+                        result = NormalizeRemarks(result, task);
                         AssessmentValidator.Validate(result, input, task);
                         return result;
                     }

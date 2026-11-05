@@ -15,8 +15,8 @@ static class ContextFixtureTests
         var snapshots = new List<ProgressSnapshot>();
         foreach (string capture in new[] {"20261104-124653-858-b665a5ea", "20261104-124817-488-cd75ebd1", "20261104-125434-693-79d9b746"})
         {
-            string path = Path.Combine(root, "DressmakerCritic-Diagnostics/exports/captures", capture, "context-runtime.json");
-            var input = JsonSerializer.Deserialize<ContextRuntime>(File.ReadAllText(path), new JsonSerializerOptions { IncludeFields = true });
+            string raw = RuntimeFixtures.Read(capture, "context-runtime.json");
+            var input = JsonSerializer.Deserialize<ContextRuntime>(raw, new JsonSerializerOptions { IncludeFields = true });
             var snapshot = ProgressSnapshotBuilder.Build(input); snapshots.Add(snapshot);
             using (var doc = JsonDocument.Parse(DiagnosticJson.Serialize(snapshot)))
                 Check(doc.RootElement.GetProperty("schemaVersion").GetString() == "1.0.0", "progress snapshot JSON fixture " + snapshots.Count);
@@ -34,8 +34,8 @@ static class ContextFixtureTests
         var sections = new[] { verified.unlocked.patterns, verified.unlocked.fabrics, verified.unlocked.accessories };
         Check(sections.Select(s => s.totalCount).SequenceEqual(new int?[] { 72, 212, 182 }) && sections.All(s => s.status == "complete" && s.items.Count == s.totalCount), "real full unlocked membership counts");
         Check(sections.All(s => s.items.All(i => i.guid != null) && s.items.Select(i => i.guid).Distinct().Count() == s.items.Count), "real unlocked IDs are present and unique per category");
-        string livePath = Path.Combine(root, "DressmakerCritic-Diagnostics/exports/captures/20261104-125434-693-79d9b746/progress-snapshot.json");
-        Check(System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(DiagnosticJson.Serialize(verified)), System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(livePath))), "offline normalized context equals actual live export");
+        string live = RuntimeFixtures.Read("20261104-125434-693-79d9b746", "progress-snapshot.json");
+        Check(System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(DiagnosticJson.Serialize(verified)), System.Text.Json.Nodes.JsonNode.Parse(live)), "offline normalized context equals actual live export");
         var complete = ProgressSnapshotBuilder.CaptureMembership(Enumerable.Range(0, 72).Select(_ => new AssetFixture()).ToList());
         Check(complete.totalCount == 72 && complete.items.Count == 72 && complete.status == "complete" && complete.items.All(i => i.guid == "fixture-id"), "compact membership exceeds graph's 32-item cap");
         var limited = ProgressSnapshotBuilder.CaptureMembership(Enumerable.Range(0, 600).Select(_ => new AssetFixture()).ToList());

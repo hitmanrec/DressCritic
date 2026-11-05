@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.3")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.4")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.3: jury locked to left half of history spread.");
+            Logger.LogInfo("Dressmaker Critic 0.15.4: history-bound results, measured page layout and model response compatibility.");
         }
         private void Start()
         {
@@ -42,20 +42,25 @@ namespace DressmakerCritic.Diagnostics
         private async void BeginCapture()
         {
             if (busy) return;
-            panel.Begin();
+            long displayTicket = panel.Begin();
             busy = true; status = "Collecting garment data, image and evaluation blockers.";
             CaptureSession capture = null;
+            object state = null;
             try
             {
                 string id = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
                 capture = new CaptureSession(Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", id), id);
                 var input = new EvaluationInput { captureId = id, capturedAtUtc = capture.manifest.startedAtUtc };
-                object progress = null, state = null, selectedRecord = null; Component manager = null;
+                object progress = null, selectedRecord = null; Component manager = null;
                 string progressStatus = "not-read", source = "GameManager.activeDress.state";
                 string selectedModel = model.Value, selectedEndpoint = endpoint.Value;
                 int selectedSaved = savedRecord.Value, selectedOrder = orderIndex.Value;
                 int requestedSaved = selectedSaved;
                 int timeoutSeconds = Math.Min(600, Math.Max(30, inferenceTimeout.Value));
+                capture.Stage("history-ui-layout", () => {
+                    capture.Write("ui-layout.json", panel.CaptureLayout());
+                    capture.Write("ui-layout-original.json", panel.OriginalLayout());
+                });
                 capture.Stage("runtime", () => capture.Write("runtime.json", GameRuntimeReader.Environment()));
                 capture.Stage("selection-and-identity", () => {
                     progress = ProgressAccess.TryRead(GameRuntimeReader.GameType("PlayerProgress"), out progressStatus);
@@ -166,8 +171,6 @@ namespace DressmakerCritic.Diagnostics
                 if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
                 capture.Write("readiness.json", capture.manifest.readiness);
                 capture.Write("manifest.json", capture.manifest);
-                panel.subject = null;
-                panel.message = null;
                 // All Unity reads/rendering above run synchronously on the game thread.
                 // Only local HTTP and file I/O run after this await; no background game scans.
                 if (backendValid)
@@ -226,15 +229,17 @@ namespace DressmakerCritic.Diagnostics
                     });
                 }
                 else capture.manifest.stages.Add(new CaptureStage { name = "local-context-inference", status = "skipped", detail = juryResult == null ? "Jury assessment unavailable" : "No verified order or customer context; jury remains independent" });
-                panel.result = juryResult;
                 var juryStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-jury-inference");
                 var contextStage = capture.manifest.stages.LastOrDefault(s => s.name == "local-context-inference");
-                panel.message = null;
+                panel.Complete(displayTicket, state, juryResult, juryResult == null
+                    ? (capture.manifest.readiness.canEvaluate ? "status.failed" : "status.blocked")
+                    : (contextStage?.status == "failed" ? "status.done.context-failed" : "status.done"));
+                capture.Stage("history-ui-result-layout", () => capture.Write("ui-layout-after.json", panel.CaptureLayout()));
                 status = "Package: " + id + "\n" + (capture.manifest.readiness.canEvaluate ? "Check jury/context stages in manifest.json." : "Blockers: " + string.Join(", ", capture.manifest.readiness.blockers));
                 if (juryResult == null && juryStage != null) Logger.LogWarning("Jury stage: " + juryStage.status + " " + (juryStage.detail ?? ""));
                 if (contextStage != null && contextStage.status == "failed") Logger.LogWarning("Context stage failed; jury result kept.");
             }
-            catch (Exception e) { panel.message = null; status = "Capture failed: " + e.GetType().Name; Logger.LogError(e); }
+            catch (Exception e) { panel.Complete(displayTicket, state, null, "status.prepare-failed"); status = "Capture failed: " + e.GetType().Name; Logger.LogError(e); }
             finally
             {
                 try { capture?.Finish(); } catch (Exception e) { Logger.LogError(e); }

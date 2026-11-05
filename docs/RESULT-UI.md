@@ -1,3 +1,7 @@
+> История реализации. Текущий history-only UX и следующий тест:
+> [CURRENT](knowledge/CURRENT.md). Закладка, overlay и snapshot label ниже относятся
+> к старым версиям и не должны восстанавливаться.
+
 # v0.9.0 evaluation result flow
 
 The launcher now says Оценить платье. It uses the existing verified pipeline and
@@ -67,3 +71,28 @@ build/layout test requires installed game DLLs and runtime. Update/install with
 the game closed, keep the same Ollama model/config, open Жюри and evaluate one
 saved dress. Check tabs, snapshot photo identity, close/reopen, scroll and smaller
 window sizes. UI presentation does not resolve the known single-angle bias.
+
+## v0.15.4 continuation of the inline notebook UI
+
+Keeps the user's history-only UI, house crests, optional locale, native TMP styling
+and Houses/Order tabs. Measures `Sketchbook.leftPage.GetWorldCorners()` in the
+holder's local space; no assumption that oldDressViewHolder spans two pages.
+Only the mod root is positioned from that rectangle. Unavailable/degenerate page
+geometry hides the root and records a reason instead of stacking controls at zero
+size. Existing reversible brief/stats compaction is retained pending geometry
+review; it is not yet visually accepted. Native controls are restored on history
+exit and binding changes. No guessed fallback Photo button is resized.
+
+Scroll viewport has a transparent raycast graphic; rows use zero horizontal
+sizeDelta, top anchors and TMP preferred text height. Rebuild happens on changed
+geometry/content, not unconditionally per frame. A selection revision and exact
+state reference prevent a late assessment from appearing on another history dress.
+Request failure is visible as short inline status; no extra debug popup.
+
+Capture adds ui-layout-original.json (before native UI adjustments), ui-layout.json
+(start), ui-layout-after.json (completion). Explicit field bindings, instance IDs,
+parents, rects/anchors/scale/screen corners, masks/raycast/layout sizes; no UI text.
+192 nodes, depth 12, 16 component names per node; truncation explicit. This is an
+on-demand probe, with the original snapshot taken once when applying the layout.
+Core and syntax checks pass; full Unity build, notebook placement and input need
+the installed game. See CURRENT for the consolidated next test.

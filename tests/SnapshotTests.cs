@@ -18,7 +18,7 @@ static class SnapshotTests
         foreach (var entry in manifest.RootElement.EnumerateArray())
         {
             string directory = Path.Combine(root, entry.GetProperty("path").GetString());
-            var input = JsonSerializer.Deserialize<Input>(File.ReadAllText(Path.Combine(directory, "editor-runtime.json")), options);
+            var input = JsonSerializer.Deserialize<Input>(RuntimeFixtures.Read(Path.GetFileName(directory), "editor-runtime.json"), options);
             var snapshot = new GarmentSnapshotBuilder(input.objects).Build(input.timeUtc, input.scene);
             snapshots.Add(snapshot);
             using (var json = JsonDocument.Parse(DiagnosticJson.Serialize(snapshot)))
@@ -39,7 +39,7 @@ static class SnapshotTests
         using (var json = JsonDocument.Parse(DiagnosticJson.Serialize(snapshots[4])))
             Check(json.RootElement.GetProperty("panels")[0].GetProperty("grainQuality").ValueKind == JsonValueKind.Number && json.RootElement.GetProperty("finished").ValueKind == JsonValueKind.False, "normalized JSON uses numeric/boolean types");
         // Mutate a deserialized fixture, never a captured file, to simulate incomplete graphs.
-        var fixture = JsonSerializer.Deserialize<Input>(File.ReadAllText(Path.Combine(root, "DressmakerCritic-Diagnostics/exports/captures/20261104-122434-315-f7e1a777/editor-runtime.json")), options);
+        var fixture = JsonSerializer.Deserialize<Input>(RuntimeFixtures.Read("20261104-122434-315-f7e1a777", "editor-runtime.json"), options);
         var state = fixture.objects.First(n => n.member == "GameManager.activeDress.state");
         var panels = state.children.First(n => n.member == "DressState.panelStates");
         var backing = panels.children.First(n => n.member.EndsWith("._items"));

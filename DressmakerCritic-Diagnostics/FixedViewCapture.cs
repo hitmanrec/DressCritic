@@ -60,12 +60,13 @@ namespace DressmakerCritic.Diagnostics
                 && Math.Abs(geometry.extents.z - 0.5f) < 0.01f;
         }
         private static bool TryCopyMesh(GameObject previewRoot, Transform mannequin, Mesh mesh, Material[] materials, Matrix4x4 worldMatrix,
-            FixedViewEvidence report, ref Bounds localBounds, ref bool hasBounds, string label, bool fromBatch, bool wasDisabled, bool expandFraming)
+            FixedViewEvidence report, ref Bounds localBounds, ref bool hasBounds, string label, bool fromBatch, bool wasDisabled, bool expandFraming, MeshRenderer source)
         {
             if (mesh == null || mesh.vertexCount == 0) { report.skippedEmptyMeshes++; return false; }
             Bounds geometry = mesh.bounds;
             if (geometry.extents.sqrMagnitude < 0.00000001f) { report.skippedEmptyMeshes++; return false; }
             if (IsFramingPolluter(label, mesh)) { report.skippedEmptyMeshes++; return false; }
+            if (report.copiedMeshes >= 256) throw new InvalidOperationException("Combined garment/accessory mesh limit exceeded");
             if (materials != null && materials.Length > 64) throw new InvalidOperationException("Material slot limit exceeded");
             var item = new GameObject(label, typeof(MeshFilter), typeof(MeshRenderer));
             item.transform.SetParent(previewRoot.transform, false); item.layer = 30;
@@ -75,6 +76,10 @@ namespace DressmakerCritic.Diagnostics
             item.GetComponent<MeshFilter>().sharedMesh = mesh;
             var copy = item.GetComponent<MeshRenderer>();
             copy.sharedMaterials = materials ?? new Material[0];
+            // Accessory colors can be instance overrides, just like fabric panels.
+            var properties = new MaterialPropertyBlock(); source.GetPropertyBlock(properties); copy.SetPropertyBlock(properties);
+            for (int slot = 0; slot < (materials?.Length ?? 0); slot++)
+            { source.GetPropertyBlock(properties, slot); if (!properties.isEmpty) copy.SetPropertyBlock(properties, slot); }
             copy.shadowCastingMode = ShadowCastingMode.Off; copy.receiveShadows = false;
             copy.lightProbeUsage = LightProbeUsage.Off; copy.reflectionProbeUsage = ReflectionProbeUsage.Off;
             if (materials != null) foreach (var material in materials) NoteMaterial(report, material);
@@ -84,7 +89,6 @@ namespace DressmakerCritic.Diagnostics
             report.copiedMeshes++;
             if (fromBatch) report.copiedBatchedAccessories++;
             if (wasDisabled) report.copiedDisabledRenderers++;
-            if (!expandFraming) return true;
             for (int x = -1; x <= 1; x += 2)
                 for (int y = -1; y <= 1; y += 2)
                     for (int z = -1; z <= 1; z += 2)
@@ -92,6 +96,9 @@ namespace DressmakerCritic.Diagnostics
                         Vector3 corner = geometry.center + Vector3.Scale(geometry.extents, new Vector3(x, y, z));
                         Vector3 local = relative.MultiplyPoint3x4(corner);
                         if (!Finite(local.x) || !Finite(local.y) || !Finite(local.z)) throw new InvalidOperationException("Non-finite mesh bounds");
+                        if (Vector3.Distance(item.transform.TransformPoint(corner), local) > 0.0001f)
+                            throw new InvalidOperationException("Accessory transform has unsupported shear or mirrored decomposition");
+                        if (!expandFraming) continue;
                         if (!hasBounds) { localBounds = new Bounds(local, Vector3.zero); hasBounds = true; }
                         else localBounds.Encapsulate(local);
                     }
@@ -100,9 +107,13 @@ namespace DressmakerCritic.Diagnostics
         private static IEnumerable<object> DictionaryValues(object dictionary)
         {
             if (dictionary == null) yield break;
+            var type = dictionary.GetType();
+            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+                throw new InvalidOperationException("Unsupported accessory dictionary type");
             // Exact BCL Dictionary layout: Entry[] _entries with fields hashCode/next/key/value.
             var entries = FieldSnapshot.ResolveFields(dictionary, "_entries") as Array;
             if (entries == null) yield break;
+            if (entries.Length > 1024) throw new InvalidOperationException("Accessory dictionary capacity limit exceeded");
             for (int i = 0; i < entries.Length; i++)
             {
                 object entry = entries.GetValue(i);
@@ -136,6 +147,8 @@ namespace DressmakerCritic.Diagnostics
                 foreach (var registration in DictionaryValues(registered))
                 {
                     var renderers = FieldSnapshot.ListItems(FieldSnapshot.ResolveFields(registration, "renderers"));
+                    if (FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(registration, "renderers"), 32) != null)
+                        throw new InvalidOperationException("Accessory registration renderer limit exceeded");
                     foreach (var obj in renderers)
                     {
                         var renderer = obj as MeshRenderer;
@@ -144,7 +157,7 @@ namespace DressmakerCritic.Diagnostics
                         // Accessories must not reopen the tiny-dress framing regression; garment bounds stay authoritative.
                         TryCopyMesh(previewRoot, mannequin, filter == null ? null : filter.sharedMesh, renderer.sharedMaterials,
                             renderer.localToWorldMatrix, report, ref localBounds, ref hasBounds,
-                            "batched-registration:" + renderer.name, true, !renderer.enabled, false);
+                            "batched-registration:" + renderer.name, true, !renderer.enabled, false, renderer);
                     }
                 }
             }
@@ -153,17 +166,20 @@ namespace DressmakerCritic.Diagnostics
             var storage = FieldSnapshot.ResolveFields(accessoryItems, "_items") as Array;
             var countObj = FieldSnapshot.ResolveFields(accessoryItems, "_size");
             int count = countObj is int ? Math.Max(0, Math.Min((int)countObj, storage == null ? 0 : storage.Length)) : 0;
+            if (count > 256) throw new InvalidOperationException("Accessory item limit exceeded");
             for (int i = 0; i < count; i++)
             {
                 var item = storage.GetValue(i) as Component;
                 if (item == null) continue;
-                foreach (var renderer in item.GetComponentsInChildren<MeshRenderer>(true))
+                var children = item.GetComponentsInChildren<MeshRenderer>(true);
+                if (children.Length > 256) throw new InvalidOperationException("Accessory renderer limit exceeded");
+                foreach (var renderer in children)
                 {
                     if (renderer == null || !seenRendererIds.Add(renderer.GetInstanceID())) continue;
                     var filter = renderer.GetComponent<MeshFilter>();
                     TryCopyMesh(previewRoot, mannequin, filter == null ? null : filter.sharedMesh, renderer.sharedMaterials,
                         renderer.localToWorldMatrix, report, ref localBounds, ref hasBounds,
-                        "accessory:" + renderer.name, false, !renderer.enabled, false);
+                        "accessory:" + renderer.name, false, !renderer.enabled, false, renderer);
                 }
             }
         }

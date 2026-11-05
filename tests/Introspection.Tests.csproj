@@ -29,6 +29,9 @@
     <Compile Include="../DressmakerCritic-Diagnostics/JuryContract.cs" Link="JuryContract.cs" />
     <Compile Include="JuryTests.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RuntimeFixtures.cs" />
+    <Compile Include="EvaluationSelectionTests.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/EvaluationSelection.cs" Link="EvaluationSelection.cs" />
     <EmbeddedResource Include="../DressmakerCritic-Diagnostics/Reference/brief-reference.en.json" LogicalName="DressmakerCritic.BriefReference.en.json" WithCulture="false" />
   </ItemGroup>
 </Project>

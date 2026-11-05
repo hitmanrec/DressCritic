@@ -1,12 +1,13 @@
 # DressCritic
 
 Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
-5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.3**.
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.4**.
 
-Fixed-view capture and local jury inference work when a model is configured.
-History-only inline Jury UI is **in progress and currently broken in-game**
-(controls land on the book spine; house crests/remarks do not layout). See
-[docs/knowledge/CURRENT.md](docs/knowledge/CURRENT.md).
+The existing history-only inline Jury, house crests, English UI and optional
+locale overlay are retained. v0.15.4 fixes the latest model response rejection,
+late-result binding and scroll input, and measures the notebook page instead of
+assuming the history holder has page-sized bounds. **Native layout needs an
+in-game test.** See [current findings and remaining blockers](docs/knowledge/CURRENT.md).
 
 ## Knowledge and evidence
 
@@ -40,13 +41,18 @@ core tests and syntax checks cannot establish native compilation/rendering.
 
 ## Current in-game check
 
-Until the left-page Jury layout is fixed, treat UI checks as blocked; inference
-captures via console `critic-export` / history Rate (if reachable) still produce
-packets for `bash pull-exports.sh`. Locale overlay sample:
-`DressmakerCritic-Diagnostics/locale.example.ru.json` →
+Open a saved dress with accessories in history, click **Rate dress**, then switch
+to another dress while inference is running: the old result must not appear on
+that page. Evaluate the selected dress and check four house crests/remarks and
+scrolling. Leave history: Jury disappears and native controls are restored.
+If Rate is inaccessible, use console `critic-export`. Import with
+`bash pull-exports.sh`; the packet includes bounded `ui-layout*.json` geometry.
+Detailed next test and remaining render checks: [CURRENT](docs/knowledge/CURRENT.md).
+
+Optional locale: copy `DressmakerCritic-Diagnostics/locale.example.ru.json` to
 `BepInEx/config/DressmakerCritic/locale.json`.
 
-## Local model configuration (for inference after the render gate is resolved)
+## Local model configuration
 
 Current recipe: **qwen3-vl:4b-instruct-q4_K_M**, alias dresscritic-vision.
 Ollama >=0.12.7, context16384, temperature0.2. For a first installation or migration
