@@ -333,7 +333,7 @@ namespace DressmakerCritic.Diagnostics
             if (scoreRt != null)
             {
                 nativeRects.Add(new NativeUiRect(scoreRt));
-                NativeUiRect.FitVisuals(scoreRt, page, Region(nativePage, 0.08f, 0.62f, 0.84f, 0.18f));
+                NativeUiRect.FitVisuals(scoreRt, page, Region(nativePage, 0.03f, 0.60f, 0.94f, 0.21f));
             }
             if (photoRt != null)
             {

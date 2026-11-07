@@ -81,9 +81,10 @@ namespace DressmakerCritic.Diagnostics
                 var row = content.GetChild(i) as RectTransform;
                 if (row == null || !row.gameObject.activeInHierarchy) continue;
                 rows.Add(new NativeUiRect(row));
-                // Actual stars/labels/bars fit inside the viewport with 24 units each side.
-                // Vertical positions and scroll range are untouched.
-                NativeUiRect.InsetHorizontal(row, target, 24);
+                foreach (var child in row.GetComponentsInChildren<RectTransform>(true).Take(128))
+                    if (child != row) rows.Add(new NativeUiRect(child));
+                // Modest 12-unit margins; glyph scale and vertical scroll are preserved.
+                NativeUiRect.InsetHorizontal(row, target, 12);
             }
         }
         public void Dispose()

@@ -52,7 +52,7 @@ namespace DressmakerCritic.Diagnostics
         {
             // A grouping RectTransform can be much smaller than its fixed-size children.
             // Fit actual graphics, not that bookkeeping rectangle; retain native font aspect.
-            Rect visual = VisualBounds(target, space);
+            Rect visual = CardBounds(target, space);
             if (visual.width <= 0 || visual.height <= 0) return;
             float heightScale = Mathf.Min(1, area.height / visual.height);
             if (target.rect.width > 1)
@@ -60,13 +60,27 @@ namespace DressmakerCritic.Diagnostics
                 float width = target.rect.width * area.width / (visual.width * heightScale);
                 target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
                 LayoutRebuilder.ForceRebuildLayoutImmediate(target);
-                visual = VisualBounds(target, space);
+                visual = CardBounds(target, space);
             }
             float scale = Mathf.Min(1, Mathf.Min(area.width / visual.width, area.height / visual.height));
             target.localScale *= scale;
-            visual = VisualBounds(target, space);
+            visual = CardBounds(target, space);
             Vector2 delta = area.center - visual.center;
             target.position += space.TransformVector(new Vector3(delta.x, delta.y, 0));
+        }
+        private static Rect CardBounds(RectTransform target, Transform space)
+        {
+            // Empty/stretch TMP rectangles are not the paper's visual bounds. Using
+            // their union can translate the actual card behind the book spine.
+            Image paper = null; float largest = 0;
+            foreach (var image in target.GetComponentsInChildren<Image>(false).Take(128))
+            {
+                if (image.sprite == null || image.color.a <= 0) continue;
+                Rect bounds = Bounds(image.rectTransform, space);
+                float area = bounds.width * bounds.height;
+                if (area > largest) { largest = area; paper = image; }
+            }
+            return paper == null ? VisualBounds(target, space) : Bounds(paper.rectTransform, space);
         }
         private static Rect VisualBounds(RectTransform target, Transform space)
         {
@@ -86,12 +100,23 @@ namespace DressmakerCritic.Diagnostics
             Rect visual = VisualBounds(target, viewport);
             float width = viewport.rect.width - padding * 2;
             if (visual.width <= 0 || width <= 0) return;
-            var scale = target.localScale;
-            scale.x *= Mathf.Min(1, width / visual.width);
-            target.localScale = scale;
+            // Resize layout rectangles rather than scaling glyphs along X.
+            float excess = Mathf.Max(0, visual.width - width);
+            target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Max(1, target.rect.width - excess));
+            LayoutRebuilder.ForceRebuildLayoutImmediate(target);
             visual = VisualBounds(target, viewport);
-            float delta = viewport.rect.center.x - visual.center.x;
+            float delta = viewport.rect.xMin + padding - visual.xMin;
             target.position += viewport.TransformVector(new Vector3(delta, 0, 0));
+            foreach (var image in target.GetComponentsInChildren<Image>(false).Take(128))
+            {
+                var rect = image.rectTransform;
+                Rect bounds = Bounds(rect, viewport);
+                float overflow = bounds.xMax - (viewport.rect.xMax - padding);
+                if (overflow <= 0 || bounds.width <= overflow) continue;
+                float local = overflow * rect.rect.width / bounds.width;
+                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.rect.width - local);
+                rect.anchoredPosition -= new Vector2(local * rect.pivot.x, 0);
+            }
         }
     }
 }
