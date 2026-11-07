@@ -69,13 +69,13 @@ namespace DressmakerCritic.Diagnostics
             else
             {
                 if (!JuryContract.NeedsContext(input)) throw new InvalidOperationException("No verified order or customer context");
-                instruction = common + "Evaluate context separately from the fashion jury; no jury votes are provided. Order: assess only the explicitly selected order's sourced summary, never unseen dialogue. " +
+                instruction = common + "Evaluate context separately from the fashion jury; no jury votes are provided. Order: assess only the explicitly selected order's sourced summary or verified displayed game brief, never unseen dialogue. " +
                     "Customer: assess only verified preferences with a source, never infer them from client name or order requirements. " +
                     "Return one JSON object with exactly schemaVersion (string 2.0.0), orderCompliance, customerCompatibility and limitations (array of concrete limitations). " +
                     "Each contextual judgement has exactly status, scope, score, remarks. Order scope is provided-summary-only; customer scope is verified-customer-preferences-only. " +
                     "Each status can be consistent, inconsistent or unknown; known status requires a 0-10 score with at most one decimal, unknown requires null. " +
                     "remarks MUST be a JSON array of 1-2 strings, never a single string; each item is at most 240 characters. Use short evidence-based sentences, never placeholder or instruction text. " +
-                    "If order brief.status is not verified-guid or asset-key, orderCompliance must be unknown/null. If customer.status is not verified or preferences/source are absent, customerCompatibility must be unknown/null. " +
+                    "If order brief.status is not verified-guid, asset-key or runtime-history-verified, orderCompliance must be unknown/null. If customer.status is not verified or preferences/source are absent, customerCompatibility must be unknown/null. " +
                     "Do not evaluate deterministic game requirements; do not return jury scores, averages or advice.";
                 evidence = new ContextEvidence { garment = visual,
                     order = JuryContract.HasOrderContext(input) ? new ContextOrderEvidence { definition = input.order.definition, brief = input.order.brief } : new ContextOrderEvidence { brief = new EvaluationBrief() },

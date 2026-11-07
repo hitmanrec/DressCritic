@@ -97,6 +97,18 @@ static class JuryTests
         var context=ModelRequest.Build(input,"fixture-model",_=>bytes,EvaluationTask.Context);
         Check(context.messages[1].content[0].text.Contains("CUSTOMER_SECRET")&&!context.messages[1].content[0].text.Contains("houseId"),"context request receives preferences without jury votes");
         Check(!context.messages[1].content[0].text.Contains("GAME_RULE_SECRET")&&!context.messages[1].content[0].text.Contains("424242"),"semantic context cannot be confused with deterministic game thresholds or budget");
+        string independentJury = DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => bytes));
+        input.order.brief.status = "runtime-history-verified"; input.order.brief.summary = "RUNTIME_BRIEF_SECRET";
+        input.order.brief.sourceUrl = "game://history/0/quest/fixture";
+        var runtimeContext = ModelRequest.Build(input, "fixture-model", _ => bytes, EvaluationTask.Context);
+        Check(runtimeContext.messages[1].content[0].text.Contains("RUNTIME_BRIEF_SECRET") &&
+            runtimeContext.messages[0].content[0].text.Contains("runtime-history-verified"), "verified runtime card reaches the context request and its admission instruction");
+        Check(DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => bytes)) == independentJury,
+            "runtime order brief does not alter independent jury evidence or instructions");
+        JuryContract.ApplyContext(Context("consistent", 8), input, result);
+        Check(result.orderCompliance.score == 8 && result.summary.average == 7, "runtime-card context validates without changing jury mean");
+        input.order.brief.sourceUrl = null;
+        Check(!JuryContract.HasOrderContext(input), "runtime status alone without source is insufficient context");
         input.order.definition = null;
         Check(EvaluationReadiness.Check(input,"fixture-model").canEvaluate && EvaluationReadiness.Check(input,"fixture-model").limitations.Contains("explicit-order-unavailable"), "unavailable order cannot block standalone visual jury");
         input.customer.status="unknown";input.order.brief.status="missing";

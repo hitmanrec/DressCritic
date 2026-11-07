@@ -17,3 +17,5 @@
 
 Старые отчёты и schemas сохранены на местах. Не использовать старые Next test
 и инструкции UI как текущий workflow. Все они проиндексированы в реестре.
+
+- [History context: extraction, limits and next game test](HISTORY-CONTEXT.md)

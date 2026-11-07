@@ -1,23 +1,166 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:dresscritic:history-order:1.0.0",
+  "$id": "urn:dresscritic:history-order:1.1.0",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "status", "origin", "association", "historyIndex", "definition", "questGiverId", "recipientId", "assetKey", "budget", "requirementsStatus", "requirements", "objects", "limitation"],
+  "required": [
+    "schemaVersion",
+    "status",
+    "origin",
+    "association",
+    "historyIndex",
+    "definition",
+    "questGiverId",
+    "recipientId",
+    "assetKey",
+    "budget",
+    "requirementsStatus",
+    "requirements",
+    "objects",
+    "limitation",
+    "requirementCount",
+    "requirementFields",
+    "displayedBrief",
+    "brief"
+  ],
   "properties": {
-    "schemaVersion": {"const": "1.0.0"},
-    "status": {"enum": ["unavailable", "record-state-mismatch", "definition-unavailable", "record-state-verified"]},
-    "origin": {"enum": ["unknown", "off-rack", "commission"]},
-    "association": {"type": ["string", "null"]},
-    "historyIndex": {"type": "integer"},
-    "definition": {"type": ["object", "null"]},
-    "questGiverId": {"type": ["string", "null"]},
-    "recipientId": {"type": ["string", "null"]},
-    "assetKey": {"type": ["string", "null"]},
-    "budget": {"type": ["integer", "null"]},
-    "requirementsStatus": {"type": ["string", "null"]},
-    "requirements": {"type": "array", "maxItems": 32},
-    "objects": {"type": "array", "maxItems": 33},
-    "limitation": {"type": "string"}
+    "schemaVersion": {
+      "const": "1.1.0"
+    },
+    "status": {
+      "enum": [
+        "unavailable",
+        "record-state-mismatch",
+        "definition-unavailable",
+        "record-state-verified"
+      ]
+    },
+    "origin": {
+      "enum": [
+        "unknown",
+        "off-rack",
+        "commission"
+      ]
+    },
+    "association": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "historyIndex": {
+      "type": "integer"
+    },
+    "definition": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "questGiverId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "recipientId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "assetKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "budget": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "requirementsStatus": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "maxItems": 32
+    },
+    "objects": {
+      "type": "array",
+      "maxItems": 33
+    },
+    "limitation": {
+      "type": "string"
+    },
+    "requirementCount": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "requirementFields": {
+      "type": "array",
+      "maxItems": 32,
+      "description": "Each wrapper has isolated reference IDs and focused tag/goal roots. Preserve unknown parameters without interpreting them."
+    },
+    "displayedBrief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "title",
+        "text",
+        "source",
+        "displayedIndex"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unavailable",
+            "display-unverified",
+            "record-display-mismatch",
+            "text-limit",
+            "title-mismatch-or-unavailable",
+            "text-unavailable",
+            "record-display-verified",
+            "display-changed-during-read"
+          ]
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 512
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4096
+        },
+        "source": {
+          "type": "string"
+        },
+        "displayedIndex": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "brief": {
+      "type": "object",
+      "description": "Selected verified runtime card, otherwise existing sourced reference; never unseen dialogue."
+    }
   }
 }

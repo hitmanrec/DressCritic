@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.11")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.12")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.11: fail-closed canonical four-view capture.");
+            Logger.LogInfo("Dressmaker Critic 0.15.12: history-linked brief and focused goal capture.");
         }
         private void Start()
         {
@@ -100,6 +100,21 @@ namespace DressmakerCritic.Diagnostics
                         var historical = HistoryOrder.Capture(selectedRecord, state, selectedSaved, Application.version);
                         var definition = FieldSnapshot.ResolveFields(selectedRecord, "questDefinition") as UnityEngine.Object;
                         historical.assetKey = definition == null ? null : definition.name;
+                        var before = GameRuntimeReader.DisplayBinding(progress, state);
+                        var books = GameRuntimeReader.Find("Sketchbook").Where(b => b.gameObject.activeInHierarchy).Take(2).ToArray();
+                        var book = books.Length == 1 ? books[0] : null;
+                        historical.displayedBrief = HistoryBriefCapture.Read(book, selectedRecord, state, selectedSaved,
+                            before.verified && book != null && before.sketchbookId == book.GetInstanceID() ? before.historyIndex : null);
+                        var after = GameRuntimeReader.DisplayBinding(progress, state);
+                        if (!after.verified || before.historyIndex != after.historyIndex || before.sketchbookId != after.sketchbookId ||
+                            before.displayDressId != after.displayDressId || before.viewerTextureId != after.viewerTextureId)
+                            historical.displayedBrief.status = "display-changed-during-read";
+                        var reference = EvaluationBrief.From(BriefReferenceCatalog.Bundled.Find(historical.definition?.guid,
+                            historical.assetKey, historical.definition?.prettyName, Application.version));
+                        historical.brief = historical.origin == "off-rack" ? new EvaluationBrief() :
+                            HistoryBriefCapture.Resolve(historical.displayedBrief, reference, selectedSaved, historical.definition?.guid);
+                        capture.Write("history-brief-binding-before.json", before);
+                        capture.Write("history-brief-binding-after.json", after);
                         capture.Write("history-order.json", historical);
                         panel.SetHistoryOrigin(displayTicket, state, historical);
                         if (historical.status != "record-state-verified") throw new InvalidOperationException(historical.status);
@@ -108,9 +123,11 @@ namespace DressmakerCritic.Diagnostics
                         input.order.definition = historical.definition;
                         input.order.budget = historical.budget;
                         input.order.deterministicRequirements = historical.requirements;
+                        input.order.requirementsStatus = historical.requirementsStatus;
+                        input.order.requirementCount = historical.requirementCount;
+                        input.order.requirementFields = historical.requirementFields;
                         input.customer.customerId = historical.recipientId ?? historical.questGiverId;
-                        input.order.brief = EvaluationBrief.From(BriefReferenceCatalog.Bundled.Find(historical.definition?.guid,
-                            historical.assetKey, historical.definition?.prettyName, Application.version));
+                        input.order.brief = historical.brief;
                     });
                 }
                 if (selectedSaved < 0 && selectedOrder >= 0) input.order.association = "explicit accepted-order index " + selectedOrder;
@@ -128,6 +145,8 @@ namespace DressmakerCritic.Diagnostics
                         if (normalized.orderStatus != "selected") throw new InvalidOperationException("Explicit order unavailable");
                         input.order.definition = normalized.order; input.order.budget = normalized.budget;
                         input.order.deterministicRequirements = normalized.completionRequirements;
+                        input.order.requirementsStatus = normalized.completionRequirementsStatus;
+                        input.order.requirementCount = normalized.completionRequirementCount;
                         var record = FieldSnapshot.ListItemAt(FieldSnapshot.ResolveFields(progress, "activeCommissions"), selectedOrder);
                         input.customer.customerId = FieldSnapshot.ResolveFields(record, "questDefinition", "questGiverCharacter", "_guid") as string;
                         var definition = FieldSnapshot.ResolveFields(record, "questDefinition") as UnityEngine.Object;

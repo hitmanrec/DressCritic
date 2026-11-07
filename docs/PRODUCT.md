@@ -124,7 +124,7 @@ the model to invent an average. No advice/action-recommendation field is accepte
 
 ## Current implementation boundary
 
-Plugin 0.15.11 implements history capture, structured garment facts, historical
+Plugin 0.15.12 implements history capture, structured garment facts, historical
 order association, direct four-vote VLM inference, strict response validation and
 native notebook review cards. The current model is Qwen3-VL-4B-Instruct Q4_K_M,
 rubric 1.1.0. There is no calibrated aesthetic scorer or validated model benchmark.
@@ -144,3 +144,9 @@ UI cosmetics are not the main development queue unless they block use.
 
 Game/save state remains read-only. Native build/render acceptance requires
 authorized game assemblies/runtime; core tests cannot substitute for it.
+
+History context completion currently precedes dataset generation: v0.15.12 adds a
+verified displayed-card path and focused goal fields. Runtime integration is pending
+the two-capture check in [HISTORY-CONTEXT](HISTORY-CONTEXT.md); extraction must remain
+visible/exported when model inference fails. This does not claim recalculated game
+compliance or complete customer preferences.

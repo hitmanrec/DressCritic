@@ -8,6 +8,8 @@ namespace DressmakerCritic.Diagnostics
     {
         public string status = "missing", summary, sourceUrl, coverage;
         public List<string> requests = new List<string>(), constraints = new List<string>(), uncertainties = new List<string>();
+        public bool IsVerified() => (status == "verified-guid" || status == "asset-key" || status == "runtime-history-verified") &&
+            !string.IsNullOrWhiteSpace(summary) && !string.IsNullOrWhiteSpace(sourceUrl);
         public static EvaluationBrief From(BriefReferenceMatch match)
         {
             if (match == null || match.entry == null) return new EvaluationBrief { status = match?.status ?? "missing" };
@@ -22,6 +24,9 @@ namespace DressmakerCritic.Diagnostics
         public AssetIdentity definition;
         public int? budget;
         public List<OrderRequirement> deterministicRequirements = new List<OrderRequirement>();
+        public string requirementsStatus = "unavailable";
+        public int? requirementCount;
+        public List<ValueNode> requirementFields = new List<ValueNode>();
         public EvaluationBrief brief = new EvaluationBrief();
     }
     [Serializable] public sealed class EvaluationImage
@@ -62,7 +67,7 @@ namespace DressmakerCritic.Diagnostics
             if (input.images.Any(i => i.binding != "history-display-chain-verified" && i.binding != "active-state-verified" && i.binding != "history-thumbnail-reference-verified")) result.blockers.Add("image-garment-identity-unverified");
             if (input.order.association != "none: no order selected for evaluation" && input.order.definition == null) result.limitations.Add("explicit-order-unavailable");
             if (string.IsNullOrWhiteSpace(model)) result.blockers.Add("local-model-not-configured");
-            if (input.order.association != "none: no order selected for evaluation" && input.order.brief.status != "verified-guid" && input.order.brief.status != "asset-key")
+            if (input.order.association != "none: no order selected for evaluation" && !input.order.brief.IsVerified())
                 result.limitations.Add("semantic-order-compliance-unknown");
             result.limitations.Add("deterministic-game-compliance-not-evaluated");
             result.limitations.Add("edit-recommendations-disabled-until-editor-capabilities-verified");
@@ -90,7 +95,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class CaptureManifest
     {
         public string schemaVersion = "1.0.0", captureId, startedAtUtc, finishedAtUtc;
-        public string pluginVersion = "0.15.11";
+        public string pluginVersion = "0.15.12";
         public bool complete;
         public List<CaptureStage> stages = new List<CaptureStage>();
         public List<CaptureFile> files = new List<CaptureFile>();

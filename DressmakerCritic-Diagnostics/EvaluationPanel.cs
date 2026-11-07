@@ -16,6 +16,7 @@ namespace DressmakerCritic.Diagnostics
         public JuryAssessment result;
         private string message;
         private string originLabel;
+        private HistoryOrderEvidence historyOrder;
         private bool contextTab;
         private bool busy;
         private bool disposed;
@@ -86,6 +87,7 @@ namespace DressmakerCritic.Diagnostics
         public void SetHistoryOrigin(long ticket, object state, HistoryOrderEvidence evidence)
         {
             if (disposed || !selection.Accepts(ticket, state)) return;
+            historyOrder = evidence;
             originLabel = evidence.origin == "off-rack" ? UiStrings.Get("origin.off-rack") :
                 evidence.origin == "commission" ? UiStrings.Get("origin.commission") + ": " + evidence.definition?.prettyName : UiStrings.Get("origin.unknown");
             RefreshContent();
@@ -142,6 +144,7 @@ namespace DressmakerCritic.Diagnostics
                 result = null;
                 message = null;
                 originLabel = null;
+                historyOrder = null;
                 contextTab = false;
             }
             return visible;
@@ -599,6 +602,15 @@ namespace DressmakerCritic.Diagnostics
             else
             {
                 if (!string.IsNullOrEmpty(originLabel)) y = AddLine(orderContent, originLabel, 15, Cocoa, y);
+                if (historyOrder != null && historyOrder.origin != "off-rack")
+                {
+                    if (historyOrder.brief.IsVerified()) y = AddLine(orderContent, historyOrder.brief.summary, 14, Ink, y);
+                    else y = AddLine(orderContent, UiStrings.Get("order.brief-unavailable"), 14, Muted, y);
+                    y = AddLine(orderContent, UiStrings.Get("order.targets") + " (" + historyOrder.requirementsStatus + ")", 14, Cocoa, y);
+                    for (int i = 0; i < historyOrder.requirements.Count; i++)
+                        y = AddLine(orderContent, HistoryOrder.DescribeRequirement(historyOrder.requirements[i], historyOrder.requirementFields.ElementAtOrDefault(i)), 14, Ink, y);
+                    y = AddLine(orderContent, UiStrings.Get("order.targets-note"), 13, Muted, y);
+                }
                 if (result != null)
                 {
                     y = AddLine(orderContent, UiStrings.Get("order.compliance") + ": " + Number(result.orderCompliance.score), 15, Cocoa, y);

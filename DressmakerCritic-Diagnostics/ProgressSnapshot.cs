@@ -61,11 +61,13 @@ namespace DressmakerCritic.Diagnostics
             var requirements = graph.Items(graph.Field(definition, "completionRequirements"), out count, out status);
             result.completionRequirementCount = count; result.completionRequirementsStatus = status;
             foreach (var requirement in requirements)
-                result.completionRequirements.Add(new OrderRequirement { type = requirement?.type?.Split(',')[0], status = graph.Status(requirement),
-                    comparison = graph.Text(requirement, "comparison") ?? graph.Text(requirement, "comparisonType"), threshold = graph.Number(requirement, "threshold"),
-                    targetScore = graph.Number(requirement, "targetScore"), gated = graph.Boolean(requirement, "gated"), tag = graph.Identity(graph.Field(requirement, "tag")) });
+                result.completionRequirements.Add(ReadRequirement(graph, requirement));
             return result;
         }
+        public static OrderRequirement ReadRequirement(GarmentSnapshotBuilder graph, ValueNode requirement) =>
+            new OrderRequirement { type = requirement?.type?.Split(',')[0], status = graph.Status(requirement),
+                comparison = graph.Text(requirement, "comparison") ?? graph.Text(requirement, "comparisonType"), threshold = graph.Number(requirement, "threshold"),
+                targetScore = graph.Number(requirement, "targetScore"), gated = graph.Boolean(requirement, "gated"), tag = graph.Identity(graph.Field(requirement, "tag")) };
         public static InventorySection CaptureMembership(object list)
         {
             var section = new InventorySection { status = "unavailable" };

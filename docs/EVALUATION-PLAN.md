@@ -110,3 +110,11 @@
 
 Исследование не устанавливает точную причину диапазона 6.3–6.7. Это пользовательское
 наблюдение и гипотезы об архитектуре, а не репрезентативный измеренный benchmark.
+
+## Current prerequisite: historical order context (0.15.12)
+
+The user prioritized finishing the garment → historical order → brief/goal link
+before dataset generation or training. Capture the actual displayed card under
+strict state/index/title binding; preserve every bounded goal's fields and explicit
+coverage. Confirm a commissioned and an off-rack history record in game before
+calling the integration complete. See [HISTORY-CONTEXT](HISTORY-CONTEXT.md).

@@ -117,7 +117,7 @@ namespace DressmakerCritic.Diagnostics
                 verdict = mean >= 9 ? "exceptional" : mean >= 7 ? "strong" : mean >= 5 ? "competent" : mean >= 3 ? "uneven" : "weak" };
         }
         public static bool HasOrderContext(EvaluationInput input) => input.order.association != "none: no order selected for evaluation" && input.order.definition != null &&
-            (input.order.brief.status == "verified-guid" || input.order.brief.status == "asset-key") && !string.IsNullOrWhiteSpace(input.order.brief.summary) && !string.IsNullOrWhiteSpace(input.order.brief.sourceUrl);
+            input.order.brief.IsVerified();
         public static bool HasCustomerContext(EvaluationInput input) => input.customer.status == "verified" && !string.IsNullOrWhiteSpace(input.customer.customerId) && !string.IsNullOrWhiteSpace(input.customer.source) && input.customer.preferences.Any(p => !string.IsNullOrWhiteSpace(p));
         public static bool NeedsContext(EvaluationInput input) => HasOrderContext(input) || HasCustomerContext(input);
         private static ContextJudgement Context(XElement node, string scope, bool available)

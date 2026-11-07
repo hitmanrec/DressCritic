@@ -76,6 +76,24 @@
             "constraints",
             "uncertainties"
           ]
+        },
+        "requirementCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "requirementFields": {
+          "type": "array",
+          "maxItems": 32,
+          "description": "Each wrapper has isolated reference IDs and focused tag/goal roots. Preserve unknown parameters without interpreting them."
+        },
+        "requirementsStatus": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
@@ -106,7 +124,9 @@
           "source": {
             "type": "string"
           },
-          "view": {"type": "string"},
+          "view": {
+            "type": "string"
+          },
           "binding": {
             "enum": [
               "active-state-verified",

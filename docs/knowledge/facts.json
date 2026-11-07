@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.11",
+  "pluginVersion": "0.15.12",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,20 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "history.displayed_brief_and_focused_goals",
+      "status": "implemented-unverified",
+      "claim": "v0.15.12 captures the displayed history card only under verified record/state/index/title binding; preserves per-goal bounded field graphs and exposes extracted context independently of inference. Native TMP path and goal coverage await commissioned/off-rack captures. Unknown customer preferences and completion remain unknown.",
+      "evidence": [
+        "docs/HISTORY-CONTEXT.md",
+        "tests/HistoryOrderTests.cs",
+        "tests/JuryTests.cs"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/HistoryOrder.cs",
+        "DressmakerCritic-Diagnostics/Plugin.cs"
+      ]
+    },
     {
       "id": "render.canonical_capture_gate",
       "status": "implemented-unverified",
