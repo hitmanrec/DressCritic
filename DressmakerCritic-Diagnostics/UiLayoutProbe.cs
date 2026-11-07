@@ -29,11 +29,13 @@ namespace DressmakerCritic.Diagnostics
         public List<double> rect, anchorMin, anchorMax, pivot, sizeDelta, anchoredPosition, localScale, screenCorners;
         public double? canvasScale, fontSize, preferredHeight, minHeight;
         public bool? raycastTarget, mask, interactable;
+        public List<double> clippingPadding;
+        public string sprite;
     }
     internal static class UiLayoutProbe
     {
         private static readonly string[] fields = { "leftPage", "oldDressViewHolder", "oldQuestTitle", "oldQuestText",
-            "oldQuestGiver", "oldQuestScoreDisplay", "comissionScoreDisplay" };
+            "oldQuestGiver", "oldQuestScoreDisplay", "comissionScoreDisplay", "tagMask", "tagBarParent", "draftViewHolder" };
         private static List<double> XY(Vector2 v) => new List<double> { v.x, v.y };
         private static Transform TransformOf(object value) => value is GameObject go ? go.transform : (value as Component)?.transform;
         private static string Short(string value) => value == null ? null : value.Substring(0, Math.Min(128, value.Length));
@@ -54,7 +56,7 @@ namespace DressmakerCritic.Diagnostics
             foreach (string field in fields) bind(field, TransformOf(FieldSnapshot.ResolveFields(book, field)));
             var score = FieldSnapshot.ResolveFields(book, "comissionScoreDisplay");
             bind("comissionScoreDisplay.inventoryRect", TransformOf(FieldSnapshot.ResolveFields(score, "inventoryRect")));
-            string[] resolvedNames = { "jury", "resolvedBrief", "resolvedScore", "resolvedPhoto" };
+            string[] resolvedNames = { "jury", "resolvedBrief", "resolvedScore", "resolvedPhoto", "tagListFrame" };
             for (int i = 0; i < resolved.Length && i < resolvedNames.Length; i++) bind(resolvedNames[i], resolved[i]);
             var visited = new HashSet<int>();
             while (pending.Count > 0 && report.nodes.Count < report.nodeLimit)
@@ -80,6 +82,9 @@ namespace DressmakerCritic.Diagnostics
                 }
                 var text = t.GetComponent<TextMeshProUGUI>(); if (text != null) node.fontSize = text.fontSize;
                 var graphic = t.GetComponent<Graphic>(); if (graphic != null) node.raycastTarget = graphic.raycastTarget;
+                var image = t.GetComponent<Image>(); if (image != null && image.sprite != null) node.sprite = Short(image.sprite.name);
+                var clipping = t.GetComponent<RectMask2D>();
+                if (clipping != null) node.clippingPadding = new List<double> { clipping.padding.x, clipping.padding.y, clipping.padding.z, clipping.padding.w };
                 node.mask = t.GetComponent<RectMask2D>() != null || t.GetComponent<Mask>() != null;
                 var selectable = t.GetComponent<Selectable>(); if (selectable != null) node.interactable = selectable.interactable;
                 var layout = t.GetComponent<LayoutElement>();

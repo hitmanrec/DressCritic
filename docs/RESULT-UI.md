@@ -2,6 +2,28 @@
 > [CURRENT](knowledge/CURRENT.md). Закладка, overlay и snapshot label ниже относятся
 > к старым версиям и не должны восстанавливаться.
 
+## 0.15.6 screenshot-driven native layout correction
+
+The reported history spread places Jury on the facing leaf. Use the unchanged
+native Photo Mode position (original brief fallback) to resolve the horizontal
+leaf, retaining the history holder as parent so page turning is preserved.
+Brief, complete historical requirements card, Jury and Photo Mode occupy separate
+vertical regions. Text reserves the upper-right clip area. The exact history
+wrapper is the only resized score target; shared inventory/content is excluded.
+
+Photo Mode Image sprites, decorative Image children, font and selectable states
+are borrowed read-only. Only owned visual objects are created; native scripts,
+listeners and animation controllers are not cloned. Existing house crest assets
+are preserved. Native rectangle snapshots restore anchors, pivot, rotation,
+scale and size, plus text margins/fonts.
+
+WIP tags receive an owned native-sprite frame and expanded rectangular clipping
+allowance without row/value/slider mutations. Existing clipping and stencil state
+are restored on exit. Diagnostic UI probes include tag bindings, clipping padding
+and sprite names. Pure page-selection tests cover left/right and centered origins,
+degenerate geometry and conflicting markers; native appearance/input still need
+the in-game check in CURRENT.
+
 # v0.9.0 evaluation result flow
 
 The launcher now says Оценить платье. It uses the existing verified pipeline and

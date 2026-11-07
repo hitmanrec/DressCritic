@@ -24,6 +24,7 @@ namespace DressmakerCritic.Diagnostics
         private Component cachedBook;
         private float nextBookSearch;
         private readonly EvaluationSelection selection = new EvaluationSelection();
+        private readonly TagListPresentation tagList = new TagListPresentation();
         private GameObject root;
         private RectTransform rootRt, scrollContent, housesContent, orderContent;
         private TextMeshProUGUI evaluateLabel, housesTabLabel, orderTabLabel, meanLabel;
@@ -43,9 +44,12 @@ namespace DressmakerCritic.Diagnostics
         private bool layoutApplied;
         private RectTransform pageRt; // left notebook page when available
         private RectTransform scoreRt, photoRt, briefRt;
-        private Vector2 scoreAnchored0, scoreSize0, photoAnchored0, photoSize0, briefAnchored0, briefSize0;
-        private Vector2 scoreOffsetMin0, scoreOffsetMax0, photoOffsetMin0, photoOffsetMax0, briefOffsetMin0, briefOffsetMax0;
-        private Vector3 scoreScale0, photoScale0, briefScale0;
+        private readonly List<NativeUiRect> nativeRects = new List<NativeUiRect>();
+        private readonly List<Vector4> briefMargins = new List<Vector4>();
+        private Rect nativePage;
+        private RectTransform photoTemplate;
+        private TextMeshProUGUI photoText;
+        private Color nativeButtonColor = Color.white, nativeButtonText = Color.white;
         private readonly List<TextMeshProUGUI> briefTexts = new List<TextMeshProUGUI>();
         private readonly List<float> briefFontSizes = new List<float>();
         private static Sprite whiteSprite;
@@ -53,10 +57,6 @@ namespace DressmakerCritic.Diagnostics
         private static readonly Color Ink = new Color32(67, 46, 43, 255);
         private static readonly Color Muted = new Color32(108, 86, 77, 255);
         private static readonly Color Cocoa = new Color32(75, 48, 43, 255);
-        private static readonly Color ButtonFace = new Color32(234, 219, 207, 255);
-        private static readonly Color ActiveFace = new Color32(91, 65, 58, 255);
-        private static readonly Color Paper = new Color32(241, 231, 222, 255);
-        private static readonly Color Line = new Color32(176, 155, 142, 255);
 
         public long Begin()
         {
@@ -79,7 +79,7 @@ namespace DressmakerCritic.Diagnostics
             RefreshContent();
         }
 
-        public UiLayoutReport CaptureLayout() => UiLayoutProbe.Capture(cachedBook, layoutStatus, rootRt, briefRt, scoreRt, photoRt);
+        public UiLayoutReport CaptureLayout() => UiLayoutProbe.Capture(cachedBook, layoutStatus, rootRt, briefRt, scoreRt, photoRt, tagList.Frame);
         public void SetHistoryOrigin(long ticket, object state, HistoryOrderEvidence evidence)
         {
             if (disposed || !selection.Accepts(ticket, state)) return;
@@ -92,6 +92,7 @@ namespace DressmakerCritic.Diagnostics
         public void Dispose()
         {
             disposed = true;
+            tagList.Dispose();
             RestoreLayout();
             TearDown();
             HouseEmblems.Release();
@@ -105,7 +106,9 @@ namespace DressmakerCritic.Diagnostics
             if (disposed) return;
             evaluate = evaluateAction;
             busy = isBusy;
-            if (!ObserveHistory(out Component book, out RectTransform spread, out _))
+            bool history = ObserveHistory(out Component book, out RectTransform spread, out _);
+            tagList.Tick(history ? null : book);
+            if (!history)
             {
                 RestoreLayout();
                 TearDown();
@@ -118,6 +121,7 @@ namespace DressmakerCritic.Diagnostics
                 Build(book, spread);
             }
             bool geometryChanged = PlaceJury(book, spread);
+            if (geometryChanged && layoutApplied) RestoreLayout();
             if (hasPlacedRect) EnsureLayout(book, spread);
             else RestoreLayout();
             bool dirty = geometryChanged || !ReferenceEquals(paintedResult, result) || paintedContext != contextTab || paintedBusy != busy || paintedMessage != message;
@@ -277,39 +281,19 @@ namespace DressmakerCritic.Diagnostics
 
         private void BorrowLook(Component book, RectTransform host)
         {
-            font = null;
-            fontMaterial = null;
-            // Prefer body copy over italic title faces.
-            foreach (string field in new[] { "oldQuestText", "oldQuestGiver", "questText", "requirementsText", "fabricUsageText" })
+            font = null; fontMaterial = null;
+            foreach (string field in new[] { "oldQuestText", "oldQuestGiver", "questText" })
             {
-                var tmp = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
-                if (tmp == null || tmp.font == null) continue;
-                font = tmp.font;
-                fontMaterial = tmp.fontSharedMaterial;
-                break;
+                var text = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
+                if (text == null || text.font == null) continue;
+                font = text.font; fontMaterial = text.fontSharedMaterial; break;
             }
-            if (font == null)
-            {
-                var score = FieldSnapshot.ResolveFields(book, "comissionScoreDisplay") as Component;
-                var label = score != null ? score.GetComponentInChildren<TextMeshProUGUI>(true) : null;
-                if (label != null && label.font != null) { font = label.font; fontMaterial = label.fontSharedMaterial; }
-            }
-            buttonBorder = FindSprite("roundedButtonBorder");
-            var draft = FieldSnapshot.ResolveFields(book, "draftButton") as GameObject;
-            if (draft != null)
-            {
-                var img = draft.GetComponent<Image>() ?? draft.GetComponentInChildren<Image>(true);
-                if (img != null && img.sprite != null) buttonBorder = img.sprite;
-            }
-            if (buttonBorder == null)
-            {
-                var photo = FindPhotoButton(host);
-                if (photo != null)
-                {
-                    var img = photo.GetComponent<Image>();
-                    if (img != null && img.sprite != null) buttonBorder = img.sprite;
-                }
-            }
+            photoTemplate = FindPhotoButton(book.transform as RectTransform, true);
+            photoText = photoTemplate == null ? null : photoTemplate.GetComponentInChildren<TextMeshProUGUI>(true);
+            var image = photoTemplate == null ? null : photoTemplate.GetComponent<Image>();
+            buttonBorder = image != null ? image.sprite : FindSprite("roundedButtonBorder");
+            nativeButtonColor = image == null ? Color.white : image.color;
+            nativeButtonText = photoText == null ? Color.white : photoText.color;
         }
 
         private static Sprite FindSprite(string name)
@@ -324,72 +308,39 @@ namespace DressmakerCritic.Diagnostics
             RestoreLayout();
             briefRt = ResolveBriefCard(book, page);
             scoreRt = ResolveScoreCard(book);
-            photoRt = FindPhotoButton(page);
+            photoRt = FindPhotoButton(book.transform as RectTransform);
             originalLayout = UiLayoutProbe.Capture(book, "before-native-layout-changes", rootRt, briefRt, scoreRt, photoRt);
             if (briefRt != null)
             {
-                CaptureRect(briefRt, out briefAnchored0, out briefSize0, out briefScale0, out briefOffsetMin0, out briefOffsetMax0);
-                ShrinkAndLift(briefRt, briefAnchored0, briefSize0, briefScale0, briefOffsetMin0, briefOffsetMax0, 0.62f, 0.35f, 0.18f);
-                CaptureBriefFonts(book);
-                for (int i = 0; i < briefTexts.Count; i++)
-                    if (briefTexts[i] != null) briefTexts[i].fontSize = briefFontSizes[i] * 0.72f;
+                nativeRects.Add(new NativeUiRect(briefRt));
+                NativeUiRect.Place(briefRt, page, Region(nativePage, 0.06f, 0.80f, 0.88f, 0.18f));
+                foreach (string field in new[] { "oldQuestTitle", "oldQuestText", "oldQuestGiver" })
+                {
+                    var text = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
+                    if (text == null || !text.transform.IsChildOf(briefRt) || text.rectTransform == briefRt) continue;
+                    briefTexts.Add(text); briefFontSizes.Add(text.fontSize); briefMargins.Add(text.margin);
+                    nativeRects.Add(new NativeUiRect(text.rectTransform));
+                    // Widen the paper but reserve the upper right for the game's hand clip.
+                    var rt = text.rectTransform;
+                    rt.anchorMin = new Vector2(0, rt.anchorMin.y);
+                    rt.anchorMax = new Vector2(1, rt.anchorMax.y);
+                    rt.offsetMin = new Vector2(briefRt.rect.width * 0.05f, rt.offsetMin.y);
+                    rt.offsetMax = new Vector2(-briefRt.rect.width * 0.23f, rt.offsetMax.y);
+                    text.margin = new Vector4(0, text.margin.y, 0, text.margin.w);
+                    text.fontSize = briefFontSizes[briefFontSizes.Count - 1] * 0.9f;
+                }
             }
             if (scoreRt != null)
             {
-                CaptureRect(scoreRt, out scoreAnchored0, out scoreSize0, out scoreScale0, out scoreOffsetMin0, out scoreOffsetMax0);
-                // Compress and lift hard so the lower-left leaf frees for jury + house rows.
-                ShrinkAndLift(scoreRt, scoreAnchored0, scoreSize0, scoreScale0, scoreOffsetMin0, scoreOffsetMax0, 0.58f, 0.40f, 0.20f);
+                nativeRects.Add(new NativeUiRect(scoreRt));
+                NativeUiRect.Place(scoreRt, page, Region(nativePage, 0.08f, 0.55f, 0.84f, 0.22f));
             }
-            if (photoRt != null)
-            {
-                CaptureRect(photoRt, out photoAnchored0, out photoSize0, out photoScale0, out photoOffsetMin0, out photoOffsetMax0);
-                photoRt.localScale = photoScale0 * 0.55f;
-                bool stretch = photoRt.anchorMin != photoRt.anchorMax;
-                if (stretch)
-                {
-                    photoRt.offsetMin = photoOffsetMin0 + new Vector2(40f, 0f);
-                    photoRt.offsetMax = photoOffsetMax0 + new Vector2(-10f, -8f);
-                }
-                else
-                {
-                    photoRt.anchoredPosition = new Vector2(photoAnchored0.x + 48f, photoAnchored0.y - 8f);
-                    if (photoSize0.x > 10f) photoRt.sizeDelta = photoSize0 * 0.7f;
-                }
-            }
+            // Photo Mode retains its original geometry, scripts and listeners.
             layoutApplied = true;
         }
 
-        private static void ShrinkAndLift(RectTransform rt, Vector2 anchored0, Vector2 size0, Vector3 scale0, Vector2 offsetMin0, Vector2 offsetMax0, float scale, float liftFactor, float shrinkFactor)
-        {
-            rt.localScale = scale0 * scale;
-            bool stretch = rt.anchorMin != rt.anchorMax;
-            float h = Math.Max(60f, Math.Abs(rt.rect.height));
-            if (stretch)
-            {
-                float lift = Math.Max(24f, h * liftFactor * 0.55f);
-                float shrink = Math.Max(28f, h * shrinkFactor);
-                rt.offsetMax = new Vector2(offsetMax0.x, offsetMax0.y + lift);
-                rt.offsetMin = new Vector2(offsetMin0.x, offsetMin0.y + shrink);
-            }
-            else
-            {
-                rt.anchoredPosition = anchored0 + new Vector2(0f, h * liftFactor);
-                if (size0.y > 10f) rt.sizeDelta = new Vector2(size0.x, size0.y * Math.Max(0.7f, scale));
-            }
-        }
-
-        private void CaptureBriefFonts(Component book)
-        {
-            briefTexts.Clear();
-            briefFontSizes.Clear();
-            foreach (string field in new[] { "oldQuestTitle", "oldQuestText", "oldQuestGiver" })
-            {
-                var tmp = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
-                if (tmp == null) continue;
-                briefTexts.Add(tmp);
-                briefFontSizes.Add(tmp.fontSize);
-            }
-        }
+        private static Rect Region(Rect page, float x, float y, float width, float height) =>
+            new Rect(page.x + page.width * x, page.y + page.height * y, page.width * width, page.height * height);
 
         private static RectTransform ResolveBriefCard(Component book, RectTransform spread)
         {
@@ -451,32 +402,9 @@ namespace DressmakerCritic.Diagnostics
 
         private static RectTransform ResolveScoreCard(Component book)
         {
-            var scoreComp = FieldSnapshot.ResolveFields(book, "comissionScoreDisplay") as Component;
-            if (scoreComp != null)
-            {
-                var inventory = FieldSnapshot.ResolveFields(scoreComp, "inventoryRect") as RectTransform;
-                if (inventory != null && inventory.gameObject.activeInHierarchy && Math.Abs(inventory.rect.height) >= 40f)
-                    return inventory;
-                var self = scoreComp.GetComponent<RectTransform>();
-                if (self != null && Math.Abs(self.rect.height) >= 40f && Math.Abs(self.rect.height) <= 600f)
-                    return self;
-            }
             var wrapper = FieldSnapshot.ResolveFields(book, "oldQuestScoreDisplay") as GameObject;
-            if (wrapper != null && wrapper.activeInHierarchy)
-            {
-                var rt = wrapper.GetComponent<RectTransform>();
-                if (rt != null && Math.Abs(rt.rect.height) <= 600f) return rt;
-            }
-            return scoreComp != null ? scoreComp.GetComponent<RectTransform>() : null;
-        }
-
-        private static void CaptureRect(RectTransform rt, out Vector2 anchored, out Vector2 size, out Vector3 scale, out Vector2 offsetMin, out Vector2 offsetMax)
-        {
-            anchored = rt.anchoredPosition;
-            size = rt.sizeDelta;
-            scale = rt.localScale;
-            offsetMin = rt.offsetMin;
-            offsetMax = rt.offsetMax;
+            // Only the exact history wrapper: inventoryRect may be shared with WIP.
+            return wrapper != null && wrapper.activeInHierarchy ? wrapper.GetComponent<RectTransform>() : null;
         }
 
         private bool PlaceJury(Component book, RectTransform spread)
@@ -501,8 +429,26 @@ namespace DressmakerCritic.Diagnostics
                 Vector2 point = spread.InverseTransformPoint(corners[i]);
                 min = Vector2.Min(min, point); max = Vector2.Max(max, point);
             }
-            var area = new Rect(min.x + (max.x - min.x) * 0.05f, min.y + (max.y - min.y) * 0.06f,
-                (max.x - min.x) * 0.9f, (max.y - min.y) * 0.39f);
+            var candidate = Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+            if (!layoutApplied || candidate.size != nativePage.size)
+            {
+                var marker = FindPhotoButton(book.transform as RectTransform);
+                var brief = ResolveBriefCard(book, spread);
+                if (marker == null && brief == null)
+                {
+                    layoutStatus = "native-left-page-marker-unavailable";
+                    hasPlacedRect = false; root.SetActive(false); return false;
+                }
+                float markerX = NativeUiRect.Bounds(marker != null ? marker : brief, spread).center.x;
+                double left = NotebookPageGeometry.LeftForMarker(candidate.x, candidate.width, markerX);
+                if (double.IsNaN(left))
+                {
+                    layoutStatus = "native-left-page-marker-conflict";
+                    hasPlacedRect = false; root.SetActive(false); return false;
+                }
+                nativePage = new Rect((float)left, candidate.y, candidate.width, candidate.height);
+            }
+            var area = Region(nativePage, 0.06f, 0.12f, 0.88f, 0.40f);
             if (float.IsNaN(area.width) || float.IsInfinity(area.width) || float.IsNaN(area.height) ||
                 float.IsInfinity(area.height) || area.width < 80 || area.height < 80)
             {
@@ -515,11 +461,11 @@ namespace DressmakerCritic.Diagnostics
             if (hasPlacedRect && placedRect == area) return false;
             hasPlacedRect = true;
             placedRect = area;
-            layoutStatus = "measured-left-page-runtime-review-required";
+            layoutStatus = "native-marker-left-page-runtime-review-required";
             rootRt.anchorMin = rootRt.anchorMax = spread.pivot;
             rootRt.pivot = new Vector2(0.5f, 0.5f);
             // Fit the existing toolbar into small notebook coordinate systems.
-            float scale = Math.Min(1f, area.width / 330f);
+            float scale = Math.Min(1f, Math.Min(area.width / 330f, area.height / 190f));
             rootRt.anchoredPosition = area.center;
             rootRt.sizeDelta = area.size / scale;
             rootRt.localScale = Vector3.one * scale;
@@ -531,46 +477,27 @@ namespace DressmakerCritic.Diagnostics
 
         private void RestoreLayout()
         {
+            for (int i = nativeRects.Count - 1; i >= 0; i--) nativeRects[i].Restore();
+            nativeRects.Clear();
             for (int i = 0; i < briefTexts.Count; i++)
-                if (briefTexts[i] != null) briefTexts[i].fontSize = briefFontSizes[i];
-            briefTexts.Clear();
-            briefFontSizes.Clear();
-            if (briefRt != null)
             {
-                briefRt.anchoredPosition = briefAnchored0;
-                briefRt.sizeDelta = briefSize0;
-                briefRt.localScale = briefScale0;
-                briefRt.offsetMin = briefOffsetMin0;
-                briefRt.offsetMax = briefOffsetMax0;
+                if (briefTexts[i] == null) continue;
+                briefTexts[i].fontSize = briefFontSizes[i];
+                briefTexts[i].margin = briefMargins[i];
             }
-            if (scoreRt != null)
-            {
-                scoreRt.anchoredPosition = scoreAnchored0;
-                scoreRt.sizeDelta = scoreSize0;
-                scoreRt.localScale = scoreScale0;
-                scoreRt.offsetMin = scoreOffsetMin0;
-                scoreRt.offsetMax = scoreOffsetMax0;
-            }
-            if (photoRt != null)
-            {
-                photoRt.anchoredPosition = photoAnchored0;
-                photoRt.sizeDelta = photoSize0;
-                photoRt.localScale = photoScale0;
-                photoRt.offsetMin = photoOffsetMin0;
-                photoRt.offsetMax = photoOffsetMax0;
-            }
+            briefTexts.Clear(); briefFontSizes.Clear(); briefMargins.Clear();
             briefRt = scoreRt = photoRt = null;
             layoutApplied = false;
         }
 
-        private static RectTransform FindPhotoButton(RectTransform page)
+        private static RectTransform FindPhotoButton(RectTransform page, bool includeInactive = false)
         {
             if (page == null) return null;
             RectTransform best = null;
             float bestScore = float.NegativeInfinity;
             foreach (var tmp in page.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
-                if (tmp == null || !tmp.gameObject.activeInHierarchy) continue;
+                if (tmp == null || (!includeInactive && !tmp.gameObject.activeInHierarchy)) continue;
                 string text = tmp.text ?? "";
                 if (text.IndexOf("Photo", StringComparison.OrdinalIgnoreCase) < 0
                     && text.IndexOf("Фото", StringComparison.OrdinalIgnoreCase) < 0)
@@ -592,14 +519,14 @@ namespace DressmakerCritic.Diagnostics
             if (evaluateLabel != null) evaluateLabel.text = busy ? UiStrings.Get("evaluating") : UiStrings.Get("evaluate");
             if (evaluateImage != null)
             {
-                evaluateImage.color = busy ? Line : ButtonFace;
+                evaluateImage.color = busy ? nativeButtonColor * 0.7f : nativeButtonColor;
                 var button = evaluateImage.GetComponent<Button>();
                 if (button != null) button.interactable = !busy;
             }
-            if (housesTabImage != null) housesTabImage.color = !contextTab ? ActiveFace : ButtonFace;
-            if (orderTabImage != null) orderTabImage.color = contextTab ? ActiveFace : ButtonFace;
-            if (housesTabLabel != null) housesTabLabel.color = !contextTab ? Paper : Ink;
-            if (orderTabLabel != null) orderTabLabel.color = contextTab ? Paper : Ink;
+            if (housesTabImage != null) housesTabImage.color = !contextTab ? nativeButtonColor : nativeButtonColor * 0.85f;
+            if (orderTabImage != null) orderTabImage.color = contextTab ? nativeButtonColor : nativeButtonColor * 0.85f;
+            if (housesTabLabel != null) housesTabLabel.color = nativeButtonText;
+            if (orderTabLabel != null) orderTabLabel.color = nativeButtonText;
             if (housesContent != null) housesContent.gameObject.SetActive(!contextTab);
             if (orderContent != null) orderContent.gameObject.SetActive(contextTab);
         }
@@ -747,7 +674,13 @@ namespace DressmakerCritic.Diagnostics
             var image = go.GetComponent<Image>();
             image.sprite = buttonBorder != null ? buttonBorder : WhiteSprite();
             image.type = buttonBorder != null ? Image.Type.Sliced : Image.Type.Simple;
-            image.color = ButtonFace;
+            image.color = nativeButtonColor;
+            if (photoTemplate != null)
+            {
+                var source = photoTemplate.GetComponent<Image>();
+                if (source != null) CopyImage(source, image);
+                CopyPhotoDecorations(go.transform);
+            }
             image.raycastTarget = true;
             var rt = go.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(w, h);
@@ -756,12 +689,51 @@ namespace DressmakerCritic.Diagnostics
             le.preferredHeight = h;
             le.minWidth = w;
             le.minHeight = h;
-            label = MakeLabel(go.transform, "Label", text, 14, Ink, TextAlignmentOptions.Center);
+            label = MakeLabel(go.transform, "Label", text, 14, nativeButtonText, TextAlignmentOptions.Center);
+            if (photoText != null)
+            {
+                label.font = photoText.font; label.fontSharedMaterial = photoText.fontSharedMaterial;
+                label.fontStyle = photoText.fontStyle;
+            }
+            label.enableAutoSizing = true; label.fontSizeMin = 10; label.fontSizeMax = 14;
             Stretch(label.rectTransform, 4, 2, -4, -2);
             var button = go.GetComponent<Button>();
             button.targetGraphic = image;
+            var native = photoTemplate == null ? null : photoTemplate.GetComponent<Button>();
+            if (native != null)
+            {
+                button.transition = native.transition == Selectable.Transition.Animation ? Selectable.Transition.ColorTint : native.transition;
+                button.colors = native.colors; button.spriteState = native.spriteState;
+            }
             button.onClick.AddListener(new UnityAction(click));
             return image;
+        }
+
+        internal static void CopyImage(Image source, Image target)
+        {
+            target.sprite = source.sprite; target.type = source.type;
+            target.material = source.material; target.color = source.color;
+            target.preserveAspect = source.preserveAspect; target.fillCenter = source.fillCenter;
+            target.pixelsPerUnitMultiplier = source.pixelsPerUnitMultiplier;
+        }
+
+        private void CopyPhotoDecorations(Transform target)
+        {
+            Rect bounds = photoTemplate.rect;
+            if (bounds.width <= 0 || bounds.height <= 0) return;
+            // Copy visual Image data only. Never clone Photo Mode scripts/listeners.
+            foreach (var image in photoTemplate.GetComponentsInChildren<Image>(true).Take(16))
+            {
+                if (image.transform == photoTemplate || !image.gameObject.activeSelf) continue;
+                var go = new GameObject("PhotoModeDecoration", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                go.transform.SetParent(target, false);
+                var copy = go.GetComponent<Image>(); CopyImage(image, copy); copy.raycastTarget = false;
+                Rect area = NativeUiRect.Bounds(image.rectTransform, photoTemplate);
+                var rt = go.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2((area.xMin - bounds.xMin) / bounds.width, (area.yMin - bounds.yMin) / bounds.height);
+                rt.anchorMax = new Vector2((area.xMax - bounds.xMin) / bounds.width, (area.yMax - bounds.yMin) / bounds.height);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+            }
         }
 
         private TextMeshProUGUI MakeLabel(Transform parent, string name, string text, float size, Color color, TextAlignmentOptions align)

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-05",
-  "pluginVersion": "0.15.5",
+  "pluginVersion": "0.15.6",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,13 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "product.ui_native_marker",
+      "status": "implemented-unverified",
+      "claim": "v0.15.6 uses native Photo Mode/original brief to choose the history leaf; moves only the complete history score wrapper, borrows Photo Mode visuals, and adds reversible WIP clipping allowance/native-sprite frame. User screenshots confirm prior defects; corrected native appearance awaits game test.",
+      "evidence": ["docs/knowledge/CURRENT.md", "docs/RESULT-UI.md", "tests/NotebookPageGeometryTests.cs"],
+      "code": ["DressmakerCritic-Diagnostics/EvaluationPanel.cs", "DressmakerCritic-Diagnostics/TagListPresentation.cs", "DressmakerCritic-Diagnostics/NativeUiRect.cs"]
+    },
     {
       "id": "runtime.history_order",
       "status": "confirmed",
