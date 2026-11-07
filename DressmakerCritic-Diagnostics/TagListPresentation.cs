@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DressmakerCritic.Diagnostics
 {
-    // Own border and clipping allowance for the WIP tag list. No rows, values or
-    // native layout dimensions are changed; no shared history inventory is resized.
+    // Native border plus reversible horizontal row insets for the WIP tag list.
+    // Tag values, vertical layout and the shared history inventory are untouched.
     internal sealed class TagListPresentation : IDisposable
     {
         private RectTransform target;
@@ -15,6 +16,9 @@ namespace DressmakerCritic.Diagnostics
         private bool stencilEnabled, clippingEnabled, addedClipping;
         private Vector4 originalPadding;
         private GameObject frame;
+        private Transform content;
+        private int rowCount;
+        private readonly List<NativeUiRect> rows = new List<NativeUiRect>();
         public RectTransform Frame => frame == null ? null : frame.GetComponent<RectTransform>();
         public void Tick(Component book)
         {
@@ -22,8 +26,14 @@ namespace DressmakerCritic.Diagnostics
             var mask = FieldSnapshot.ResolveFields(book, "tagMask") as RectTransform;
             if (holder == null || !holder.activeInHierarchy || mask == null || !mask.gameObject.activeInHierarchy)
             { Dispose(); return; }
-            if (target == mask) { PlaceFrame(); return; }
+            if (target == mask)
+            {
+                if (content != null && content.childCount != rowCount) InsetRows();
+                PlaceFrame(); return;
+            }
             Dispose(); target = mask;
+            content = FieldSnapshot.ResolveFields(book, "tagBarParent") as Transform;
+            InsetRows();
             clipping = mask.GetComponent<RectMask2D>();
             addedClipping = clipping == null;
             if (addedClipping) clipping = mask.gameObject.AddComponent<RectMask2D>();
@@ -59,8 +69,27 @@ namespace DressmakerCritic.Diagnostics
             area.xMin -= 24; area.xMax += 24; area.yMin -= 20; area.yMax += 20;
             NativeUiRect.Place(frame.GetComponent<RectTransform>(), target.parent, area);
         }
+        private void InsetRows()
+        {
+            foreach (var row in rows) row.Restore();
+            rows.Clear();
+            if (content == null || target == null) return;
+            if (content is RectTransform rect) LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            rowCount = content.childCount;
+            for (int i = 0; i < Math.Min(rowCount, 256); i++)
+            {
+                var row = content.GetChild(i) as RectTransform;
+                if (row == null || !row.gameObject.activeInHierarchy) continue;
+                rows.Add(new NativeUiRect(row));
+                // Actual stars/labels/bars fit inside the viewport with 24 units each side.
+                // Vertical positions and scroll range are untouched.
+                NativeUiRect.InsetHorizontal(row, target, 24);
+            }
+        }
         public void Dispose()
         {
+            foreach (var row in rows) row.Restore();
+            rows.Clear(); content = null; rowCount = 0;
             if (clipping != null)
             {
                 clipping.padding = originalPadding;

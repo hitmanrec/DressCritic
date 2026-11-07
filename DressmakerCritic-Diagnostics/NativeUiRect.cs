@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Linq;
 
 namespace DressmakerCritic.Diagnostics
 {
@@ -45,6 +47,51 @@ namespace DressmakerCritic.Diagnostics
             target.anchoredPosition = (a + b) * 0.5f;
             target.sizeDelta = new Vector2(Mathf.Abs(b.x - a.x), Mathf.Abs(b.y - a.y));
             target.localScale = Vector3.one; target.localRotation = Quaternion.identity;
+        }
+        public static void FitVisuals(RectTransform target, Transform space, Rect area)
+        {
+            // A grouping RectTransform can be much smaller than its fixed-size children.
+            // Fit actual graphics, not that bookkeeping rectangle; retain native font aspect.
+            Rect visual = VisualBounds(target, space);
+            if (visual.width <= 0 || visual.height <= 0) return;
+            float heightScale = Mathf.Min(1, area.height / visual.height);
+            if (target.rect.width > 1)
+            {
+                float width = target.rect.width * area.width / (visual.width * heightScale);
+                target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(target);
+                visual = VisualBounds(target, space);
+            }
+            float scale = Mathf.Min(1, Mathf.Min(area.width / visual.width, area.height / visual.height));
+            target.localScale *= scale;
+            visual = VisualBounds(target, space);
+            Vector2 delta = area.center - visual.center;
+            target.position += space.TransformVector(new Vector3(delta.x, delta.y, 0));
+        }
+        private static Rect VisualBounds(RectTransform target, Transform space)
+        {
+            bool found = false; Rect result = new Rect();
+            foreach (var graphic in target.GetComponentsInChildren<Graphic>(false).Take(128))
+            {
+                Rect bounds = Bounds(graphic.rectTransform, space);
+                if (bounds.width <= 0 || bounds.height <= 0) continue;
+                result = found ? Rect.MinMaxRect(Mathf.Min(result.xMin, bounds.xMin), Mathf.Min(result.yMin, bounds.yMin),
+                    Mathf.Max(result.xMax, bounds.xMax), Mathf.Max(result.yMax, bounds.yMax)) : bounds;
+                found = true;
+            }
+            return found ? result : Bounds(target, space);
+        }
+        public static void InsetHorizontal(RectTransform target, RectTransform viewport, float padding)
+        {
+            Rect visual = VisualBounds(target, viewport);
+            float width = viewport.rect.width - padding * 2;
+            if (visual.width <= 0 || width <= 0) return;
+            var scale = target.localScale;
+            scale.x *= Mathf.Min(1, width / visual.width);
+            target.localScale = scale;
+            visual = VisualBounds(target, viewport);
+            float delta = viewport.rect.center.x - visual.center.x;
+            target.position += viewport.TransformVector(new Vector3(delta, 0, 0));
         }
     }
 }

@@ -313,7 +313,6 @@ namespace DressmakerCritic.Diagnostics
             if (briefRt != null)
             {
                 nativeRects.Add(new NativeUiRect(briefRt));
-                NativeUiRect.Place(briefRt, page, Region(nativePage, 0.06f, 0.80f, 0.88f, 0.18f));
                 foreach (string field in new[] { "oldQuestTitle", "oldQuestText", "oldQuestGiver" })
                 {
                     var text = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
@@ -329,13 +328,18 @@ namespace DressmakerCritic.Diagnostics
                     text.margin = new Vector4(0, text.margin.y, 0, text.margin.w);
                     text.fontSize = briefFontSizes[briefFontSizes.Count - 1] * 0.9f;
                 }
+                NativeUiRect.FitVisuals(briefRt, page, Region(nativePage, 0.06f, 0.83f, 0.88f, 0.14f));
             }
             if (scoreRt != null)
             {
                 nativeRects.Add(new NativeUiRect(scoreRt));
-                NativeUiRect.Place(scoreRt, page, Region(nativePage, 0.08f, 0.55f, 0.84f, 0.22f));
+                NativeUiRect.FitVisuals(scoreRt, page, Region(nativePage, 0.08f, 0.62f, 0.84f, 0.18f));
             }
-            // Photo Mode retains its original geometry, scripts and listeners.
+            if (photoRt != null)
+            {
+                nativeRects.Add(new NativeUiRect(photoRt));
+                NativeUiRect.FitVisuals(photoRt, page, Region(nativePage, 0.37f, 0.045f, 0.26f, 0.035f));
+            }
             layoutApplied = true;
         }
 
