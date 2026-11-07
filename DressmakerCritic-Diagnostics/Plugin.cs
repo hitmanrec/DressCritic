@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.10")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.11")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.10: fixed-height paper verdict cards and uniform house crests.");
+            Logger.LogInfo("Dressmaker Critic 0.15.11: fail-closed canonical four-view capture.");
         }
         private void Start()
         {
@@ -164,9 +164,8 @@ namespace DressmakerCritic.Diagnostics
                     }
                 });
                 capture.Stage("accessory-render-probe", () => capture.Write("accessory-render.json", GameRuntimeReader.AccessoryRenderProbe(progress)));
-                capture.Stage("fixed-view-rendering", () => {
+                bool fixedViewsValid = FixedViewCaptureGate.Run(input, () => capture.Stage("fixed-view-rendering", () => {
                     FixedViewCapture.Capture(capture.directory, state, progress);
-                    input.images.Clear();
                     var axes = new[] { "plus-z", "minus-z", "plus-x", "minus-x" };
                     var labels = new[] { "front (+Z)", "back (-Z)", "side A (+X)", "side B (-X)" };
                     for (int i = 0; i < axes.Length; i++)
@@ -183,12 +182,13 @@ namespace DressmakerCritic.Diagnostics
                         capture.Write("garment-after-fixed-views.json", afterFixed);
                         throw new InvalidOperationException("Garment fields changed during fixed-view rendering");
                     }
-                });
+                }));
                 bool backendValid = capture.Stage("backend-configuration", () => capture.Write("backend.json", new BackendDiagnostic {
                     model = selectedModel, endpoint = LocalEvaluator.ValidateEndpoint(selectedEndpoint).AbsoluteUri,
                     configured = !string.IsNullOrWhiteSpace(selectedModel) }));
                 capture.Write("evaluation-input.json", input);
                 capture.manifest.readiness = EvaluationReadiness.Check(input, selectedModel);
+                if (!fixedViewsValid) { capture.manifest.readiness.blockers.Add("fixed-view-capture-failed-or-incomplete"); capture.manifest.readiness.canEvaluate = false; }
                 if (!backendValid) { capture.manifest.readiness.blockers.Add("invalid-model-endpoint"); capture.manifest.readiness.canEvaluate = false; }
                 capture.Write("readiness.json", capture.manifest.readiness);
                 capture.Write("manifest.json", capture.manifest);

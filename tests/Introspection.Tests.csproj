@@ -29,6 +29,8 @@
     <Compile Include="../DressmakerCritic-Diagnostics/JuryContract.cs" Link="JuryContract.cs" />
     <Compile Include="JuryTests.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="FixedViewCaptureGateTests.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/FixedViewCaptureGate.cs" Link="FixedViewCaptureGate.cs" />
     <Compile Include="NotebookPageGeometryTests.cs" />
     <Compile Include="../DressmakerCritic-Diagnostics/NotebookPageGeometry.cs" Link="NotebookPageGeometry.cs" />
     <Compile Include="HistoryOrderTests.cs" />

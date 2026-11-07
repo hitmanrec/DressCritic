@@ -14,6 +14,7 @@ class Program
     static void Main(string[] args)
     {
         EvaluationSelectionTests.Run();
+        FixedViewCaptureGateTests.Run();
         NotebookPageGeometryTests.Run();
         HistoryOrderTests.Run();
         SelectionProbeTests.Run();
