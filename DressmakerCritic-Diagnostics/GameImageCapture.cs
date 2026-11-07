@@ -69,7 +69,7 @@ namespace DressmakerCritic.Diagnostics
                 RenderTexture.active = temporary;
                 pixels = new Texture2D(metadata.width, metadata.height, TextureFormat.RGB24, false);
                 pixels.ReadPixels(new Rect(0, 0, metadata.width, metadata.height), 0, 0); pixels.Apply();
-                byte[] png = ImageConversion.EncodeToPNG(pixels);
+                byte[] png = UnityPng.EncodeToPNG(pixels);
                 if (png == null || png.Length == 0) throw new InvalidOperationException("PNG encoding failed");
                 File.WriteAllBytes(Path.Combine(directory, "image.png"), png);
                 if (cameraObject != null)
@@ -91,7 +91,7 @@ namespace DressmakerCritic.Diagnostics
                             RenderTexture.active = temporary;
                             pixels.ReadPixels(new Rect(0, 0, metadata.width, metadata.height), 0, 0); pixels.Apply();
                             string name = yaw < 0 ? "angle-left.png" : "angle-right.png";
-                            File.WriteAllBytes(Path.Combine(directory, name), ImageConversion.EncodeToPNG(pixels));
+                            File.WriteAllBytes(Path.Combine(directory, name), UnityPng.EncodeToPNG(pixels));
                             metadata.files.Add(name);
                         }
                         metadata.viewsStatus = "three candidate views; framing and garment identity require visual verification";

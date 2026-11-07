@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 namespace DressmakerCritic.Diagnostics
 {
-    // Compact heraldic marks for the four fictional houses. Generated at runtime so the
-    // plugin ships no image assets; IDs match JuryContract house ids.
+    // House crest sprites. Prefers embedded 512² parchment assets; falls back to a tiny
+    // procedural mark if a PNG is missing. IDs match JuryContract house ids.
     internal static class HouseEmblems
     {
         private static readonly Dictionary<string, Sprite> cache = new Dictionary<string, Sprite>();
@@ -19,7 +22,7 @@ namespace DressmakerCritic.Diagnostics
         {
             if (string.IsNullOrEmpty(houseId)) return null;
             if (cache.TryGetValue(houseId, out Sprite existing) && existing != null) return existing;
-            var sprite = Bake(houseId);
+            var sprite = LoadEmbedded(houseId) ?? Bake(houseId);
             cache[houseId] = sprite;
             return sprite;
         }
@@ -29,10 +32,41 @@ namespace DressmakerCritic.Diagnostics
             foreach (var pair in cache)
             {
                 if (pair.Value == null) continue;
-                if (pair.Value.texture != null) Object.Destroy(pair.Value.texture);
-                Object.Destroy(pair.Value);
+                if (pair.Value.texture != null) UnityEngine.Object.Destroy(pair.Value.texture);
+                UnityEngine.Object.Destroy(pair.Value);
             }
             cache.Clear();
+        }
+
+        private static Sprite LoadEmbedded(string id)
+        {
+            try
+            {
+                var asm = Assembly.GetExecutingAssembly();
+                using (var stream = asm.GetManifestResourceStream("DressmakerCritic.House." + id + ".png"))
+                {
+                    if (stream == null) return null;
+                    using (var ms = new MemoryStream())
+                    {
+                        stream.CopyTo(ms);
+                        byte[] bytes = ms.ToArray();
+                        if (bytes.Length == 0 || bytes.Length > 2 * 1024 * 1024) return null;
+                        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false)
+                        {
+                            filterMode = FilterMode.Bilinear,
+                            wrapMode = TextureWrapMode.Clamp,
+                            name = "DressCriticHouse-" + id
+                        };
+                        if (!UnityPng.LoadImage(tex, bytes, true))
+                        {
+                            UnityEngine.Object.Destroy(tex);
+                            return null;
+                        }
+                        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+                    }
+                }
+            }
+            catch { return null; }
         }
 
         private static Sprite Bake(string id)
@@ -120,7 +154,6 @@ namespace DressmakerCritic.Diagnostics
                 int y = size / 2 + i * 3;
                 HLine(px, size, y, size / 2 - 8 + (i % 2), size / 2 + 8 - (i % 2), accent, 1);
             }
-            // unused Paper keeps palette documented for future polish
             _ = Paper;
         }
 

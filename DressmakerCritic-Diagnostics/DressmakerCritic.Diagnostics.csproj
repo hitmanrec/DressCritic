@@ -13,6 +13,10 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <EmbeddedResource Include="Reference/brief-reference.en.json" LogicalName="DressmakerCritic.BriefReference.en.json" WithCulture="false" />
+    <EmbeddedResource Include="Assets/houses/harmony.png" LogicalName="DressmakerCritic.House.harmony.png" WithCulture="false" />
+    <EmbeddedResource Include="Assets/houses/character.png" LogicalName="DressmakerCritic.House.character.png" WithCulture="false" />
+    <EmbeddedResource Include="Assets/houses/avant_garde.png" LogicalName="DressmakerCritic.House.avant_garde.png" WithCulture="false" />
+    <EmbeddedResource Include="Assets/houses/atelier.png" LogicalName="DressmakerCritic.House.atelier.png" WithCulture="false" />
     <!-- Needed when compiling .NET Framework plugins with dotnet on Linux. -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <Reference Include="BepInEx">
@@ -21,10 +25,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>$(DressmakerGameRoot)/Dressmaker_Data/Managed/UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">

@@ -321,7 +321,7 @@ namespace DressmakerCritic.Diagnostics
                     RenderTexture.active = target;
                     pixels.ReadPixels(new Rect(0, 0, 768, 768), 0, 0); pixels.Apply();
                     string file = "fixed-axis-" + axes[i] + ".png";
-                    File.WriteAllBytes(Path.Combine(directory, file), ImageConversion.EncodeToPNG(pixels));
+                    File.WriteAllBytes(Path.Combine(directory, file), UnityPng.EncodeToPNG(pixels));
                     report.views.Add(new FixedViewRecord { file = file, axis = axes[i], x = camera.transform.position.x, y = camera.transform.position.y, z = camera.transform.position.z });
                 }
                 foreach (var light in UnityEngine.Object.FindObjectsOfType<Light>(true).Take(64))
