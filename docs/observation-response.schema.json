@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dresscritic:experimental-observations:0.1.0",
+  "$comment": "Development-only. Python validator also enforces unique IDs, all five distinct criteria and cross-references to supported observations. No final scoring is defined.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "observations", "criteria", "limitations"],
+  "properties": {
+    "schemaVersion": {"const": "0.1.0"},
+    "observations": {
+      "type": "array", "maxItems": 12,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "description", "view", "region", "certainty"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 40},
+          "description": {"$ref": "#/$defs/text"},
+          "view": {"enum": ["front (+Z)", "back (-Z)", "side A (+X)", "side B (-X)"]},
+          "region": {"type": "string", "minLength": 1, "maxLength": 80},
+          "certainty": {"enum": ["supported", "uncertain"]}
+        }
+      }
+    },
+    "criteria": {
+      "type": "array", "minItems": 5, "maxItems": 5,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["criterionId", "status", "assessment", "observationIds", "rationale"],
+        "properties": {
+          "criterionId": {"enum": ["composition", "material_coherence", "expressiveness", "novelty", "proportions"]},
+          "status": {"enum": ["supported", "unknown"]},
+          "assessment": {"enum": ["weak", "mixed", "strong", null]},
+          "observationIds": {"type": "array", "maxItems": 12, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 40}},
+          "rationale": {"$ref": "#/$defs/text"}
+        },
+        "allOf": [{
+          "if": {"properties": {"status": {"const": "unknown"}}},
+          "then": {"properties": {"assessment": {"const": null}, "observationIds": {"maxItems": 0}}},
+          "else": {"properties": {"assessment": {"enum": ["weak", "mixed", "strong"]}, "observationIds": {"minItems": 1}}}
+        }]
+      }
+    },
+    "limitations": {"type": "array", "maxItems": 8, "items": {"$ref": "#/$defs/text"}}
+  },
+  "$defs": {"text": {"type": "string", "minLength": 1, "maxLength": 240, "pattern": "\\S"}}
+}

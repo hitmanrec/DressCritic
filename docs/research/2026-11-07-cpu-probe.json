@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "1.0.0",
+  "date": "2026-11-07",
+  "kind": "development CPU runtime/protocol probe, not a model-quality benchmark",
+  "captureId": "20261104-230842-469-86722d39",
+  "eligibleSamples": 1,
+  "humanLabels": 0,
+  "currentGameModelChanged": false,
+  "inGamePerformanceVerified": false,
+  "model": {
+    "repository": "unsloth/Qwen3.5-2B-GGUF",
+    "revision": "f6d5376be1edb4d416d56da11e5397a961aca8ae",
+    "weightsFile": "Qwen3.5-2B-Q4_K_M.gguf",
+    "weightsSha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+    "projectorSha256": "7035e9cb8d7c6a9681d07eef9a364783e86ea4cd73faab2eabb4f43a101830c7"
+  },
+  "runtime": {
+    "release": "b12110",
+    "archiveSha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55",
+    "serverSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+    "runtimeDependenciesHashed": 38,
+    "threads": 4,
+    "context": 8192,
+    "gpuLayers": 0,
+    "projectorBackend": "CPU"
+  },
+  "hardware": {
+    "cpuAffinityCount": 5,
+    "cgroupCpuMax": "400000 100000",
+    "cgroupMemoryMaxBytes": 34359738368
+  },
+  "experiments": [
+    {
+      "name": "real-baseline",
+      "protocol": "baseline",
+      "sourceCommit": "6dae9c04e13bcf4da893a6dcfab6fd03e089f0c3",
+      "sourceDirty": true,
+      "structured": false,
+      "maxOutputTokens": 1024,
+      "temperature": 0.2,
+      "startupSeconds": 1.1227414059976581,
+      "peakResidentSetBytes": 3058790400,
+      "processExited": true,
+      "requests": [
+        {
+          "repeat": 0,
+          "httpSeconds": 48.87791860099969,
+          "schemaValid": false,
+          "error": "ValueError: production harness rejected input/output: Unhandled exception. System.IO.InvalidDataException: Unexpected assessment members",
+          "requestSha256": "8f6340c3179c2bf1d1ae913107a9d035cc2d93eecbfb43a3517f5a1158fa064b",
+          "responseSha256": "a728dcdc60bcc79b01521489d6e0b810fe47fd947891ca8005191a9e0d3717cc",
+          "finishReason": "stop",
+          "usage": {
+            "completion_tokens": 352,
+            "prompt_tokens": 4413,
+            "total_tokens": 4765,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "repeat": 1,
+          "httpSeconds": 28.263287083995237,
+          "schemaValid": false,
+          "error": "ValueError: truncated model completion",
+          "requestSha256": "8f6340c3179c2bf1d1ae913107a9d035cc2d93eecbfb43a3517f5a1158fa064b",
+          "responseSha256": "659b9797a47a81aa970d2d7e48f828ab5d2cfdfa6e48c78e46060b977f5b1b57",
+          "finishReason": "length",
+          "usage": {
+            "completion_tokens": 1024,
+            "prompt_tokens": 4413,
+            "total_tokens": 5437,
+            "prompt_tokens_details": {
+              "cached_tokens": 4409
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "real-baseline-2048",
+      "protocol": "baseline",
+      "sourceCommit": "713a107aca9e491a7ab22100203f439c66c1d299",
+      "sourceDirty": true,
+      "structured": false,
+      "maxOutputTokens": 2048,
+      "temperature": 0.2,
+      "startupSeconds": 1.3232150710027781,
+      "peakResidentSetBytes": 2989371392,
+      "processExited": true,
+      "requests": [
+        {
+          "repeat": 0,
+          "httpSeconds": 51.733445276004204,
+          "schemaValid": false,
+          "error": "ValueError: production harness rejected input/output: Unhandled exception. System.IO.InvalidDataException: Unexpected assessment members",
+          "requestSha256": "70cbe856b8399bb0a3eb390be96a9e5a3e8ef849597439e2ac0eb0159b0bec2e",
+          "responseSha256": "f1ad6f808feeb35866f95b24df0b5d3940c387b383fd7c40a0827b133262ecb2",
+          "finishReason": "stop",
+          "usage": {
+            "completion_tokens": 457,
+            "prompt_tokens": 4413,
+            "total_tokens": 4870,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "real-observations",
+      "protocol": "observations-v1",
+      "sourceCommit": "713a107aca9e491a7ab22100203f439c66c1d299",
+      "sourceDirty": true,
+      "structured": false,
+      "maxOutputTokens": 2048,
+      "temperature": 0.2,
+      "startupSeconds": 1.3189777029983816,
+      "peakResidentSetBytes": 3063488512,
+      "processExited": true,
+      "requests": [
+        {
+          "repeat": 0,
+          "httpSeconds": 74.37015802400128,
+          "schemaValid": false,
+          "error": "ValueError: invalid bounded text",
+          "requestSha256": "6cc020e59f7b2ae8be3242fa76c0e89a61cd2dc5b91272535ed5111386906a0a",
+          "responseSha256": "d612202309a1bcb910152f0ccd07c8ddcc5db2365d6bd99b7baa3a33cd9afb96",
+          "finishReason": "stop",
+          "usage": {
+            "completion_tokens": 1313,
+            "prompt_tokens": 4239,
+            "total_tokens": 5552,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "repeat": 1,
+          "httpSeconds": 43.20638979299838,
+          "schemaValid": false,
+          "error": "ValueError: unexpected protocol members",
+          "requestSha256": "6cc020e59f7b2ae8be3242fa76c0e89a61cd2dc5b91272535ed5111386906a0a",
+          "responseSha256": "f28911a5ed00a8851921a924f4d6ba4cb8c857d5e65770e4a34fdb310cac926c",
+          "finishReason": "stop",
+          "usage": {
+            "completion_tokens": 1589,
+            "prompt_tokens": 4239,
+            "total_tokens": 5828,
+            "prompt_tokens_details": {
+              "cached_tokens": 4235
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "real-observations-structured",
+      "protocol": "observations-v1",
+      "sourceCommit": "713a107aca9e491a7ab22100203f439c66c1d299",
+      "sourceDirty": true,
+      "structured": true,
+      "maxOutputTokens": 2048,
+      "temperature": 0.2,
+      "startupSeconds": 1.4205573680010275,
+      "peakResidentSetBytes": 3021930496,
+      "processExited": true,
+      "requests": [
+        {
+          "repeat": 0,
+          "httpSeconds": 84.85535614899709,
+          "schemaValid": true,
+          "error": null,
+          "requestSha256": "4fd461a35fb11a50d3dbf5466c1dcc1a4e6dfc0f6ed68c343bffa8b69b3ba340",
+          "responseSha256": "3d2c7b1944fc5568bc63c9763e6b99db0440aae2f6d7e1dee2dabb53f2c09827",
+          "finishReason": "stop",
+          "usage": {
+            "completion_tokens": 1616,
+            "prompt_tokens": 4239,
+            "total_tokens": 5855,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Only one dress; no human quality labels or held-out test.",
+    "Qwen3-VL-4B, Qwen3.5-4B and Gemma 4 E2B were not run here.",
+    "Early baseline used 1024 output tokens; a separate run retried production 2048.",
+    "Development commands shared the CPU; timings do not establish isolated or gaming performance.",
+    "Tooling was under development (sourceDirty true); no model selection/leaderboard is justified.",
+    "Full requests/server sessions remain outside Git; compact content fixtures are retained under tests/fixtures/qwen35-2b-probe.",
+    "Structured response passed validation but all five criteria were strong; aesthetic validity is unknown.",
+    "Runtime emitted non-consecutive multimodal position warnings; effects were not isolated against another backend."
+  ]
+}

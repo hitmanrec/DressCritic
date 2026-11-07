@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
-5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.10**.
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.11**.
 
 The existing history-only inline Jury, house crests, English UI and optional
 locale overlay are retained. v0.15.4 fixes the latest model response rejection,
@@ -15,6 +15,13 @@ Primary direction: [grounded, calibrated local evaluation](docs/EVALUATION-PLAN.
 The current direct VLM ratings are a prototype baseline, not a validated quality
 scale. [Repository audit](docs/REPOSITORY-AUDIT.md) records the next blockers;
 input validity and controlled model evaluation take priority over UI cosmetics.
+
+[Offline tools and owned-runtime probe](docs/OFFLINE-EVALUATION.md) now support
+capture inventory, repeated baseline/observation requests and local CPU startup/
+cleanup without game assemblies. [Recorded CPU probe](docs/research/2026-11-07-cpu-probe.json)
+is a one-dress engineering experiment, not a calibrated model comparison.
+The current in-game model is unchanged. Fixed-view failure now blocks inference;
+the original viewer image remains diagnostic evidence only.
 
 [Structured knowledge base](docs/knowledge/README.md) is the current entry point:
 
@@ -97,6 +104,7 @@ index from viewer siblingIndex. Full dialogue/customer preferences remain unknow
 ```bash
 dotnet run --project tests/Introspection.Tests.csproj
 python3 tests/test_capture_importer.py
+python3 tests/test_offline_evaluation.py
 python3 tools/review_capture.py /path/to/capture
 ```
 

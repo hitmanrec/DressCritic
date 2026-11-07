@@ -1,0 +1,47 @@
+{
+  "jury": [
+    {
+      "houseId": "harmony",
+      "status": "7.0",
+      "score": 7.0,
+      "remarks": [
+        "Strong vertical line with balanced proportions. The color transition at the waist is clean and deliberate.",
+        "The keyhole bodice and pussybow collar create a cohesive, elegant silhouette."
+      ]
+    },
+    {
+      "houseId": "character",
+      "status": "8.0",
+      "score": 8.0,
+      "remarks": [
+        "Expressive and confident. The color blocking draws the eye to the waist and skirt.",
+        "The long sleeves and pussybow collar add a distinct, feminine flair."
+      ]
+    },
+    {
+      "houseId": "avant_garde",
+      "status": "6.0",
+      "score": 6.0,
+      "remarks": [
+        "Bold color blocking with a unique keyhole bodice. The asymmetry in the skirt panels is unconventional.",
+        "The combination of wool and tweed creates a textured, interesting look."
+      ]
+    },
+    {
+      "houseId": "atelier",
+      "status": "7.5",
+      "score": 7.5,
+      "remarks": [
+        "Elegant proportions with a well-balanced silhouette. The color palette is sophisticated.",
+        "The pussybow collar and keyhole bodice add a touch of classic elegance."
+      ]
+    }
+  ],
+  "limitations": [
+    "Only one view of the garment is provided; the back and side views are limited to the visible silhouette.",
+    "The exact color and texture of the skirt panels are not clearly distinguishable from the bodice.",
+    "The specific construction of the keyhole bodice and waist seam is not visible.",
+    "The texture of the pussybow collar is not clearly visible.",
+    "The exact fit and drape of the skirt are not visible from the provided views."
+  ]
+}

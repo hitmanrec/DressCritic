@@ -124,15 +124,18 @@ the model to invent an average. No advice/action-recommendation field is accepte
 
 ## Current implementation boundary
 
-Plugin 0.15.10 implements history capture, structured garment facts, historical
+Plugin 0.15.11 implements history capture, structured garment facts, historical
 order association, direct four-vote VLM inference, strict response validation and
 native notebook review cards. The current model is Qwen3-VL-4B-Instruct Q4_K_M,
 rubric 1.1.0. There is no calibrated aesthetic scorer or validated model benchmark.
 
-Existing schemas describe this prototype; future observation/scoring contracts
-must be versioned when implemented. Manual Ollama remains a development
-dependency. The source audit lists a possible single-view fallback after fixed
-capture failure, missing benchmark provenance and unverified context failures.
+Existing schemas describe this prototype; the separate observation schema 0.1.0
+is experimental/offline only. Production calibrated scoring contracts remain
+future work. Manual Ollama remains a development dependency. The source audit
+identified a single-view fallback; v0.15.11 blocks it. Offline provenance tools
+and an owned CPU runtime probe now exist. Model selection, human calibration,
+in-game hardware measurements and end-user packaging remain unfinished. Context
+failures reported by the user still require their raw capture for diagnosis.
 
 Current UI is history-only inline, using native assets, four crests, fixed-height
 cards and optional locale.json. Old bookmarks, overlays and render-gate

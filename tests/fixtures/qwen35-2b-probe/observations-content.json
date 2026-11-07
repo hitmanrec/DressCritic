@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "0.1.0",
+  "observations": [
+    {
+      "id": "obs_1",
+      "description": "Front view shows dark olive green bodice with long sleeves and a pussybow collar. The bodice has a defined waistline and a pencil skirt attached.",
+      "view": "front (+Z)",
+      "region": "bodice and skirt",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_2",
+      "description": "Back view shows the same dark olive green bodice and pencil skirt. The pussybow collar is visible at the neckline.",
+      "view": "back (-Z)",
+      "region": "bodice and skirt",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_3",
+      "description": "Side A view shows the right side of the garment. The bodice has a fitted waistline and the skirt continues down the leg.",
+      "view": "side A (+X)",
+      "region": "bodice and skirt",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_4",
+      "description": "Side B view shows the left side of the garment. The bodice has a fitted waistline and the skirt continues down the leg.",
+      "view": "side B (-X)",
+      "region": "bodice and skirt",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_5",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "front (+Z)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_6",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "back (-Z)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_7",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "side A (+X)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_8",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "side B (-X)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_9",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "front (+Z)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_10",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "back (-Z)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_11",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "side A (+X)",
+      "region": "fabric",
+      "certainty": "supported"
+    },
+    {
+      "id": "obs_12",
+      "description": "The bodice is made of a dark olive green fabric with a distinct paneling pattern on the skirt.",
+      "view": "side B (-X)",
+      "region": "fabric",
+      "certainty": "supported"
+    }
+  ],
+  "criteria": [
+    {
+      "criterionId": "composition",
+      "status": "supported",
+      "assessment": "strong",
+      "observationIds": [
+        "obs_1",
+        "obs_2",
+        "obs_3",
+        "obs_4"
+      ],
+      "rationale": "The garment is composed of a bodice, long sleeves, a pussybow collar, and a pencil skirt. The bodice has a defined waistline and the skirt continues down the leg."
+    },
+    {
+      "criterionId": "material_coherence",
+      "status": "supported",
+      "assessment": "strong",
+      "observationIds": [
+        "obs_5",
+        "obs_6",
+        "obs_7",
+        "obs_8"
+      ],
+      "rationale": "The bodice and skirt are made of a dark olive green fabric with a distinct paneling pattern."
+    },
+    {
+      "criterionId": "expressiveness",
+      "status": "supported",
+      "assessment": "strong",
+      "observationIds": [
+        "obs_1",
+        "obs_2",
+        "obs_3",
+        "obs_4"
+      ],
+      "rationale": "The garment features a pussybow collar and a defined waistline, which adds visual interest and structure."
+    },
+    {
+      "criterionId": "novelty",
+      "status": "supported",
+      "assessment": "strong",
+      "observationIds": [
+        "obs_1",
+        "obs_2",
+        "obs_3",
+        "obs_4"
+      ],
+      "rationale": "The combination of a pussybow collar and a pencil skirt is a distinctive design choice."
+    },
+    {
+      "criterionId": "proportions",
+      "status": "supported",
+      "assessment": "strong",
+      "observationIds": [
+        "obs_1",
+        "obs_2",
+        "obs_3",
+        "obs_4"
+      ],
+      "rationale": "The bodice has a defined waistline and the skirt continues down the leg, creating a balanced silhouette."
+    }
+  ],
+  "limitations": [
+    "The exact color of the fabric is not definitively determined as it appears dark olive green in all views.",
+    "The specific pattern on the skirt is not clearly visible in all views.",
+    "The exact color of the pussybow collar is not definitively determined as it appears dark in all views.",
+    "The exact color of the bodice is not definitively determined as it appears dark in all views.",
+    "The exact color of the long sleeves is not definitively determined as they appear dark in all views.",
+    "The exact color of the collar is not definitively determined as it appears dark in all views.",
+    "The exact color of the skirt is not definitively determined as it appears dark in all views.",
+    "The exact color of the bodice is not definitively determined as it appears dark in all views."
+  ]
+}

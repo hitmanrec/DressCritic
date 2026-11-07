@@ -1,0 +1,9 @@
+{
+  "server": {"path": "/absolute/path/to/llama-server", "sha256": "SHA256_FROM_VERIFIED_RUNTIME"},
+  "model": {"path": "/absolute/path/to/Qwen3.5-2B-Q4_K_M.gguf", "sha256": "TRUSTED_MODEL_SHA256"},
+  "projector": {"path": "/absolute/path/to/mmproj-F16.gguf", "sha256": "TRUSTED_PROJECTOR_SHA256"},
+  "runtimeFiles": [],
+  "threads": 4,
+  "context": 8192,
+  "source": "Development example. Fill pinned artifact hashes and all runtime shared-library hashes before a reproducible experiment."
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.10",
+  "pluginVersion": "0.15.11",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,20 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "render.canonical_capture_gate",
+      "status": "implemented-unverified",
+      "claim": "v0.15.11 removes the initial viewer image before fixed capture, clears incomplete/failed sets and blocks inference. Core fault tests pass, including post-render rejection; full native build/runtime pending. Supersedes the active fallback defect recorded at 19e6d98.",
+      "evidence": ["docs/knowledge/CURRENT.md", "tests/FixedViewCaptureGateTests.cs"],
+      "code": ["DressmakerCritic-Diagnostics/FixedViewCaptureGate.cs", "DressmakerCritic-Diagnostics/Plugin.cs"]
+    },
+    {
+      "id": "research.owned_cpu_probe",
+      "status": "confirmed",
+      "claim": "One captured dress was processed locally using verified Qwen3.5-2B Q4_K_M/F16 projector and llama.cpp b12110 CPU. Owned processes exited; sampled RSS about 3 GB. One schema-constrained observation response validated, all five interpretations strong. No human quality validation or in-game performance claim.",
+      "evidence": ["docs/research/2026-11-07-cpu-probe.json", "tests/fixtures/qwen35-2b-probe/observations-content.json", "docs/OFFLINE-EVALUATION.md"],
+      "code": ["tools/local_vision_runtime.py", "tools/benchmark_models.py", "tools/observation_protocol.py"]
+    },
     {
       "id": "product.calibrated_evaluation_plan",
       "status": "confirmed",

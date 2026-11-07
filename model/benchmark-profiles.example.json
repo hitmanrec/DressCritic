@@ -1,0 +1,20 @@
+{
+  "profiles": [
+    {
+      "id": "qwen35-2b-cpu",
+      "model": "qwen35-2b",
+      "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+      "runtimeEvidence": {
+        "status": "fill from actual artifacts or use --runtime-config",
+        "weightsSha256": null,
+        "projectorSha256": null,
+        "runtimeBuild": null,
+        "quantization": "Q4_K_M",
+        "backend": "CPU"
+      },
+      "requestOverrides": {
+        "chat_template_kwargs": {"enable_thinking": false}
+      }
+    }
+  ]
+}

@@ -4,6 +4,15 @@ Baseline: коммит `19e6d98`, plugin 0.15.10. Основная очеред�
 [EVALUATION-PLAN](EVALUATION-PLAN.md). Проверены текущие исходники, тесты и документы;
 нового запуска Unity, аппаратного benchmark или сравнения моделей не было.
 
+Обновление после baseline-аудита: v0.15.11 / `713a107` закрывает fallback guard-кодом
+и fault tests. Добавлены offline inventory, production C# harness, repeated runner,
+экспериментальный observation protocol и owned Linux CPU runtime probe. Изображений
+для качественного сравнения по-прежнему только одно, human labels нет. Реальный
+2B CPU probe сохранён в [research JSON](research/2026-11-07-cpu-probe.json);
+это не head-to-head benchmark. Текущие инструменты: [OFFLINE-EVALUATION](OFFLINE-EVALUATION.md).
+Таблица ниже сохраняет находки исходного baseline; закрытые/частично выполненные
+части нужно читать с этим обновлением, не как новую очередь UI-работ.
+
 ## Находки и приоритеты
 
 | Приоритет | Находка | Доказательство в коде | Следующее действие |

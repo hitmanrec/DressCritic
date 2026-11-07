@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../DressmakerCritic-Diagnostics/FieldSnapshot.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/DiagnosticJson.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/GarmentSnapshot.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/ProgressAccess.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/ProgressSnapshot.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/RuntimeContextCapture.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/FocusedGarmentFields.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/ImageEvidence.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/BriefReferenceCatalog.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/EvaluationContract.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/ModelRequest.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/LocalEvaluator.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/HistoryImageBinding.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/CaptureSession.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/SelectionProbe.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/JuryContract.cs" />
+    <EmbeddedResource Include="../../DressmakerCritic-Diagnostics/Reference/brief-reference.en.json" LogicalName="DressmakerCritic.BriefReference.en.json" WithCulture="false" />
+  </ItemGroup>
+</Project>

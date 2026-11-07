@@ -4,6 +4,8 @@
 
 - [Основной план качества оценивания](EVALUATION-PLAN.md) — принятый приоритет
 - [Актуальная ревизия репозитория](REPOSITORY-AUDIT.md) — блокеры с привязкой к коду
+- [Offline-инструменты и собственный runtime](OFFLINE-EVALUATION.md)
+- [Результаты CPU probe](research/2026-11-07-cpu-probe.json) — один sample, не benchmark качества
 
 - [Текущее состояние и блокеры](knowledge/CURRENT.md)
 - [Подтверждённые runtime-данные](knowledge/RUNTIME.md)

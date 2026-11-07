@@ -5,6 +5,13 @@
 контракт — [PRODUCT](PRODUCT.md), состояние реализации — [ревизия](REPOSITORY-AUDIT.md).
 Это решение о направлении, а не заявление о готовности нового оценщика.
 
+Текущий инженерный прогресс: step 0 закрыт guard-кодом и fault tests; для steps
+1–2 готовы offline inventory/runner и есть один технический sample. Step 3 имеет
+экспериментальный observation contract, но не калиброванный scorer. Step 4 проверен
+в виде owned Linux CPU runtime вне Unity, не end-user packaging. Один реальный
+2B probe не является сравнением кандидатов. См. [инструкции/ограничения](OFFLINE-EVALUATION.md)
+и [сырые численные результаты](research/2026-11-07-cpu-probe.json).
+
 ## Цель
 
 Четыре вымышленных дома дают оценки 0–10 и конкретные короткие отзывы. Явно

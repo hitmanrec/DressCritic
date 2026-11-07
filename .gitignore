@@ -9,3 +9,5 @@ Dressmaker Mod Loader*/
 *.user
 *.suo
 .vs/
+__pycache__/
+*.gguf

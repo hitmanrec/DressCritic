@@ -46,6 +46,8 @@ static class JuryTests
         JuryContract.ApplyContext(Context("inconsistent",2,"consistent",8),input,result);
         Check(result.customerCompatibility.score==8 && result.summary.average==7,"customer compatibility never changes jury mean");
         string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
+        Refuse(() => JuryContract.ReadJury(File.ReadAllText(Path.Combine(root, "tests/fixtures/qwen35-2b-probe/invalid-jury-content.json")), "real-2b"),
+            "real 2B output with numeric statuses and missing version is not silently repaired into a jury assessment");
         string stringRemarks = File.ReadAllText(Path.Combine(root,"tests/fixtures/jury-string-remarks.json"));
         Refuse(() => JuryContract.ReadJury(stringRemarks, "strict"), "canonical assessment schema still requires remarks arrays");
         string normalized = LocalEvaluator.NormalizeRemarks(stringRemarks, EvaluationTask.Jury);
