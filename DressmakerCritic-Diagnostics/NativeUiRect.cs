@@ -11,9 +11,12 @@ namespace DressmakerCritic.Diagnostics
         private readonly Vector2 min, max, pivot, size, position;
         private readonly Vector3 scale;
         private readonly Quaternion rotation;
+        private readonly Transform parent;
+        private readonly int sibling;
         public NativeUiRect(RectTransform target)
         {
             this.target = target;
+            parent = target.parent; sibling = target.GetSiblingIndex();
             min = target.anchorMin; max = target.anchorMax; pivot = target.pivot;
             size = target.sizeDelta; position = target.anchoredPosition;
             scale = target.localScale; rotation = target.localRotation;
@@ -21,6 +24,11 @@ namespace DressmakerCritic.Diagnostics
         public void Restore()
         {
             if (target == null) return;
+            if (target.parent != parent)
+            {
+                target.SetParent(parent, false);
+                target.SetSiblingIndex(sibling);
+            }
             target.anchorMin = min; target.anchorMax = max; target.pivot = pivot;
             target.sizeDelta = size; target.anchoredPosition = position;
             target.localScale = scale; target.localRotation = rotation;

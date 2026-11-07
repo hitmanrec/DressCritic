@@ -45,6 +45,7 @@ namespace DressmakerCritic.Diagnostics
         private RectTransform pageRt; // left notebook page when available
         private RectTransform scoreRt, photoRt, briefRt;
         private readonly List<NativeUiRect> nativeRects = new List<NativeUiRect>();
+        private readonly List<GameObject> nativeSlots = new List<GameObject>();
         private readonly List<Vector4> briefMargins = new List<Vector4>();
         private Rect nativePage;
         private RectTransform photoTemplate;
@@ -313,6 +314,7 @@ namespace DressmakerCritic.Diagnostics
             if (briefRt != null)
             {
                 nativeRects.Add(new NativeUiRect(briefRt));
+                IsolateCard(briefRt, page, Region(nativePage, 0.06f, 0.83f, 0.88f, 0.14f));
                 foreach (string field in new[] { "oldQuestTitle", "oldQuestText", "oldQuestGiver" })
                 {
                     var text = FieldSnapshot.ResolveFields(book, field) as TextMeshProUGUI;
@@ -333,7 +335,9 @@ namespace DressmakerCritic.Diagnostics
             if (scoreRt != null)
             {
                 nativeRects.Add(new NativeUiRect(scoreRt));
-                NativeUiRect.FitVisuals(scoreRt, page, Region(nativePage, 0.03f, 0.60f, 0.94f, 0.21f));
+                var scoreArea = Region(nativePage, 0.05f, 0.60f, 0.90f, 0.21f);
+                IsolateCard(scoreRt, page, scoreArea);
+                NativeUiRect.FitVisuals(scoreRt, page, scoreArea);
             }
             if (photoRt != null)
             {
@@ -345,6 +349,21 @@ namespace DressmakerCritic.Diagnostics
 
         private static Rect Region(Rect page, float x, float y, float width, float height) =>
             new Rect(page.x + page.width * x, page.y + page.height * y, page.width * width, page.height * height);
+
+        private void IsolateCard(RectTransform card, RectTransform page, Rect area)
+        {
+            // The original parent can drive its child's anchors after our placement.
+            // Own the layout parent, while retaining the actual game graphics and text.
+            var slot = new GameObject("DressCriticNativeCardSlot", typeof(RectTransform));
+            slot.transform.SetParent(page, false);
+            nativeSlots.Add(slot);
+            var rect = slot.GetComponent<RectTransform>();
+            NativeUiRect.Place(rect, page, area);
+            card.SetParent(rect, true);
+            Vector2 size = card.rect.size; Vector3 position = card.position;
+            card.anchorMin = card.anchorMax = rect.pivot;
+            card.sizeDelta = size; card.position = position;
+        }
 
         private static RectTransform ResolveBriefCard(Component book, RectTransform spread)
         {
@@ -483,6 +502,9 @@ namespace DressmakerCritic.Diagnostics
         {
             for (int i = nativeRects.Count - 1; i >= 0; i--) nativeRects[i].Restore();
             nativeRects.Clear();
+            foreach (var slot in nativeSlots)
+                if (slot != null) { slot.SetActive(false); UnityEngine.Object.Destroy(slot); }
+            nativeSlots.Clear();
             for (int i = 0; i < briefTexts.Count; i++)
             {
                 if (briefTexts[i] == null) continue;
@@ -607,21 +629,24 @@ namespace DressmakerCritic.Diagnostics
             emblemImage.preserveAspect = true;
             emblemImage.raycastTarget = false;
             var emblemRt = emblem.GetComponent<RectTransform>();
-            emblemRt.anchorMin = emblemRt.anchorMax = new Vector2(0, 1);
-            emblemRt.pivot = new Vector2(0, 1);
-            emblemRt.anchoredPosition = new Vector2(0, -2);
-            emblemRt.sizeDelta = new Vector2(34, 34);
+            float emblemWidth = Mathf.Clamp(parent.rect.width * 0.18f, 64, 96);
+            float textLeft = emblemWidth + 12;
+            emblemRt.anchorMin = Vector2.zero;
+            emblemRt.anchorMax = new Vector2(0, 1);
+            emblemRt.pivot = new Vector2(0, 0.5f);
+            emblemRt.anchoredPosition = Vector2.zero;
+            emblemRt.sizeDelta = new Vector2(emblemWidth, -8);
 
             var name = MakeLabel(row.transform, "Name", UiStrings.House(vote.houseId) + " — " + Number(vote.score), 15, Cocoa, TextAlignmentOptions.Left);
             var nameRt = name.rectTransform;
             nameRt.anchorMin = new Vector2(0, 1);
             nameRt.anchorMax = new Vector2(1, 1);
             nameRt.pivot = new Vector2(0, 1);
-            nameRt.anchoredPosition = new Vector2(42, -2);
-            nameRt.sizeDelta = new Vector2(-48, 20);
+            nameRt.anchoredPosition = new Vector2(textLeft, -2);
+            nameRt.sizeDelta = new Vector2(-textLeft - 6, 20);
 
             float body = 38;
-            float width = Math.Max(1f, parent.rect.width - 48f);
+            float width = Math.Max(1f, parent.rect.width - textLeft - 6);
             foreach (string remark in vote.remarks ?? Enumerable.Empty<string>())
             {
                 var line = MakeLabel(row.transform, "Remark", remark, 14, Ink, TextAlignmentOptions.Left);
@@ -630,8 +655,8 @@ namespace DressmakerCritic.Diagnostics
                 lineRt.anchorMin = new Vector2(0, 1);
                 lineRt.anchorMax = new Vector2(1, 1);
                 lineRt.pivot = new Vector2(0, 1);
-                lineRt.anchoredPosition = new Vector2(42, -body);
-                lineRt.sizeDelta = new Vector2(-48, h);
+                lineRt.anchoredPosition = new Vector2(textLeft, -body);
+                lineRt.sizeDelta = new Vector2(-textLeft - 6, h);
                 body += h + 2;
             }
             rowRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Math.Max(40, body + 6));
