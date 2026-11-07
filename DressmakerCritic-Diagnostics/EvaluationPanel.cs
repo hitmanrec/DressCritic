@@ -34,6 +34,8 @@ namespace DressmakerCritic.Diagnostics
         private TMP_FontAsset font;
         private Material fontMaterial;
         private Sprite buttonBorder;
+        private Sprite verdictPaper;
+        private Color verdictPaperColor = Color.white;
         private JuryAssessment paintedResult;
         private string paintedMessage;
         private Rect placedRect;
@@ -295,6 +297,12 @@ namespace DressmakerCritic.Diagnostics
             buttonBorder = image != null ? image.sprite : FindSprite("roundedButtonBorder");
             nativeButtonColor = image == null ? Color.white : image.color;
             nativeButtonText = photoText == null ? Color.white : photoText.color;
+            var brief = ResolveBriefCard(book, host);
+            var paper = brief == null ? null : brief.GetComponentsInChildren<Image>(true)
+                .Take(32).Where(i => i.sprite != null)
+                .OrderByDescending(i => Mathf.Abs(i.rectTransform.rect.width * i.rectTransform.rect.height)).FirstOrDefault();
+            verdictPaper = paper == null ? null : paper.sprite;
+            verdictPaperColor = paper == null ? Color.white : paper.color;
         }
 
         private static Sprite FindSprite(string name)
@@ -612,15 +620,21 @@ namespace DressmakerCritic.Diagnostics
 
         private float AddHouseRow(RectTransform parent, CriticVote vote, float y)
         {
-            var row = new GameObject("House-" + vote.houseId, typeof(RectTransform));
+            const float height = 96, padding = 8, emblemSize = 80, textLeft = 100;
+            var row = new GameObject("House-" + vote.houseId, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             row.transform.SetParent(parent, false);
             var rowRt = row.GetComponent<RectTransform>();
             rowRt.anchorMin = new Vector2(0, 1);
             rowRt.anchorMax = new Vector2(1, 1);
             rowRt.pivot = new Vector2(0.5f, 1);
-            rowRt.sizeDelta = Vector2.zero;
+            rowRt.sizeDelta = new Vector2(0, height);
             rowRt.anchoredPosition = new Vector2(0, -y);
             rows.Add(row);
+            var background = row.GetComponent<Image>();
+            background.sprite = verdictPaper != null ? verdictPaper : WhiteSprite();
+            background.type = verdictPaper != null && verdictPaper.border.sqrMagnitude > 0 ? Image.Type.Sliced : Image.Type.Simple;
+            background.color = verdictPaper != null ? verdictPaperColor : (Color)new Color32(239, 224, 205, 255);
+            background.raycastTarget = false;
 
             var emblem = new GameObject("Emblem", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             emblem.transform.SetParent(row.transform, false);
@@ -629,38 +643,32 @@ namespace DressmakerCritic.Diagnostics
             emblemImage.preserveAspect = true;
             emblemImage.raycastTarget = false;
             var emblemRt = emblem.GetComponent<RectTransform>();
-            float emblemWidth = Mathf.Clamp(parent.rect.width * 0.18f, 64, 96);
-            float textLeft = emblemWidth + 12;
-            emblemRt.anchorMin = Vector2.zero;
-            emblemRt.anchorMax = new Vector2(0, 1);
-            emblemRt.pivot = new Vector2(0, 0.5f);
-            emblemRt.anchoredPosition = Vector2.zero;
-            emblemRt.sizeDelta = new Vector2(emblemWidth, -8);
+            emblemRt.anchorMin = emblemRt.anchorMax = new Vector2(0, 1);
+            emblemRt.pivot = new Vector2(0, 1);
+            emblemRt.anchoredPosition = new Vector2(padding, -padding);
+            emblemRt.sizeDelta = new Vector2(emblemSize, emblemSize);
 
             var name = MakeLabel(row.transform, "Name", UiStrings.House(vote.houseId) + " — " + Number(vote.score), 15, Cocoa, TextAlignmentOptions.Left);
             var nameRt = name.rectTransform;
             nameRt.anchorMin = new Vector2(0, 1);
             nameRt.anchorMax = new Vector2(1, 1);
             nameRt.pivot = new Vector2(0, 1);
-            nameRt.anchoredPosition = new Vector2(textLeft, -2);
-            nameRt.sizeDelta = new Vector2(-textLeft - 6, 20);
+            nameRt.anchoredPosition = new Vector2(textLeft, -padding);
+            nameRt.sizeDelta = new Vector2(-textLeft - padding, 20);
+            name.enableAutoSizing = true; name.fontSizeMin = 12; name.fontSizeMax = 15;
+            name.maxVisibleLines = 1; name.overflowMode = TextOverflowModes.Ellipsis;
 
-            float body = 38;
-            float width = Math.Max(1f, parent.rect.width - textLeft - 6);
-            foreach (string remark in vote.remarks ?? Enumerable.Empty<string>())
-            {
-                var line = MakeLabel(row.transform, "Remark", remark, 14, Ink, TextAlignmentOptions.Left);
-                float h = Math.Max(18, line.GetPreferredValues(remark, width, float.PositiveInfinity).y + 2);
-                var lineRt = line.rectTransform;
-                lineRt.anchorMin = new Vector2(0, 1);
-                lineRt.anchorMax = new Vector2(1, 1);
-                lineRt.pivot = new Vector2(0, 1);
-                lineRt.anchoredPosition = new Vector2(textLeft, -body);
-                lineRt.sizeDelta = new Vector2(-textLeft - 6, h);
-                body += h + 2;
-            }
-            rowRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Math.Max(40, body + 6));
-            return y + rowRt.sizeDelta.y + 8;
+            string remarks = string.Join(" ", vote.remarks ?? Enumerable.Empty<string>());
+            var body = MakeLabel(row.transform, "Remarks", remarks, 14, Ink, TextAlignmentOptions.TopLeft);
+            var bodyRt = body.rectTransform;
+            bodyRt.anchorMin = new Vector2(0, 1);
+            bodyRt.anchorMax = new Vector2(1, 1);
+            bodyRt.pivot = new Vector2(0, 1);
+            bodyRt.anchoredPosition = new Vector2(textLeft, -28);
+            bodyRt.sizeDelta = new Vector2(-textLeft - padding, height - 28 - padding);
+            body.enableAutoSizing = true; body.fontSizeMin = 12; body.fontSizeMax = 14;
+            body.maxVisibleLines = 3; body.overflowMode = TextOverflowModes.Ellipsis;
+            return y + height + 8;
         }
 
         private float AddLine(RectTransform parent, string text, float size, Color color, float y)
