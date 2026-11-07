@@ -11,6 +11,11 @@ in-game test.** See [current findings and remaining blockers](docs/knowledge/CUR
 
 ## Knowledge and evidence
 
+Primary direction: [grounded, calibrated local evaluation](docs/EVALUATION-PLAN.md).
+The current direct VLM ratings are a prototype baseline, not a validated quality
+scale. [Repository audit](docs/REPOSITORY-AUDIT.md) records the next blockers;
+input validity and controlled model evaluation take priority over UI cosmetics.
+
 [Structured knowledge base](docs/knowledge/README.md) is the current entry point:
 
 - [Status, blockers and next test](docs/knowledge/CURRENT.md)

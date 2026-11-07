@@ -1,11 +1,15 @@
 > Текущая версия/блокеры: [CURRENT](knowledge/CURRENT.md). Разделы с номерами
 > старых версий ниже описывают историю реализации, не текущий следующий тест.
 
-# DressCritic product contract — jury MVP (2026-11-05)
+# DressCritic product contract — 2026-11-07
 
-This document fixes the product direction. It supersedes the single 0–100 visual
-score and the temporary diagnostics/facts UI. No encoder-only scoring branch and
-no multi-garment comparison are planned for this MVP.
+This is the current product contract. The primary execution plan is
+[EVALUATION-PLAN](EVALUATION-PLAN.md); the source audit is
+[REPOSITORY-AUDIT](REPOSITORY-AUDIT.md). They supersede historical UI queues and
+the prototype's free-form generation of four scores. Offline comparison is a
+development tool, not a player-facing multi-garment feature. An encoder-only
+release is not the target; a learned lightweight scoring component is conditional
+on evidence, not prohibited or preselected.
 
 ## Product goal and release acceptance
 
@@ -39,10 +43,31 @@ Release acceptance requires:
   do not establish a production latency guarantee.
 - Fully offline evaluation and runtime cleanup are verified on Linux/Proton.
 
+## Primary evaluation decision
+
+Separate game facts, visual observations, calibrated criterion/house scoring,
+and grounded review wording. A successful JSON response is not evidence of
+aesthetic quality. Neither numeric range stretching nor added randomness can
+replace recognition and calibration. Current direct-score inference remains a
+baseline until the controlled evaluation set and candidate comparison justify a
+replacement; no new model is selected yet.
+
+Start with input validity, a roughly 30–50-dress pilot with controlled variants
+and human reasons/preferences, then compare compact model candidates on held-out
+garment families and repeatability. Choose thresholds before the final test.
+Evaluate factual hallucinations before tuning score scales. Design quality is
+not rendering quality, number of accessories, or novelty alone.
+
+The full protocol, candidate shortlist, hardware measurements and research
+sources are maintained in EVALUATION-PLAN. A separate trained encoder/head is an
+optional later optimization; do not build speculative parallel pipelines.
+
 ## Always available jury
 
-One local vision-language model plays four fictional fashion-house roles, not four
-independent models or agents. House IDs are stable; display names are chosen independently of the model contract.
+The prototype uses one local vision-language model for all four roles. The
+target keeps four fictional fashion houses while separating their scoring from
+review generation; it does not require four independent models or processes.
+House IDs are stable; display names are independent of the model contract.
 
 | ID | Display name | Preference |
 | --- | --- | --- |
@@ -70,8 +95,11 @@ not empirical ground truth; real-model repeatability/calibration is still requir
 
 ## Independent context channels
 
-1. Order compliance: only an explicitly selected order and a verified/key-matched
-   sourced brief. Scope is the provided summary, never the complete unseen dialogue.
+1. Order compliance: the selected history dress's own saved quest record and a
+   verified/key-matched sourced brief. Explicit active-order selection is only a
+   development option for an active dress and cannot override historical origin.
+   Known off-rack records have no commission context; unknown origin stays unknown.
+   Scope is the provided summary, never the complete unseen dialogue.
 2. Customer compatibility: only documented preferences with an explicit source.
    Unknown until such a profile is actually available; never inferred from a name,
    stereotype or one order.
@@ -96,38 +124,20 @@ the model to invent an average. No advice/action-recommendation field is accepte
 
 ## Current implementation boundary
 
-v0.9.0 adds the Evaluate/result flow to the existing real local pipeline. The
-first real saved-garment evaluation succeeded in v0.8.5 (17.3 seconds, mean 6.25).
-Rubric 1.1.0 limits Atelier to visual plausibility; physical construction,
-comfort, functionality and intent cannot be established from the captured view.
+Plugin 0.15.10 implements history capture, structured garment facts, historical
+order association, direct four-vote VLM inference, strict response validation and
+native notebook review cards. The current model is Qwen3-VL-4B-Instruct Q4_K_M,
+rubric 1.1.0. There is no calibrated aesthetic scorer or validated model benchmark.
 
-The result panel shows a captured snapshot, its history record number/time,
-four votes, app-owned mean/verdict, optional context and evidence limitations.
-It never claims to follow the current live garment: changing the garment requires
-a new evaluation. Starting another evaluation clears the previous display;
-closing the panel does not cancel an ongoing request. No reflection is performed
-by the panel or per frame. Snapshot/results remain available for diagnostics.
+Existing schemas describe this prototype; future observation/scoring contracts
+must be versioned when implemented. Manual Ollama remains a development
+dependency. The source audit lists a possible single-view fallback after fixed
+capture failure, missing benchmark provenance and unverified context failures.
 
-Manual Ollama is still required. Customer evidence, context runtime testing,
-repeatability/calibration, active/URP capture outside the history viewer and
-packaging/model lifecycle remain unfinished. Native result UI needs in-game
-verification; no native build is claimed without the proprietary game references.
+Current UI is history-only inline, using native assets, four crests, fixed-height
+cards and optional locale.json. Old bookmarks, overlays and render-gate
+instructions are historical; see RESULT-UI and FIXED-VIEWS for their evidence.
+UI cosmetics are not the main development queue unless they block use.
 
-## v0.10.0 presentation
-
-The Jury bookmark opens a mod-owned paper-styled overlay. At widths >=850px the
-captured image/mean occupy the left page, houses/context tabs the right; smaller
-screens use one text column. Preview is read from the same capture-local PNG
-used for inference, loaded on the GUI thread once per path, and destroyed when
-replaced/unloaded. It never follows a different current garment. Display names
-and Russian mottos do not enter the model prompt or change scoring IDs.
-House emblems and Sketchbook-native Unity UI (game TMP font / border sprites)
-ship in v0.14.0 with English chrome and an optional locale overlay. Localized
-model remarks remain separate unfinished work.
-
-## Current runtime gate: v0.11.0
-
-Fixed-view candidate capture is implemented but awaits native compile/render and
-coverage review. Inference is paused in this validation build until that evidence
-exists. See [FIXED-VIEWS.md](FIXED-VIEWS.md). The prior single-angle results remain
-research history and are not a calibrated final evaluator.
+Game/save state remains read-only. Native build/render acceptance requires
+authorized game assemblies/runtime; core tests cannot substitute for it.

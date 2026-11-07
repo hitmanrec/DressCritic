@@ -1,5 +1,10 @@
 # Изображения: что действительно доказано
 
+Ревизия 2026-11-07 выявила в текущем Plugin возможный single-view fallback после
+падения fixed-view stage. Утверждения ниже о намерении не делать fallback не
+означают, что код уже гарантирует это. Исправление и failure-path тест — P0 перед
+benchmark; см. [актуальный аудит](../REPOSITORY-AUDIT.md).
+
 ## Идентичность
 
 OldDressView.renderImage.m_Texture даёт чистую картинку, но это общий RenderTexture

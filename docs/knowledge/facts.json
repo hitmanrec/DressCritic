@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "asOf": "2026-11-05",
+  "asOf": "2026-11-07",
   "pluginVersion": "0.15.10",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
@@ -9,6 +9,20 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "product.calibrated_evaluation_plan",
+      "status": "confirmed",
+      "claim": "User approved the primary plan on 2026-11-07: facts, visual observations, calibrated house scoring and grounded reviews; controlled pilot and compact-model comparison precede model replacement. This confirms the decision, not implementation or model quality.",
+      "evidence": ["docs/PRODUCT.md", "docs/EVALUATION-PLAN.md", "docs/REPOSITORY-AUDIT.md"],
+      "code": ["DressmakerCritic-Diagnostics/ModelRequest.cs", "DressmakerCritic-Diagnostics/JuryContract.cs"]
+    },
+    {
+      "id": "render.failed_fixed_view_fallback_path",
+      "status": "confirmed",
+      "claim": "Static audit at 19e6d98: a failed FixedViewCapture before images.Clear can leave the original image eligible for readiness; Stage catches the exception and readiness does not require fixed-view stage success. This is a source-level path, not a reproduced native failure.",
+      "evidence": ["docs/REPOSITORY-AUDIT.md"],
+      "code": ["DressmakerCritic-Diagnostics/Plugin.cs", "DressmakerCritic-Diagnostics/CaptureSession.cs", "DressmakerCritic-Diagnostics/EvaluationContract.cs"]
+    },
     {
       "id": "product.ui_native_marker",
       "status": "implemented-unverified",

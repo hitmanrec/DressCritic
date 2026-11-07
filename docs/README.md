@@ -2,6 +2,9 @@
 
 Начать с [базы знаний](knowledge/README.md).
 
+- [Основной план качества оценивания](EVALUATION-PLAN.md) — принятый приоритет
+- [Актуальная ревизия репозитория](REPOSITORY-AUDIT.md) — блокеры с привязкой к коду
+
 - [Текущее состояние и блокеры](knowledge/CURRENT.md)
 - [Подтверждённые runtime-данные](knowledge/RUNTIME.md)
 - [Рендер/свет/аксессуары](knowledge/RENDERING.md)
