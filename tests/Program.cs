@@ -19,6 +19,7 @@ class Program
         HistoryOrderTests.Run();
         HistoryContextFixtureTests.Run();
         NativeExportApiProbeTests.Run();
+        NativeGarmentTests.Run();
         SelectionProbeTests.Run();
         JuryTests.Run();
         EvidenceTests.Run();

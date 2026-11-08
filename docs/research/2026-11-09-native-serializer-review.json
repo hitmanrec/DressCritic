@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-11-09",
+  "assemblies": {
+    "Framework": {
+      "sha256": "e53a0a1e864c8cffd393bed4e3e640363d9f086759f92323ea9b5cb09239543c",
+      "bytes": 390144
+    },
+    "Assembly-CSharp": {
+      "sha256": "441da5e958f7b27c9d6de65874914874d490e670e13163aa516410f8cf4d9e53",
+      "bytes": 886272
+    }
+  },
+  "reviewedSettings": {
+    "SerializeObjectReferences": false,
+    "LogLevel": "None (0)",
+    "GetJSONStringWhitespace": false,
+    "formatVersionWrapper": "not inserted; native garment state only"
+  },
+  "readOnlyFindings": [
+    "FileSystem save helper uses a fresh JSONSerializer and Config, with SerializeObjectReferences=false.",
+    "Reachable plain state serialization reads instance fields, not arbitrary properties.",
+    "ScriptableEnum leaves use base GUID (stored _guid only) and the known Unity Object.name getter, not lazy asset Index loading.",
+    "Custom method registry, ICustomJSONSerializable and custom field/policy attributes are extension points: preflight rejects relevant handlers/interfaces/attributes.",
+    "Native adapter calls no export UI, file save/load, progress or quest methods.",
+    "Mutable state is copied without game instance constructors; only reviewed ScriptableEnum leaves remain shared."
+  ],
+  "privateInteropSmoke": {
+    "realFrameworkDll": true,
+    "actualGameAssemblyExecuted": false,
+    "unityEngine": "minimal private stand-ins; not the game runtime",
+    "cases": [
+      "off-rack",
+      "commission-labelled",
+      "accessories"
+    ],
+    "result": "all three accepted by real Framework serializer and full payload/source-value validator",
+    "limitations": [
+      "Owned test DTOs and assets only; Unity engine behaviours and installed native plugin still require a game capture.",
+      "Neither game DLLs, decompiled code nor stand-ins are committed."
+    ]
+  },
+  "runtimeAcceptance": "pending one installed-game capture",
+  "nativeDataPrimary": true,
+  "modelChange": "same default model/prompts; compact material/accessory evidence limited to first 32 for oversized native states"
+}

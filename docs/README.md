@@ -23,3 +23,5 @@
 - [Three-dress history context results](HISTORY-CONTEXT-RESULTS.md)
 
 - [Native export integration: metadata probe and blocker](NATIVE-EXPORT.md)
+
+- [Native garment status schema](native-garment-report.schema.json)

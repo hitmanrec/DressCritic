@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.15")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.16")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.15: native serializer path identified; metadata reference deduplication.");
+            Logger.LogInfo("Dressmaker Critic 0.15.16: automatic reviewed in-memory native garment export.");
         }
         private void Start()
         {
@@ -52,6 +52,8 @@ namespace DressmakerCritic.Diagnostics
                 capture = new CaptureSession(Path.Combine(Paths.ConfigPath, "DressmakerCritic", "captures", id), id);
                 var input = new EvaluationInput { captureId = id, capturedAtUtc = capture.manifest.startedAtUtc };
                 object progress = null, selectedRecord = null; Component manager = null;
+                GarmentSnapshot observedBefore = null;
+                NativeGarmentResult native = null;
                 string progressStatus = "not-read", source = "GameManager.activeDress.state";
                 string selectedModel = model.Value, selectedEndpoint = endpoint.Value;
                 int selectedSaved = savedRecord.Value, selectedOrder = orderIndex.Value;
@@ -91,8 +93,34 @@ namespace DressmakerCritic.Diagnostics
                     var roots = GameRuntimeReader.GarmentGraph(state, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
                     capture.Write("garment-raw.json", roots);
                     input.garment = new GarmentSnapshotBuilder(roots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
+                    observedBefore = input.garment;
                     input.assetNames = GameRuntimeReader.AssetNames(state);
                     capture.Write("garment.json", input.garment);
+                });
+                capture.Stage("native-garment", () => {
+                    native = ReviewedNativeExport.Capture(state, source, Application.version, asset => {
+                        var value = asset as UnityEngine.Object;
+                        if (value == null) throw new InvalidDataException("Native asset is unavailable");
+                        return value.name; // known Unity API, not an arbitrary game property.
+                    });
+                    input.nativeGarment = native.Report;
+                    if (native.Report.status == "accepted")
+                    {
+                        var previousGarment = input.garment; var previousNames = input.assetNames;
+                        try
+                        {
+                            var metadata = observedBefore ?? new GarmentSnapshot { capturedAtUtc = input.capturedAtUtc, unityScene = SceneManager.GetActiveScene().name, source = source };
+                            var normalized = NativeDressJson.Normalize(native.Root, metadata);
+                            var names = NativeDressJson.AssetNames(native.Root, input.assetNames);
+                            File.WriteAllText(Path.Combine(capture.directory, native.Report.file), native.Json, new System.Text.UTF8Encoding(false));
+                            input.garment = normalized; input.assetNames = names;
+                            capture.Write("garment.json", input.garment);
+                        }
+                        catch (Exception e) { input.garment = previousGarment; input.assetNames = previousNames;
+                            native.Report.status = "blocked"; native.Report.reason = "Native output staging: " + e.GetType().Name; native.Report.isNativeGarmentPayload = false; }
+                    }
+                    if (native.Report.status != "accepted") input.limitations.Add("native-export-unavailable: " + native.Report.reason);
+                    capture.Write("native-export.json", native.Report);
                 });
                 if (selectedSaved >= 0)
                 {
@@ -154,7 +182,7 @@ namespace DressmakerCritic.Diagnostics
                     }
                 });
                 capture.Stage("targeted-api-metadata", () => capture.Write("targeted-api.json", GameRuntimeReader.Metadata()));
-                capture.Stage("native-export-api", () => capture.Write("native-export-api.json", GameRuntimeReader.NativeExportMetadata(state)));
+                if (native?.Report.status != "accepted") capture.Stage("native-export-api", () => capture.Write("native-export-api.json", GameRuntimeReader.NativeExportMetadata(state)));
                 capture.Stage("saved-garment-candidates", () => capture.Write("history-candidates.json", GameRuntimeReader.HistorySnapshots(progress, input.capturedAtUtc, SceneManager.GetActiveScene().name, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"))));
                 capture.Stage("viewer-selection-probe", () => capture.Write("viewer-selection.json", GameRuntimeReader.SelectionProbe(progress)));
                 string imageBinding = "unverified";
@@ -175,7 +203,8 @@ namespace DressmakerCritic.Diagnostics
                     object afterState = selectedSaved >= 0 ? FieldSnapshot.ResolveFields(selectedRecord, "dress") : FieldSnapshot.ResolveFields(manager, "activeDress", "state");
                     var afterRoots = GameRuntimeReader.GarmentGraph(afterState, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"));
                     var after = new GarmentSnapshotBuilder(afterRoots).Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
-                    if (!ReferenceEquals(afterState, state) || DiagnosticJson.Serialize(after) != DiagnosticJson.Serialize(input.garment))
+                    if (!ReferenceEquals(afterState, state) || (observedBefore != null && DiagnosticJson.Serialize(after) != DiagnosticJson.Serialize(observedBefore)) ||
+                        (native?.Report.status == "accepted" && !native.SourceUnchanged()))
                     {
                         foreach (var image in input.images) image.binding = "unverified";
                         imageBinding = "unverified";
@@ -197,7 +226,9 @@ namespace DressmakerCritic.Diagnostics
                     // Capture still writes fixed-view PNGs for the model; the jury panel no longer shows a redundant preview.
                     var afterFixed = new GarmentSnapshotBuilder(GameRuntimeReader.GarmentGraph(state, source, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField")))
                         .Build(input.capturedAtUtc, SceneManager.GetActiveScene().name, source);
-                    if (DiagnosticJson.Serialize(afterFixed) != DiagnosticJson.Serialize(input.garment))
+                    object currentState = selectedSaved >= 0 ? FieldSnapshot.ResolveFields(selectedRecord, "dress") : FieldSnapshot.ResolveFields(manager, "activeDress", "state");
+                    if (!ReferenceEquals(currentState, state) || (observedBefore != null && DiagnosticJson.Serialize(afterFixed) != DiagnosticJson.Serialize(observedBefore)) ||
+                        (native?.Report.status == "accepted" && !native.SourceUnchanged()))
                     {
                         capture.Write("garment-after-fixed-views.json", afterFixed);
                         throw new InvalidOperationException("Garment fields changed during fixed-view rendering");

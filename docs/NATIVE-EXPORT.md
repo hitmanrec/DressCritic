@@ -1,129 +1,105 @@
-# Native garment JSON without manual export
+# Automatic native garment state — 0.15.16
 
-Goal: use the game's own garment serialization as the automatic structural source
-for the exact selected historical dress, supplement it with its historical order
-and four views. Replacing the extraction source must not change jury independence
-or invoke progress/quest/garment writes.
+The normal Rate dress / critic-export pipeline now obtains the selected garment's
+JSON **in memory using the reviewed game serializer**. No manual .dress export,
+file dialog, FileSystem save helper or progress/quest operation is called. The
+JSON is then saved only as a diagnostic artifact in the existing capture directory.
 
-## Current implementation: 0.15.14
+## Source and API
 
-**Native in-memory serialization is not yet enabled.** The supplied `.dress` files
-prove the output format, not a safe callable API. The existing garment pipeline
-remains active; no handwritten surrogate is labelled as a native export.
+The reviewed game/framework binaries are identified by SHA-256 in
+[the review record](research/2026-11-09-native-serializer-review.json). Neither DLL,
+decompiled code nor private test stand-ins are committed. Only game 0.7.0 with
+those exact assembly fingerprints is enabled; unknown versions/binaries fail
+before invocation and retain the existing field-reader fallback.
 
-Available `targeted-api.json` records confirm only:
+The in-memory sequence uses a fresh Framework.JSONSerializer and Config,
+SerializeObjectReferences=false, BeginSerialization with LogLevel.None (0),
+Serialize on an owned copy, EndSerialization in finally, and GetJSONString(false)
+on the resulting JSONObject. It reproduces native state serialization without
+FileSystem's optional FILE_FORMAT wrapper. Whitespace differs from manual exports;
+field values/structure are validated against the selected snapshot.
 
-- `System.Void Sketchbook.ExportDress()`
-- `System.Void PhotoScene.ExportDress()`
-- `PlayerProgress.MigrateSaveData(Framework.JSONObject, System.Int32)` establishes
-  the JSONObject type name; the migration method is not called or probed as an
-  export entrypoint.
+The notebook's native Sketchbook.ExportDress reads GameManager.activeDress.state;
+PhotoScene.ExportDress reads its own _displayDress.state. Neither UI handler is
+used. Our argument comes from the existing exact selected history record/display
+binding. This avoids exporting the active dress while viewing another history item.
 
-Void UI handlers may select another garment, display a save dialog, write files
-or call other game logic. Proprietary assemblies are unavailable in this workspace;
-their implementations, serializer configuration, custom converters and callback
-behaviour cannot be verified offline. Unity JsonUtility/third-party reflection
-serialization is not substituted: it may execute callbacks/getters and may not
-match native asset-reference conversion.
+## Read-only boundary and bounds
 
-## Automatic discovery in the next capture
+- The source DressState, panel/join/accessory state and BCL lists are deeply copied
+  without invoking game instance constructors. Writes target only detached copies.
+  Reviewed ScriptableEnum asset leaves are retained as references; serialization
+  reads their stored base GUID and the known Unity Object.name getter. The lazy
+  ScriptableEnum.Index/asset-loading path is not used.
+- A closed field/type contract rejects unexpected fields, derived state types,
+  custom object overrides, type initializers on plain game data, custom JSON
+  interfaces and unreviewed attributes before serialization. Native reflection
+  traverses fields; arbitrary game properties/cost/fit methods are not called.
+- The serializer's custom-handler registry is checked for reachable plain payload
+  types. Custom comparers, non-runtime Type keys, unknown registry layouts and
+  relevant registered handlers block invocation. Registry delegates/enumerators
+  are not executed to perform this check.
+- Input bounds: 8192 nodes, depth 10, 128 panels/accessories, 512 joins, 256 nodes
+  per accessory path; finite float magnitude at most 1,000,000; asset names at
+  most 512 characters and a 32-hex GUID. The native formatter otherwise replaces
+  invalid floats; preflight rejects those instead of accepting invented zeros.
+- Output is at most 2 MiB, JSON depth 16. Every field, collection count, asset
+  reference and primitive/vector value is matched to the detached snapshot.
+  Duplicated/extra/missing fields fail. Floating comparisons permit the native
+  formatter's roundoff (relative/absolute tolerance 1e-6).
+- Full state fingerprints before/after serialization and after image rendering,
+  plus the existing record/state reference and display checks, protect pairing.
+  A mutation during capture blocks acceptance/inference. This is additional
+  validation, not permission to mutate and restore game state.
 
-Normal Rate dress / `critic-export` now records `native-export-api.json`, before
-image capture and inference. No extra button, configuration or manual `.dress`
-export is required. Successful type discovery is cached for the state type during this process;
-missing type metadata is retried on a later capture, never on a frame tick;
-reflection is not performed per frame. This stage does not affect visual-jury
-readiness if metadata is unavailable.
+## Artifacts and model input
 
-The probe accepts types only, never the live state as a serialization argument.
-It reads:
+native-export.json is the versioned status/provenance report
+([schema](native-garment-report.schema.json)). Accepted capture reports contain
+status=accepted, detachedCopy=true, isNativeGarmentPayload=true, file/hash/byte
+count, source fingerprint and approved assembly hashes.
 
-- Root UI export method metadata and referenced methods/fields/types.
-- DressState and observed `panelStates`, `accessoryStates`, `joinStates` and
-  `measurements` field types, interfaces, method signatures and serialization
-  attribute metadata. Attribute constructors and property getters are not invoked.
-- Up to eight serialization/JSON-named methods on state/JSONObject, for discovery
-  only; naming is not evidence of safety and never authorizes invocation.
-- Bounded method-reference traversal within the root game/framework assemblies,
-  including function-pointer delegate targets and async MoveNext metadata.
-- Field read/write operation names, referenced external file/serializer calls,
-  indirect write/calli operation markers, body hashes and assembly MVIDs. Runtime
-  virtual dispatch, reflection and native callbacks remain unresolved possibilities.
+native-garment.json is the native .dress-shaped state: components/variants,
+panels and fabric references/cut transforms, joins, accessories including paths
+and offsets, measurements and finish flags. It has no invented schemaVersion or
+quest fields; the separate report versions and identifies its contract.
 
-No game static field values, string literals, raw IL, proprietary DLLs, meshes or
-textures are written to the report. A reference to File.WriteAllText is metadata,
-not an executed file write. This probe writes only its diagnostic report.
+Accepted native state is the primary source for garment.json and evaluation-input
+state facts. Friendly asset names and definition facts absent from native JSON
+are enriched only on matching GUIDs from existing metadata. All native fields
+remain in the raw artifact; they are not all dumped into the VLM prompt. Current
+model evidence keeps at most the first 32 material/accessory entries, with explicit
+coverage limitations for larger designs. Mannequin color is excluded from visual
+asset-name facts. Orders/client data remain separate from the independent jury.
 
-Limits: 64 method bodies, depth 4, 16 KiB per body, 128 KiB inspected IL total,
-8192 instructions total, 128 unique operation/member references per body (occurrences counted separately), 12 type descriptions.
-Type field/property descriptions retain FieldSnapshot's bounds (eight declaring
-levels, up to 64 fields/properties per level). Method lists are capped at 128;
-attribute lists at 16 and attribute arguments/named values at eight. Failures and
-truncation are explicit. Literal attribute strings are not exported; type arguments,
-enum values and booleans retain useful converter/settings identity.
+Unsupported profile, callbacks, graph limits, payload mismatch or output failure
+produce an explicit blocked report and retain the previous reader. Successful
+native captures skip the heavy export-API investigation report; failed ones keep
+it for compatibility diagnostics. No UI buttons were added.
 
-The report's `nativeSerializationStatus=not-invoked-unverified` and
-`isNativeGarmentPayload=false` are intentional. A bounded call graph or absence
-of observed writes does not prove a method is pure. Hashes identify observed
-bodies, not semantic safety of uninspected callees.
+## Verification and next game check
 
-[Report schema](native-export-api.schema.json).
+Core tests cover three real user .dress files, detached lists/path state, asset
+leaves, constructor/getter traps, callback/comparer rejection, failure cleanup,
+wrong payloads, changed source, duplicate fields, limits and VLM evidence bounds.
+The new bridge also builds for net472 without game DLLs.
 
-## Required next check
+A private smoke test executed the **actual supplied Framework.dll** on owned test
+DTOs and the three garment states, with minimal Unity API stand-ins outside Git.
+All three returned native JSON accepted by the full field/value matcher. This
+verifies the API sequence/serialization on that setup; it does not run the actual
+Assembly-CSharp game state or establish Unity engine behavior. The installed
+plugin still needs runtime acceptance.
 
-Install 0.15.14 and capture one existing commissioned history dress as usual.
-Send the complete capture, especially `native-export-api.json` and `runtime.json`.
-The model need not be started for these files to be produced. If inference is
-running, the API metadata is still written before that request. No manual export,
-new garment or progress change is needed.
+Update/install 0.15.16, restart, open one existing history dress with accessories,
+and run Rate dress or critic-export as usual. No new garment or manual .dress is
+needed. Send the full capture. Acceptance: native-export.json is accepted with
+detachedCopy=true, native-garment.json is listed/hashed in the manifest, normalized
+counts/IDs correspond to that history item, and fixed views remain paired. If
+native is blocked, the reason and fallback data should be present. Model access
+is not required to produce native-state artifacts; inference is a later stage.
 
-Then inspect the actual helper, its argument/source selection and serializer
-settings/callbacks. Only after a read-only path is verified should an adapter call
-it on the independently selected historical state, obtain JSON in memory, bound
-its size/collections, and check state/binding before and after. Native JSON must
-stay paired with that same state; a filename or matching component shape is not
-an identity guarantee. If the report is insufficient, request targeted metadata or
-privately inspect the necessary assemblies without committing them; do not guess
-a callable serializer signature.
-
-Tests use trap constructors, attributes and getters, file-write references,
-delegate/async bodies and an oversized synthetic method. They verify discovery
-without execution and bounded output. They cannot replace the game's API report
-or prove native serialization readiness.
-
-## Received 0.15.14 API report — 2026-11-09
-
-Capture `20261108-214839-334-cefd9aae` verified the native chain:
-
-`Sketchbook.ExportDress` → `GameManager.activeDress.state` →
-`ExportUtility.ExportDress` → native save dialog →
-`FileSystem.SaveObjectToJSONFile<DressState>` →
-new `Framework.JSONSerializer` / `Config`, `BeginSerialization`, `Serialize(object)`,
-`EndSerialization`, `JSONValue.GetJSONString` → filesystem write.
-
-The photo scene handler instead reads `PhotoScene._displayDress.state`. The notebook
-handler therefore cannot be substituted for serializing a selected history state.
-This gives a concrete explanation for the earlier mismatched .dress/capture pair,
-without establishing which UI action originally produced that upload.
-
-An in-memory adapter should bypass dialog/path/write code and pass the verified
-historical state directly to a fresh serializer. However, the main `GetJSONValue`
-method was cut at 64 total references before later type/converter branches. The
-exact SerializeObjectReferences flag value and enum arguments are also absent;
-we must not infer settings or getter/callback safety from the prefix.
-
-0.15.15 fixes that diagnostic limitation by counting repeated operation/member
-references rather than spending slots on every repeated primitive type check. The
-per-body unique-reference cap is 128; global byte/instruction/method/depth limits
-stay bounded. Existing 1.0.0 reports remain readable; occurrences is additive.
-**Native invocation remains disabled.**
-
-To finish without another game-only metadata iteration, privately inspect
-`Dressmaker_Data/Managed/Framework.dll` and `Assembly-CSharp.dll`. Neither assembly
-will be committed. This is the current implementation blocker; no new manual
-.dress export is needed. [Captured evidence](research/2026-11-09-native-export-path.json).
-
-The same capture confirms context JSON-schema transport on the user's actual
-Ollama: every stage passed; order fit for Studious Motivation and unknown client
-preferences remained unknown/null. This is valid abstention, not proof of aesthetic
-score quality.
+Prior metadata-only findings and the earlier truncation are recorded in
+[the path report](research/2026-11-09-native-export-path.json). Those blockers
+were resolved by private inspection of the user-supplied binaries.

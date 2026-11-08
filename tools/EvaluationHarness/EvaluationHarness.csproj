@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType></PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../DressmakerCritic-Diagnostics/NativeStateSnapshot.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/ReviewedNativeExport.cs" />
+    <Compile Include="../../DressmakerCritic-Diagnostics/NativeDressJson.cs" />
     <Compile Include="../../DressmakerCritic-Diagnostics/FieldSnapshot.cs" />
     <Compile Include="../../DressmakerCritic-Diagnostics/DiagnosticJson.cs" />
     <Compile Include="../../DressmakerCritic-Diagnostics/GarmentSnapshot.cs" />

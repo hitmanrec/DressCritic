@@ -1,6 +1,39 @@
 # Текущее состояние и очередь
 
-Версия кода: **0.15.15**; последний полученный игровой пакет — **0.15.14**, 2026-11-08 UTC.
+Версия кода: **0.15.16**; последний полученный игровой пакет — **0.15.14**, 2026-11-08 UTC.
+
+## Автоматический native payload реализован — 0.15.16
+
+Полученные Framework.dll и Assembly-CSharp.dll разобраны приватно; SHA-256
+зафиксированы, сами DLL/декомпиляция вне Git. Вызов memory API подключён для
+reviewed game 0.7.0: fresh JSONSerializer/Config, SerializeObjectReferences=false,
+LogLevel.None, Serialize(detached state), End в finally, GetJSONString(false).
+UI ExportDress, FileSystem helpers, progress/quest/garment operations не вызываются.
+
+NativeStateContract копирует mutable state без игровых конструкторов; только
+ScriptableEnum asset leaves остаются ссылками и читаются через base GUID/Unity.name.
+Неизвестные layout/attributes/interfaces/overrides, callback registry/comparers,
+неограниченные коллекции и нечисловые float блокируются до сессии. JSON сверяется
+со всеми полями/значениями копии; full fingerprints и source reference проверяются
+до/после/после рендера. Native guard не используется как разрешение мутировать
+исходные данные и восстанавливать их потом.
+
+Accepted native-garment.json теперь primary state source для garment.json и
+оценки. Legacy graph даёт только identity-matched definition metadata и fallback.
+Native-export.json хранит provenance/status. Полный raw не отправляется VLM;
+материалы/аксессуары ограничены первыми 32 с явным caveat для больших коллекций.
+Задание, клиент и actual game compliance по-прежнему отдельные данные.
+
+Приватный smoke с реальным Framework.dll, owned DTO и минимальными Unity stand-ins
+прошёл для всех трёх .dress. Это не запуск Assembly-CSharp/реального Unity.
+Bridge дополнительно собирается для net472. Финальная native/game приёмка pending.
+Нужен один обычный capture исторического платья с аксессуарами на 0.15.16:
+native-export.status accepted, detachedCopy true, raw файл в manifest, корректные
+counts/IDs и unchanged source/view binding. Ручной .dress больше не нужен.
+[Реализация](../NATIVE-EXPORT.md), [review evidence](../research/2026-11-09-native-serializer-review.json).
+
+Ниже сохранена история расследования; запрос DLL и запрет native invocation из
+0.15.15 выполнены/сняты только для reviewed profile с текущими guard-условиями.
 
 ## Получена карта экспорта 0.15.14 — 2026-11-09
 

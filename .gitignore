@@ -11,3 +11,5 @@ Dressmaker Mod Loader*/
 .vs/
 __pycache__/
 *.gguf
+# Proprietary assemblies are inspected outside the checkout, never vendored.
+*.dll

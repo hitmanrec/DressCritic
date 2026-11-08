@@ -124,3 +124,9 @@ brief and goal extraction for two commissions and off-rack. The remaining contex
 issue is model response/semantic quality, not absence of those orders. 0.15.13 adds
 constrained context decoding; two 2B CPU probes prove transport/format only and
 retain documented semantic failures. See [results](HISTORY-CONTEXT-RESULTS.md).
+
+0.15.16 now uses reviewed in-memory native serialization as the primary bounded
+garment-state source, with detached-copy/callback/profile guards and legacy
+fallback. This closes the serializer-inspection engineering blocker; one installed
+game capture is needed for runtime acceptance. It does not select a new model or
+calibrate aesthetic/contextual scores.

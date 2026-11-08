@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dresscritic:native-garment-report:1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reason",
+    "source",
+    "file",
+    "sha256",
+    "sourceFingerprint",
+    "gameAssemblySha256",
+    "frameworkAssemblySha256",
+    "schemaVersion",
+    "status",
+    "serializer",
+    "bytes",
+    "detachedCopy",
+    "isNativeGarmentPayload",
+    "limitation"
+  ],
+  "properties": {
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "file": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceFingerprint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "gameAssemblySha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "frameworkAssemblySha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "enum": [
+        "unavailable",
+        "blocked",
+        "accepted"
+      ]
+    },
+    "serializer": {
+      "const": "Framework.JSONSerializer"
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2097152
+    },
+    "detachedCopy": {
+      "type": "boolean"
+    },
+    "isNativeGarmentPayload": {
+      "type": "boolean"
+    },
+    "limitation": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "accepted"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "detachedCopy": {
+            "const": true
+          },
+          "isNativeGarmentPayload": {
+            "const": true
+          },
+          "file": {
+            "const": "native-garment.json"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sourceFingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  ]
+}

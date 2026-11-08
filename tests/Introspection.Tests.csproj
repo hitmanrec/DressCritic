@@ -36,6 +36,10 @@
     <Compile Include="HistoryOrderTests.cs" />
     <Compile Include="HistoryContextFixtureTests.cs" />
     <Compile Include="NativeExportApiProbeTests.cs" />
+    <Compile Include="NativeGarmentTests.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/NativeStateSnapshot.cs" Link="NativeStateSnapshot.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/ReviewedNativeExport.cs" Link="ReviewedNativeExport.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/NativeDressJson.cs" Link="NativeDressJson.cs" />
     <Compile Include="../DressmakerCritic-Diagnostics/NativeExportApiProbe.cs" Link="NativeExportApiProbe.cs" />
     <Compile Include="../DressmakerCritic-Diagnostics/HistoryOrder.cs" Link="HistoryOrder.cs" />
     <Compile Include="RuntimeFixtures.cs" />

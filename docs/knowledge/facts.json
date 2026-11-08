@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.15",
+  "pluginVersion": "0.15.16",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,22 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "native_export.reviewed_memory_adapter",
+      "status": "implemented-unverified",
+      "claim": "0.15.16 invokes the privately reviewed Framework serializer on a bounded detached mutable-state copy for fingerprint-approved game 0.7.0; guards block callbacks/layouts/unsafe data and full JSON is matched to the snapshot. Native state becomes primary normalized facts; orders remain separate. Real Framework with private Unity stand-ins passed three DTO/export cases; installed game acceptance remains pending. DLLs and decompiled code are not committed.",
+      "evidence": [
+        "docs/NATIVE-EXPORT.md",
+        "docs/research/2026-11-09-native-serializer-review.json",
+        "tests/NativeGarmentTests.cs"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/ReviewedNativeExport.cs",
+        "DressmakerCritic-Diagnostics/NativeStateSnapshot.cs",
+        "DressmakerCritic-Diagnostics/NativeDressJson.cs",
+        "DressmakerCritic-Diagnostics/Plugin.cs"
+      ]
+    },
     {
       "id": "native_export.observed_source_and_serializer_path",
       "status": "confirmed",

@@ -26,6 +26,12 @@ fields; причины отказа и цели доступны независ�
 надёжность оценок; модель игры не заменена. Pending — новый context-вызов на
 игровом Ollama, затем работа над grounded scoring по основному плану.
 
+0.15.16: DLL blocker снят приватным анализом. Добавлен guarded in-memory native
+adapter на detached state; accepted native JSON — primary facts source, legacy
+остаётся fallback/enrichment. Private real Framework smoke не заменяет проверку
+в Unity. Следующая задача — один game capture для native acceptance, затем
+возврат к grounded/calibrated evaluation по основному плану.
+
 ## Находки и приоритеты
 
 | Приоритет | Находка | Доказательство в коде | Следующее действие |

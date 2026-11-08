@@ -116,5 +116,17 @@ static class JuryTests
         Check(EvaluationReadiness.Check(input,"fixture-model").canEvaluate && EvaluationReadiness.Check(input,"fixture-model").limitations.Contains("explicit-order-unavailable"), "unavailable order cannot block standalone visual jury");
         input.customer.status="unknown";input.order.brief.status="missing";
         Refuse(()=>ModelRequest.Build(input,"fixture-model",_=>bytes,EvaluationTask.Context),"no wasted context request when verified inputs absent");
+        input.garment.panels = Enumerable.Range(0, 40).Select(i => new GarmentPanel { index = i, fabric = new AssetIdentity { guid = "material-" + i } }).ToList();
+        input.garment.accessories = Enumerable.Range(0, 40).Select(i => new GarmentAccessory { definition = new AssetIdentity { guid = "accessory-" + i } }).ToList();
+        input.assetNames = input.garment.panels.Select(p => p.fabric.guid).Concat(input.garment.accessories.Select(a => a.definition.guid))
+            .Select(id => new EvaluationAssetName { guid = id, assetName = id }).ToList();
+        var bounded = ModelRequest.Build(input, "fixture-model", _ => bytes);
+        using (var evidence = JsonDocument.Parse(bounded.messages[1].content[0].text))
+        {
+            var facts = evidence.RootElement.GetProperty("garment");
+            Check(facts.GetProperty("materials").GetArrayLength() == 32 && facts.GetProperty("accessories").GetArrayLength() == 32 &&
+                !bounded.messages[1].content[0].text.Contains("material-39") && bounded.messages[1].content[0].text.Contains("limited to the first 32"),
+                "full native capture does not overflow model facts or silently imply complete evidence");
+        }
     }
 }

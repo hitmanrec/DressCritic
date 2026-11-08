@@ -45,6 +45,7 @@ namespace DressmakerCritic.Diagnostics
     {
         public string schemaVersion = "2.0.0", captureId, capturedAtUtc;
         public GarmentSnapshot garment;
+        public NativeGarmentReport nativeGarment;
         public EvaluationOrder order = new EvaluationOrder();
         public CustomerEvidence customer = new CustomerEvidence();
         public List<EvaluationImage> images = new List<EvaluationImage>();
@@ -95,7 +96,7 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class CaptureManifest
     {
         public string schemaVersion = "1.0.0", captureId, startedAtUtc, finishedAtUtc;
-        public string pluginVersion = "0.15.15";
+        public string pluginVersion = "0.15.16";
         public bool complete;
         public List<CaptureStage> stages = new List<CaptureStage>();
         public List<CaptureFile> files = new List<CaptureFile>();

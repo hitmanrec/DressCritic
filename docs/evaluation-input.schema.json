@@ -226,6 +226,13 @@
           ]
         }
       }
+    },
+    "nativeGarment": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Optional native-garment-report 1.0.0 provenance; raw JSON remains a separate local artifact and is not jury context."
     }
   }
 }

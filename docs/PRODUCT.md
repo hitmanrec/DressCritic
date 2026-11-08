@@ -124,7 +124,7 @@ the model to invent an average. No advice/action-recommendation field is accepte
 
 ## Current implementation boundary
 
-Plugin 0.15.15 implements history capture, structured garment facts, historical
+Plugin 0.15.16 implements history capture, structured garment facts, historical
 order association, direct four-vote VLM inference, strict response validation and
 native notebook review cards. The current model is Qwen3-VL-4B-Instruct Q4_K_M,
 rubric 1.1.0. There is no calibrated aesthetic scorer or validated model benchmark.
@@ -160,3 +160,9 @@ confirms that notebook ExportDress reads the active state. Core serializer branc
 and config values remain unreviewed; private assembly inspection is required before
 calling it on history. 0.15.15 improves metadata reference counting, not native
 serialization readiness.
+
+0.15.16 enables the reviewed in-memory serializer on a bounded detached history
+state, with profile/callback/layout guards and legacy fallback. Native JSON is the
+primary normalized garment-state source; full raw remains local and model evidence
+stays compact. Private real-Framework smoke and net472 core build passed; installed
+Unity/Mono acceptance is pending. The DLL-inspection blocker has been resolved.
