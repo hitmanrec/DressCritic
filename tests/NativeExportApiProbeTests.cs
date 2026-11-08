@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
+using System.Text.Json;
 using DressmakerCritic.Diagnostics;
 
 static class NativeExportApiProbeTests
@@ -80,5 +81,27 @@ static class NativeExportApiProbeTests
         var deep = NativeExportApiProbe.Capture(chain.CreateType(), null, null, null);
         Check(deep.truncated && deep.methods.Count == NativeExportApiProbe.MaxDepth + 1 && deep.methods.All(m => m.depth <= NativeExportApiProbe.MaxDepth),
             "export reference traversal stops at the explicit depth cap");
+        var repeatedType = module.DefineType("RepeatedReferenceFixture", TypeAttributes.Public);
+        var repeatedMethod = repeatedType.DefineMethod("ExportDress", MethodAttributes.Public | MethodAttributes.Static, typeof(void), Type.EmptyTypes);
+        var repeatedBody = repeatedMethod.GetILGenerator();
+        var abs = typeof(Math).GetMethod("Abs", new[] { typeof(int) });
+        for (int i = 0; i < 160; i++) { repeatedBody.Emit(OpCodes.Ldc_I4_0); repeatedBody.Emit(OpCodes.Call, abs); repeatedBody.Emit(OpCodes.Pop); }
+        repeatedBody.Emit(OpCodes.Ret);
+        var repeatedReport = NativeExportApiProbe.Capture(repeatedType.CreateType(), null, null, null);
+        Check(repeatedReport.methods.Single().status == "metadata" && repeatedReport.methods[0].references.Count == 1 &&
+            repeatedReport.methods[0].references[0].occurrences == 160,
+            "repeated primitive-helper calls do not consume unique-reference budget or truncate later serializer branches");
+
+        var native = JsonSerializer.Deserialize<NativeExportApiReport>(RuntimeFixtures.Read("20261108-214839-334-cefd9aae", "native-export-api.json"),
+            new JsonSerializerOptions { IncludeFields = true });
+        var sketchbook = native.methods.Single(m => m.signature.StartsWith("Sketchbook.ExportDress("));
+        Check(sketchbook.references.Any(r => r.member == "GameManager.activeDress") && !sketchbook.references.Any(r => r.member?.Contains("_displayDress") == true),
+            "real native notebook export uses active garment, not historical preview");
+        var save = native.methods.Single(m => m.signature.StartsWith("FileSystem.SaveObjectToJSONFile("));
+        Check(save.references.Any(r => r.member?.Contains("JSONSerializer.Serialize(") == true) &&
+            save.references.Any(r => r.member?.Contains("FileSystem.WriteTextFile(") == true),
+            "real native save separates serialization from filesystem writing");
+        Check(native.truncated && native.methods.Single(m => m.signature.StartsWith("Framework.JSONSerializer.GetJSONValue(")).status == "reference-limit" &&
+            native.nativeSerializationStatus == "not-invoked-unverified", "incomplete real serializer graph is not native serialization approval");
     }
 }

@@ -99,7 +99,18 @@
           },
           "references": {
             "type": "array",
-            "maxItems": 64
+            "maxItems": 128,
+            "items": {
+              "type": "object",
+              "properties": {
+                "occurrences": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8192
+                }
+              },
+              "description": "Unique operation/token reference. occurrences is additive; absent in older 1.0.0 reports."
+            }
           },
           "signature": {
             "type": [

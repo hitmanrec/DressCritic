@@ -55,7 +55,7 @@ textures are written to the report. A reference to File.WriteAllText is metadata
 not an executed file write. This probe writes only its diagnostic report.
 
 Limits: 64 method bodies, depth 4, 16 KiB per body, 128 KiB inspected IL total,
-8192 instructions total, 64 member references per body, 12 type descriptions.
+8192 instructions total, 128 unique operation/member references per body (occurrences counted separately), 12 type descriptions.
 Type field/property descriptions retain FieldSnapshot's bounds (eight declaring
 levels, up to 64 fields/properties per level). Method lists are capped at 128;
 attribute lists at 16 and attribute arguments/named values at eight. Failures and
@@ -90,3 +90,40 @@ Tests use trap constructors, attributes and getters, file-write references,
 delegate/async bodies and an oversized synthetic method. They verify discovery
 without execution and bounded output. They cannot replace the game's API report
 or prove native serialization readiness.
+
+## Received 0.15.14 API report — 2026-11-09
+
+Capture `20261108-214839-334-cefd9aae` verified the native chain:
+
+`Sketchbook.ExportDress` → `GameManager.activeDress.state` →
+`ExportUtility.ExportDress` → native save dialog →
+`FileSystem.SaveObjectToJSONFile<DressState>` →
+new `Framework.JSONSerializer` / `Config`, `BeginSerialization`, `Serialize(object)`,
+`EndSerialization`, `JSONValue.GetJSONString` → filesystem write.
+
+The photo scene handler instead reads `PhotoScene._displayDress.state`. The notebook
+handler therefore cannot be substituted for serializing a selected history state.
+This gives a concrete explanation for the earlier mismatched .dress/capture pair,
+without establishing which UI action originally produced that upload.
+
+An in-memory adapter should bypass dialog/path/write code and pass the verified
+historical state directly to a fresh serializer. However, the main `GetJSONValue`
+method was cut at 64 total references before later type/converter branches. The
+exact SerializeObjectReferences flag value and enum arguments are also absent;
+we must not infer settings or getter/callback safety from the prefix.
+
+0.15.15 fixes that diagnostic limitation by counting repeated operation/member
+references rather than spending slots on every repeated primitive type check. The
+per-body unique-reference cap is 128; global byte/instruction/method/depth limits
+stay bounded. Existing 1.0.0 reports remain readable; occurrences is additive.
+**Native invocation remains disabled.**
+
+To finish without another game-only metadata iteration, privately inspect
+`Dressmaker_Data/Managed/Framework.dll` and `Assembly-CSharp.dll`. Neither assembly
+will be committed. This is the current implementation blocker; no new manual
+.dress export is needed. [Captured evidence](research/2026-11-09-native-export-path.json).
+
+The same capture confirms context JSON-schema transport on the user's actual
+Ollama: every stage passed; order fit for Studious Motivation and unknown client
+preferences remained unknown/null. This is valid abstention, not proof of aesthetic
+score quality.

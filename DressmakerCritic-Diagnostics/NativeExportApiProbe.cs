@@ -39,14 +39,14 @@ namespace DressmakerCritic.Diagnostics
         public List<NativeExportReference> references = new List<NativeExportReference>();
     }
     [Serializable] public sealed class NativeExportReference
-    { public string operation, member, assembly, status; }
+    { public string operation, member, assembly, status; public int occurrences = 1; }
 
     // Reflection metadata only. In particular, ExportDress must NEVER be invoked here:
     // observed UI entrypoints return void and may select a state, open dialogs or write files.
     public sealed class NativeExportApiProbe
     {
         public const int MaxMethods = 64, MaxTypes = 12, MaxDepth = 4, MaxBodyBytes = 16384,
-            MaxTotalBytes = 131072, MaxInstructions = 8192, MaxReferences = 64;
+            MaxTotalBytes = 131072, MaxInstructions = 8192, MaxReferences = 128;
         private static readonly Dictionary<short, OpCode> Codes = typeof(OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static)
             .Where(f => f.FieldType == typeof(OpCode)).Select(f => (OpCode)f.GetValue(null)).GroupBy(c => c.Value).ToDictionary(g => g.Key, g => g.First());
         private readonly NativeExportApiReport report = new NativeExportApiReport();
@@ -160,6 +160,7 @@ namespace DressmakerCritic.Diagnostics
                 report.inspectedIlBytes += il.Length;
                 using (var hash = SHA256.Create()) item.bodySha256 = BitConverter.ToString(hash.ComputeHash(il)).Replace("-", "").ToLowerInvariant();
                 int offset = 0;
+                var references = new Dictionary<string, NativeExportReference>();
                 while (offset < il.Length && report.instructionCount < MaxInstructions)
                 {
                     report.instructionCount++;
@@ -173,12 +174,17 @@ namespace DressmakerCritic.Diagnostics
                     if (size < 0 || size > il.Length - offset) throw new InvalidOperationException("Invalid operand size");
                     if (op.OperandType == OperandType.InlineMethod || op.OperandType == OperandType.InlineField || op.OperandType == OperandType.InlineTok || op.OperandType == OperandType.InlineType)
                     {
+                        int token = BitConverter.ToInt32(il, offset);
+                        string key = op.Name + ":" + token.ToString(CultureInfo.InvariantCulture);
+                        NativeExportReference repeated;
+                        if (references.TryGetValue(key, out repeated)) { repeated.occurrences++; offset += size; continue; }
                         if (item.references.Count >= MaxReferences) { report.truncated = true; item.status = "reference-limit"; return; }
                         var reference = new NativeExportReference { operation = op.Name };
+                        references.Add(key, reference);
                         item.references.Add(reference);
                         try
                         {
-                            var member = method.Module.ResolveMember(BitConverter.ToInt32(il, offset), method.DeclaringType.GetGenericArguments(), method.IsGenericMethod ? method.GetGenericArguments() : null);
+                            var member = method.Module.ResolveMember(token, method.DeclaringType.GetGenericArguments(), method.IsGenericMethod ? method.GetGenericArguments() : null);
                             reference.member = Name(member); reference.assembly = member.Module.Assembly.GetName().Name; reference.status = "metadata";
                             if (member is MethodBase called) Enqueue(called, depth + 1);
                         }

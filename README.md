@@ -1,7 +1,7 @@
 # DressCritic
 
 Read-only local garment evaluator for Dressmaker / Linux-Proton, BepInEx
-5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.14**.
+5.4.23.5, Yuuma ModLoader 0.7.8. Current plugin: **0.15.15**.
 
 The existing history-only inline Jury, house crests, English UI and optional
 locale overlay are retained. v0.15.4 fixes the latest model response rejection,
@@ -121,3 +121,7 @@ responses with JSON schema and normalizes the observed colour-variety target;
 0.15.14 automatically records a bounded native-export API probe in captures.
 This does **not** yet call the native serializer or create a `.dress` file:
 [native export integration status](docs/NATIVE-EXPORT.md).
+
+0.15.15 preserves the observed native export path and improves metadata reference
+coverage. Native serialization remains blocked on reviewing the serializer and
+settings; the notebook's native export targets the active dress, not history.

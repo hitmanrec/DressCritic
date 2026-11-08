@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-11-09",
+  "captureId": "20261108-214839-334-cefd9aae",
+  "pluginVersion": "0.15.14",
+  "integrityVerified": true,
+  "failedStages": [],
+  "historicalOrder": {
+    "index": 6,
+    "title": "Studious Motivation",
+    "briefStatus": "record-display-verified"
+  },
+  "contextInferenceStatus": "ok",
+  "contextOrderStatus": "unknown",
+  "nativeApiTruncated": true,
+  "assemblies": [
+    {
+      "name": "Assembly-CSharp",
+      "version": "0.0.0.0",
+      "moduleVersionId": "98187c06-fdb3-463d-a5da-dfae5130f51b"
+    },
+    {
+      "name": "Framework",
+      "version": "0.0.0.0",
+      "moduleVersionId": "c8ed8668-05da-484b-9fb1-01de383212ec"
+    }
+  ],
+  "serializationPath": [
+    "Sketchbook.ExportDress -> GameManager.activeDress.state -> ExportUtility.ExportDress",
+    "ExportUtility.ExportDress -> StandaloneFileBrowser.SaveFilePanel -> FileSystem.SaveObjectToJSONFile",
+    "FileSystem.SaveObjectToJSONFile -> new JSONSerializer / new Config -> BeginSerialization -> Serialize(object) -> EndSerialization -> JSONValue.GetJSONString -> FileSystem.WriteTextFile"
+  ],
+  "blockers": [
+    "GetJSONValue was truncated at 64 total references; unseen branches/callbacks/getters remain unreviewed.",
+    "The assigned SerializeObjectReferences value and exact enum settings are not present in the metadata-only report.",
+    "Need privately inspect Framework.dll and Assembly-CSharp.dll, without committing either, to verify the in-memory adapter before invocation."
+  ],
+  "nativeSerializationEnabled": false,
+  "fixtureArtifactSha256": {
+    "manifest.json": "e586d1115859eccfe6909432a521ad3fb04871c8faf2b6b99c58241014172493",
+    "native-export-api.json": "d8521d313aada2dcc481961b049d231669d238fa01d3c78b00d37c147e49c2a8",
+    "runtime.json": "c433431dc5a52d1480a2323687d05891e115c3e2da5949a4c60f50061875e340",
+    "history-order.json": "2f5b41f4220f58cf9f2a5d5a029af943c66bb0e4e811a45dfe2f52a4f4e9e3ab",
+    "assessment.json": "10551552716a441372d28f9678358955441e368e0638d0ed55a7e49ca91d4f4b",
+    "context-model-response.json": "64e28c2adb7ce4a1faf1b79279e07dc0bb5351b57797dc11cf8057bc056d5b75"
+  },
+  "limitations": [
+    "Call metadata is evidence of referenced members, not complete control/data flow or purity.",
+    "Sketchbook source selection differs from the history preview; this can explain earlier export/capture mismatch, but the upload has no trace of which native UI action produced that file.",
+    "Successful context contract with unknown/null is not semantic-score calibration."
+  ]
+}

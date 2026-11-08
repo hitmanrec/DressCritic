@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.14",
+  "pluginVersion": "0.15.15",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,18 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "native_export.observed_source_and_serializer_path",
+      "status": "confirmed",
+      "claim": "0.15.14 capture confirms Sketchbook.ExportDress reads GameManager.activeDress.state; PhotoScene reads its _displayDress.state. FileSystem.SaveObjectToJSONFile constructs Framework.JSONSerializer/Config, serializes to JSONValue then writes. Core GetJSONValue is truncated and config primitive values absent; safe in-memory invocation remains unverified. All capture stages, including context schema transport on user Ollama, passed.",
+      "evidence": [
+        "docs/research/2026-11-09-native-export-path.json",
+        "tests/fixtures/runtime/20261108-214839-334-cefd9aae/native-export-api.json.gz"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/NativeExportApiProbe.cs"
+      ]
+    },
     {
       "id": "native_export.api_discovery",
       "status": "implemented-unverified",

@@ -17,6 +17,11 @@ confirmed for these cases. Off-rack did not acquire today's accepted commission.
 Customer recipient is absent; giver identity is not a verified preference profile.
 Full dialogue and client taste remain unknown.
 
+Update: the later 0.15.14 capture `20261108-214839-334-cefd9aae` passed every stage,
+including the context call on the user's Ollama. Studious Motivation fit and missing
+client preferences were unknown/null. This confirms deployed format compatibility,
+not semantic-score quality. See [native path evidence](research/2026-11-09-native-export-path.json).
+
 ## Context inference failed separately
 
 Both commissioned calls returned valid JSON with the wrong structure:
