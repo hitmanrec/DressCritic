@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "2.0.0",
+  "orderCompliance": {
+    "status": "consistent",
+    "scope": "provided-summary-only",
+    "score": 9.5,
+    "remarks": [
+      "Order brief explicitly states 'Chilly Overtime' with runtime history verification.",
+      "Order brief summary is verified and displayed; no hidden dialogue or inferred preferences."
+    ]
+  },
+  "customerCompatibility": {
+    "status": "unknown",
+    "scope": "verified-customer-preferences-only",
+    "score": null,
+    "remarks": [
+      "Customer preferences are not provided in the source data.",
+      "Customer compatibility is unknown due to missing source data."
+    ]
+  },
+  "limitations": [
+    "Customer preferences are not available in the provided source data.",
+    "Customer compatibility cannot be determined without explicit preferences.",
+    "Order compliance is limited to the provided summary and runtime history.",
+    "No jury scores or garment quality assessments are included."
+  ]
+}

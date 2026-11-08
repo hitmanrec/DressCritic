@@ -19,3 +19,5 @@
 и инструкции UI как текущий workflow. Все они проиндексированы в реестре.
 
 - [History context: extraction, limits and next game test](HISTORY-CONTEXT.md)
+
+- [Three-dress history context results](HISTORY-CONTEXT-RESULTS.md)

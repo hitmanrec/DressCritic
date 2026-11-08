@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.12")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.13")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.12: history-linked brief and focused goal capture.");
+            Logger.LogInfo("Dressmaker Critic 0.15.13: schema-constrained context output and verified history goals.");
         }
         private void Start()
         {
@@ -253,6 +253,7 @@ namespace DressmakerCritic.Diagnostics
                     await capture.StageAsync("local-context-inference", async () => {
                         var request = ModelRequest.Build(input, selectedModel, image => File.ReadAllBytes(Path.Combine(capture.directory, image.file)), EvaluationTask.Context);
                         string json = DiagnosticJson.Serialize(request);
+                        capture.Write("context-response-format.json", request.response_format);
                         capture.Write("context-request-audit.json", new RequestDiagnostic { model = selectedModel, imageCount = input.images.Count,
                             reasoningEffort = request.reasoning_effort, maxOutputTokens = request.max_tokens, responseFormat = request.response_format.type,
                             timeoutSeconds = timeoutSeconds, requestBytes = System.Text.Encoding.UTF8.GetByteCount(json), systemPrompt = request.messages[0].content[0].text });

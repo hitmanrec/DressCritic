@@ -118,3 +118,9 @@ before dataset generation or training. Capture the actual displayed card under
 strict state/index/title binding; preserve every bounded goal's fields and explicit
 coverage. Confirm a commissioned and an off-rack history record in game before
 calling the integration complete. See [HISTORY-CONTEXT](HISTORY-CONTEXT.md).
+
+The three 0.15.12 game captures reviewed on 2026-11-09 confirm historical record,
+brief and goal extraction for two commissions and off-rack. The remaining context
+issue is model response/semantic quality, not absence of those orders. 0.15.13 adds
+constrained context decoding; two 2B CPU probes prove transport/format only and
+retain documented semantic failures. See [results](HISTORY-CONTEXT-RESULTS.md).

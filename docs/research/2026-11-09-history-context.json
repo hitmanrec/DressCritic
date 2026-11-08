@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-11-09",
+  "captureDateUtc": "2026-11-08",
+  "captures": [
+    {
+      "captureId": "20261108-201223-533-ef38beed",
+      "pluginVersion": "0.15.12",
+      "integrityVerified": true,
+      "historyIndex": 10,
+      "origin": "off-rack",
+      "questTitle": "Off rack dress",
+      "briefStatus": "record-display-verified",
+      "goalCount": 0,
+      "goalFieldsStatus": "complete",
+      "panels": 17,
+      "accessories": 0,
+      "copiedBatchedAccessories": 0,
+      "batchEntries": 0,
+      "fixedViewsStatus": "accepted-fixed-views",
+      "contextStage": {
+        "name": "local-context-inference",
+        "status": "skipped",
+        "detail": "No verified order or customer context; jury remains independent",
+        "elapsedMs": 0
+      },
+      "fixtureArtifactSha256": {
+        "manifest.json": "97319734b9929e7cd91a1edac2b494c1f596083969e9080702999d66d8531b24",
+        "history-order.json": "b0d27f665af5bdcb9d1c0c10d660814010dc94fe194304deb91432eedbf72e64",
+        "evaluation-input.json": "6cac14d7d89517a188de159f2f1eb7d86b8240ea560a019f8265e802f40a4b69",
+        "garment.json": "a46b4cdc3b46b8eb96f96bbde6883a664c5e327ef9ac7046006dd87451feb129",
+        "fixed-views.json": "7fd4514d31200648439a20bafba6915279a07c42b1d6ecbf1f64c9ae2515acb3",
+        "identity-evidence.json": "3646f8183deb876d1757d2026ca746ff13d37889da39511b1996069ee2b2c3a8",
+        "history-candidates.json": "4374aa98a57ff2978f8905306e873d6d517576577d2b4939980bf1ebcdcd96cd"
+      }
+    },
+    {
+      "captureId": "20261108-201906-668-966b6e72",
+      "pluginVersion": "0.15.12",
+      "integrityVerified": true,
+      "historyIndex": 5,
+      "origin": "commission",
+      "questTitle": "Vegetable Empire",
+      "briefStatus": "record-display-verified",
+      "goalCount": 5,
+      "goalFieldsStatus": "complete",
+      "panels": 23,
+      "accessories": 20,
+      "copiedBatchedAccessories": 2,
+      "batchEntries": 26,
+      "fixedViewsStatus": "accepted-fixed-views",
+      "contextStage": {
+        "name": "local-context-inference",
+        "status": "failed",
+        "detail": "InvalidDataException: Unexpected assessment members",
+        "elapsedMs": 8235.7654
+      },
+      "fixtureArtifactSha256": {
+        "manifest.json": "c115d510ed59c3fc5fbe23ef848d7e70051a0a91b54f5aa4853cbef40677d6f4",
+        "history-order.json": "8b51916dc36e05c127fa1af9db72f9adb446076a62ce32c76d12e408900043c9",
+        "evaluation-input.json": "3b4fa7d4c4b9213d30c352b93d0e17df4677623eb776f69b524b1055336b027c",
+        "garment.json": "e697e3a8872af2513eac6de2b0c58ea2d1142c24195a9836530fcc033ea7551c",
+        "fixed-views.json": "bb8ea93ac77ffbd44b4e292ad9309b217befd3e94d5c6ce943f56da6f43f0f07",
+        "identity-evidence.json": "4087cab6cfd7ad3d52bb28b72524c140fcf5bcc6e332a656a929a42f80073cbb",
+        "history-candidates.json": "0d1cdd1653bfbf0208ef1b2ada69b0dd4ffff674e6d50b7c53e94e893eba343c",
+        "context-model-response.json": "779b847f319ddfe6fa902303dd0af7903fe69caefc38669ec56ad1367bc7aa54"
+      }
+    },
+    {
+      "captureId": "20261108-201120-546-6cf8f74f",
+      "pluginVersion": "0.15.12",
+      "integrityVerified": true,
+      "historyIndex": 7,
+      "origin": "commission",
+      "questTitle": "Chilly Overtime ",
+      "briefStatus": "record-display-verified",
+      "goalCount": 5,
+      "goalFieldsStatus": "complete",
+      "panels": 24,
+      "accessories": 11,
+      "copiedBatchedAccessories": 2,
+      "batchEntries": 22,
+      "fixedViewsStatus": "accepted-fixed-views",
+      "contextStage": {
+        "name": "local-context-inference",
+        "status": "failed",
+        "detail": "InvalidDataException: Unexpected assessment members",
+        "elapsedMs": 5124.7865
+      },
+      "fixtureArtifactSha256": {
+        "manifest.json": "8c014094e00bc053193f0447e077c539dee4a056f0b3515ffb0ba130062b7fda",
+        "history-order.json": "89cb1982ab80f8303cb385de5c8e1f2e0a9ef165c6d5fd46bfce8d167748cc3c",
+        "evaluation-input.json": "38c8c86cee573519c11b05d179b129bd519486b27590927818158656264cd596",
+        "garment.json": "1a48e937c86433464b80e71d8b0c43b65766e985d8f4d29ce8953e089ae87199",
+        "fixed-views.json": "4c6bfd8c24a4b07c744fb30c992e76b1d74ce277098092e2fe577f8dadca16eb",
+        "identity-evidence.json": "3646f8183deb876d1757d2026ca746ff13d37889da39511b1996069ee2b2c3a8",
+        "history-candidates.json": "600be4b45e4dc12c4ec3812629cc192bfa4027603147edb444b1fdbe542c57fe",
+        "context-model-response.json": "286dfbe73be32e362675d0b89cc7af378adb9181de267bd8b98fa59fa913ac71"
+      }
+    }
+  ],
+  "dressExports": [
+    {
+      "uploadName": "off rack export.dress",
+      "sha256": "bd0ea445bcaec446fc852b433f46f4d740cee6203bbc0f225a03478b235c2239",
+      "fixture": "tests/fixtures/dress-exports/off-rack.dress.gz",
+      "panels": 17,
+      "accessories": 0,
+      "questAssociationPresent": false,
+      "matchingHistoryShapeIndex": 10,
+      "pairedCaptureIndex": 10,
+      "exactStateIdentityVerified": false
+    },
+    {
+      "uploadName": "по заказу экспорт.dress",
+      "sha256": "1f956b274fb7d95659bb60fd244a10a2a26721a472f1afc8cf577c2e01765716",
+      "fixture": "tests/fixtures/dress-exports/commission-labelled.dress.gz",
+      "panels": 25,
+      "accessories": 10,
+      "questAssociationPresent": false,
+      "matchingHistoryShapeIndex": 9,
+      "pairedCaptureIndex": 7,
+      "exactStateIdentityVerified": false
+    },
+    {
+      "uploadName": "many accesories export.dress",
+      "sha256": "4de9cf747e02847d2e8c9978a8bb05d52f24366da9028dd29495304c8bad7ee2",
+      "fixture": "tests/fixtures/dress-exports/accessories.dress.gz",
+      "panels": 23,
+      "accessories": 20,
+      "questAssociationPresent": false,
+      "matchingHistoryShapeIndex": 5,
+      "pairedCaptureIndex": 5,
+      "exactStateIdentityVerified": false
+    }
+  ],
+  "findings": [
+    "All three manifest file sizes and SHA-256 hashes verified against supplied files.",
+    "History brief/state association and goal field extraction passed on two commissions and one off-rack record.",
+    "Both commissioned context responses violated the nested-object contract; strict validation correctly rejected them.",
+    "The commissioned-labelled dress export matches record 9 shape/counts, not its paired capture record 7. Do not use as an image/state training pair.",
+    "Native .dress includes garment state and asset references, but no quest definition, brief or goals and no meshes/textures.",
+    "20 accessory states and batched accessory copying are present; observed front image shows decoration. Exact all-view rendering/color acceptance is not established."
+  ],
+  "limitations": [
+    "No human aesthetic labels or score calibration.",
+    "Shipping native build and new constrained context decoding still need an installed-game/backend test.",
+    "Original PNGs and full capture archives are retained in the research workspace; compressed text fixtures only are committed."
+  ],
+  "developmentProbe": {
+    "model": {
+      "path": "/workspace/dresscritic-research/Qwen3.5-2B-Q4_K_M.gguf",
+      "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223"
+    },
+    "projector": {
+      "path": "/workspace/dresscritic-research/mmproj-F16.gguf",
+      "sha256": "7035e9cb8d7c6a9681d07eef9a364783e86ea4cd73faab2eabb4f43a101830c7"
+    },
+    "server": {
+      "path": "/workspace/dresscritic-research/runtime/llama-b12110/llama-server",
+      "sha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400"
+    },
+    "cpuOnly": true,
+    "contextTokens": 8192,
+    "threads": 4,
+    "sourceBaseCommit": "3f199b7",
+    "sourceDirty": true,
+    "defaultGameModelChanged": false,
+    "runs": [
+      {
+        "fixture": "tests/fixtures/context-2b-probe/metadata-only.json",
+        "sourceCaptureId": "20261108-201120-546-6cf8f74f",
+        "format": "json_schema",
+        "schemaValidated": true,
+        "productionContextValidatorPassed": true,
+        "qualityValidated": false,
+        "manualReview": "Structurally valid but unacceptable: provenance verification was used to justify 9.5 instead of visible garment fit.",
+        "requestSeconds": 58.83673336999891,
+        "startupSeconds": 1.1318967530005466,
+        "totalStartupSeconds": 2.5491706770008022,
+        "peakResidentSetBytes": 3024175104,
+        "processExited": true,
+        "requestSha256": "2bb1d52674a21c195e6299dde2cd0df050b5e25d51b176b637b81c487bba1605",
+        "responseSha256": "f304173db1bd191d137c1c94e6e52dfe4cac6e5229124940826b5b7de5236ad6",
+        "systemPromptSha256": "f5d396f64e68c8d809c9a425315a318a28326b997465640f7f198a16df7ce892",
+        "sourceContentSha256": "3125c5e7adfb375e7f4bcca57b6b48b200f31afff752a2bf296277a341df7c16",
+        "usage": {
+          "completion_tokens": 237,
+          "prompt_tokens": 7222,
+          "total_tokens": 7459,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "judgements": {
+          "schemaVersion": "2.0.0",
+          "orderCompliance": {
+            "status": "consistent",
+            "scope": "provided-summary-only",
+            "score": 9.5,
+            "remarks": [
+              "Order brief explicitly states 'Chilly Overtime' with runtime history verification.",
+              "Order brief summary is verified and displayed; no hidden dialogue or inferred preferences."
+            ]
+          },
+          "customerCompatibility": {
+            "status": "unknown",
+            "scope": "verified-customer-preferences-only",
+            "score": null,
+            "remarks": [
+              "Customer preferences are not provided in the source data.",
+              "Customer compatibility is unknown due to missing source data."
+            ]
+          },
+          "limitations": [
+            "Customer preferences are not available in the provided source data.",
+            "Customer compatibility cannot be determined without explicit preferences.",
+            "Order compliance is limited to the provided summary and runtime history.",
+            "No jury scores or garment quality assessments are included."
+          ]
+        },
+        "fixtureSha256": "c67d54fc011c27fcdab34a475aa759bab61c44ee08dc72e38a7f54bb6d16cd9f"
+      },
+      {
+        "fixture": "tests/fixtures/context-2b-probe/grounding-revision.json",
+        "sourceCaptureId": "20261108-201120-546-6cf8f74f",
+        "format": "json_schema",
+        "schemaValidated": true,
+        "productionContextValidatorPassed": true,
+        "qualityValidated": false,
+        "manualReview": "Mentions actual visible coverage and collar, but collar-to-brief link is unsupported and a limitation contradicts the consistent status. Not accepted as reliable semantic scoring.",
+        "requestSeconds": 61.141087267998955,
+        "startupSeconds": 1.2223003229992173,
+        "totalStartupSeconds": 2.334931494000557,
+        "peakResidentSetBytes": 3024773120,
+        "processExited": true,
+        "requestSha256": "3c0239b6ac3652a9c93f702223bc0e4494a9e0016b8d98910e80fdbcdd3fabaf",
+        "responseSha256": "2c4f0f6c904db24cfdb2545a3f9889070f07edc7ae976ec2289b64911ef66b91",
+        "systemPromptSha256": "3f3c9a297fb4bd59db226e8c20a804c70821a568dcba44914b625f78c08a4f71",
+        "sourceContentSha256": "6af82658ebea35f42aa3229cd137d16142c07d5b3d9fb6ce8419632fcc9e0d69",
+        "usage": {
+          "completion_tokens": 265,
+          "prompt_tokens": 7296,
+          "total_tokens": 7561,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "judgements": {
+          "schemaVersion": "2.0.0",
+          "orderCompliance": {
+            "status": "consistent",
+            "scope": "provided-summary-only",
+            "score": 8.5,
+            "remarks": [
+              "Brief requests a warmer dress; garment is a long-sleeved coat dress with a structured bodice and skirt, matching the 'warmer' requirement.",
+              "Brief specifies 'Chilly Overtime'; garment features a double ruffle and bow collar, consistent with the requested look."
+            ]
+          },
+          "customerCompatibility": {
+            "status": "unknown",
+            "scope": "verified-customer-preferences-only",
+            "score": null,
+            "remarks": [
+              "Customer preferences are not provided in the source data; compatibility cannot be assessed."
+            ]
+          },
+          "limitations": [
+            "Customer preferences are not provided in the source data; compatibility cannot be assessed.",
+            "Fit assessment is limited to visible silhouette and coverage; fit status is marked as unknown.",
+            "Game requirements and specific activity needs are not provided in the source data; fit assessment is limited to visible silhouette and coverage."
+          ]
+        },
+        "fixtureSha256": "d725ca7e3cfe365ad1632f277a9867ec8ced5af3c686710a551e67a1d5d438d7"
+      }
+    ],
+    "limitations": [
+      "Different model/backend from the user's Ollama Qwen3-VL baseline.",
+      "One dress, no calibration or model ranking claim.",
+      "Cloud CPU shared with development checks, not an isolated performance benchmark or in-game measurement.",
+      "Multimodal non-consecutive-position warnings remain in runtime logs; impact not isolated.",
+      "Exact full requests/raw responses and sessions retained outside Git; compact content fixtures and request/response hashes committed."
+    ]
+  }
+}

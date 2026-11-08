@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.12",
+  "pluginVersion": "0.15.13",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -10,13 +10,27 @@
   },
   "facts": [
     {
-      "id": "history.displayed_brief_and_focused_goals",
-      "status": "implemented-unverified",
-      "claim": "v0.15.12 captures the displayed history card only under verified record/state/index/title binding; preserves per-goal bounded field graphs and exposes extracted context independently of inference. Native TMP path and goal coverage await commissioned/off-rack captures. Unknown customer preferences and completion remain unknown.",
+      "id": "history.three_runtime_captures_01512",
+      "status": "confirmed",
+      "claim": "Three 0.15.12 packets verify state/history association and displayed TMP text for Chilly Overtime, Vegetable Empire and off-rack; goals captured as 5, 5 and 0. Both commissioned context calls failed response-shape validation. ColorVarietyRequirement.minimumDistinctColors=3 observed. Commission-labelled .dress is not the captured dress by shape/counts.",
       "evidence": [
-        "docs/HISTORY-CONTEXT.md",
-        "tests/HistoryOrderTests.cs",
-        "tests/JuryTests.cs"
+        "docs/HISTORY-CONTEXT-RESULTS.md",
+        "docs/research/2026-11-09-history-context.json",
+        "tests/HistoryContextFixtureTests.cs"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/HistoryOrder.cs",
+        "DressmakerCritic-Diagnostics/ModelRequest.cs"
+      ]
+    },
+    {
+      "id": "history.displayed_brief_and_focused_goals",
+      "status": "confirmed",
+      "claim": "v0.15.12 history record/state/index/title binding, TMP card text and focused goal fields were confirmed in three supplied captures: Chilly Overtime, Vegetable Empire and off-rack. Scope is these cases, not all quests or complete dialogue. Unknown customer preferences and goal completion remain unknown. The new 0.15.13 context schema still needs the user backend check.",
+      "evidence": [
+        "docs/HISTORY-CONTEXT-RESULTS.md",
+        "docs/research/2026-11-09-history-context.json",
+        "tests/HistoryContextFixtureTests.cs"
       ],
       "code": [
         "DressmakerCritic-Diagnostics/HistoryOrder.cs",

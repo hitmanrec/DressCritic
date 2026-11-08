@@ -181,6 +181,13 @@
               "string",
               "null"
             ]
+          },
+          "minimumDistinctColors": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Observed ColorVarietyRequirement.minimumDistinctColors target; completion/color grouping is not calculated."
           }
         },
         "additionalProperties": false

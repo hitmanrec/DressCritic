@@ -34,6 +34,9 @@ namespace DressmakerCritic.Diagnostics
             guid == OffRackGuid ? "off-rack" : commissions.Contains(guid) ? "commission" : "unknown";
         public static string DescribeRequirement(OrderRequirement goal, ValueNode raw = null)
         {
+            if (goal.type == "ColorVarietyRequirement" && goal.minimumDistinctColors.HasValue)
+                return "Different colours · at least " + goal.minimumDistinctColors.Value.ToString(CultureInfo.InvariantCulture) +
+                    (goal.gated == true ? " · conditional; activation unknown" : "");
             string label = goal.type == "TagScoreRequirement" ? goal.tag?.prettyName ?? goal.tag?.guid ?? "Unknown tag" :
                 goal.type == "QualityRequirement" ? "Quality" : goal.type ?? "Unavailable goal";
             double? target = goal.targetScore ?? goal.threshold;

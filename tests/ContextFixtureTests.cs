@@ -35,7 +35,9 @@ static class ContextFixtureTests
         Check(sections.Select(s => s.totalCount).SequenceEqual(new int?[] { 72, 212, 182 }) && sections.All(s => s.status == "complete" && s.items.Count == s.totalCount), "real full unlocked membership counts");
         Check(sections.All(s => s.items.All(i => i.guid != null) && s.items.Select(i => i.guid).Distinct().Count() == s.items.Count), "real unlocked IDs are present and unique per category");
         string live = RuntimeFixtures.Read("20261104-125434-693-79d9b746", "progress-snapshot.json");
-        Check(System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(DiagnosticJson.Serialize(verified)), System.Text.Json.Nodes.JsonNode.Parse(live)), "offline normalized context equals actual live export");
+        var legacy = System.Text.Json.Nodes.JsonNode.Parse(live);
+        foreach (var goal in legacy["completionRequirements"].AsArray()) goal["minimumDistinctColors"] = null;
+        Check(System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(DiagnosticJson.Serialize(verified)), legacy), "offline normalized context equals actual live export with additive nullable goal field");
         var complete = ProgressSnapshotBuilder.CaptureMembership(Enumerable.Range(0, 72).Select(_ => new AssetFixture()).ToList());
         Check(complete.totalCount == 72 && complete.items.Count == 72 && complete.status == "complete" && complete.items.All(i => i.guid == "fixture-id"), "compact membership exceeds graph's 32-item cap");
         var limited = ProgressSnapshotBuilder.CaptureMembership(Enumerable.Range(0, 600).Select(_ => new AssetFixture()).ToList());

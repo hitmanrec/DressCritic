@@ -17,6 +17,7 @@ class Program
         FixedViewCaptureGateTests.Run();
         NotebookPageGeometryTests.Run();
         HistoryOrderTests.Run();
+        HistoryContextFixtureTests.Run();
         SelectionProbeTests.Run();
         JuryTests.Run();
         EvidenceTests.Run();

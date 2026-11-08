@@ -50,6 +50,7 @@ namespace DressmakerCritic.Diagnostics
                     foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
                     {
                         if (type == typeof(ModelPart) && field.GetValue(value) == null) continue;
+                        if (type == typeof(ModelFormat) && field.Name == "json_schema" && field.GetValue(value) == null) continue;
                         if (!first) output.Append(','); first = false;
                         Quote(field.Name, output); output.Append(':');
                         Write(field.GetValue(value), output, depth + 1, path);

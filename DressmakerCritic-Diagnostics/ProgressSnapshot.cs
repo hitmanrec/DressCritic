@@ -20,6 +20,7 @@ namespace DressmakerCritic.Diagnostics
         public double? threshold, targetScore;
         public bool? gated;
         public AssetIdentity tag;
+        public int? minimumDistinctColors;
         public string interpretation = "raw deterministic game requirement; no aesthetic or semantic brief evaluation";
     }
     [Serializable] public sealed class ProgressSnapshot
@@ -67,7 +68,8 @@ namespace DressmakerCritic.Diagnostics
         public static OrderRequirement ReadRequirement(GarmentSnapshotBuilder graph, ValueNode requirement) =>
             new OrderRequirement { type = requirement?.type?.Split(',')[0], status = graph.Status(requirement),
                 comparison = graph.Text(requirement, "comparison") ?? graph.Text(requirement, "comparisonType"), threshold = graph.Number(requirement, "threshold"),
-                targetScore = graph.Number(requirement, "targetScore"), gated = graph.Boolean(requirement, "gated"), tag = graph.Identity(graph.Field(requirement, "tag")) };
+                targetScore = graph.Number(requirement, "targetScore"), gated = graph.Boolean(requirement, "gated"), tag = graph.Identity(graph.Field(requirement, "tag")),
+                minimumDistinctColors = requirement?.type?.Split(',')[0] == "ColorVarietyRequirement" ? graph.Integer(requirement, "minimumDistinctColors") : null };
         public static InventorySection CaptureMembership(object list)
         {
             var section = new InventorySection { status = "unavailable" };

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "2.0.0",
+  "orderCompliance": {
+    "status": "consistent",
+    "scope": "provided-summary-only",
+    "score": 8.5,
+    "remarks": [
+      "Brief requests a warmer dress; garment is a long-sleeved coat dress with a structured bodice and skirt, matching the 'warmer' requirement.",
+      "Brief specifies 'Chilly Overtime'; garment features a double ruffle and bow collar, consistent with the requested look."
+    ]
+  },
+  "customerCompatibility": {
+    "status": "unknown",
+    "scope": "verified-customer-preferences-only",
+    "score": null,
+    "remarks": [
+      "Customer preferences are not provided in the source data; compatibility cannot be assessed."
+    ]
+  },
+  "limitations": [
+    "Customer preferences are not provided in the source data; compatibility cannot be assessed.",
+    "Fit assessment is limited to visible silhouette and coverage; fit status is marked as unknown.",
+    "Game requirements and specific activity needs are not provided in the source data; fit assessment is limited to visible silhouette and coverage."
+  ]
+}

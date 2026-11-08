@@ -1,8 +1,11 @@
 # Historical dress → order → brief and goals
 
 Current priority before dataset generation/training. Implementation: **0.15.12**.
-The latest full committed game packet is still **0.15.3**. New extraction paths
-have offline coverage, not in-game acceptance.
+The three supplied **0.15.12** game packets now confirm history binding, displayed
+brief and bounded goals for two commissions and an off-rack dress. See
+[results](HISTORY-CONTEXT-RESULTS.md). The implementation/test description below
+records the original 0.15.12 checkpoint; the new 0.15.13 context format needs
+confirmation with the installed Ollama backend.
 
 ## What was missing
 
@@ -63,7 +66,7 @@ color-rule semantics, sale outcome and client taste are not inferred. A future
 compliance reader must verify these separately; the native game target card still
 provides its own displayed results.
 
-## Next game test
+## Original 0.15.12 acceptance test (completed with the supplied captures)
 
 1. `git pull --ff-only`, `bash install.sh`, restart the game.
 2. Open an existing **commissioned** dress in history (a quest outside the five
@@ -79,4 +82,6 @@ Acceptance: commissioned packet has record-state-verified, matching historical
 definition/index, record-display-verified text and the expected goal count/fields;
 off-rack has origin=off-rack and no admitted order context. Unknown GUID stays
 unknown, not automatically off-rack. Compare extracted goals with the native card.
-Do not mark this integration complete until these runtime results are inspected.
+The supplied runtime results have now been inspected: extraction passed; semantic
+inference failed on response shape. A single new commissioned capture is the next
+check for the 0.15.13 schema-constrained context request.

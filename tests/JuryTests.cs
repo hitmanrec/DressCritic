@@ -101,6 +101,9 @@ static class JuryTests
         input.order.brief.status = "runtime-history-verified"; input.order.brief.summary = "RUNTIME_BRIEF_SECRET";
         input.order.brief.sourceUrl = "game://history/0/quest/fixture";
         var runtimeContext = ModelRequest.Build(input, "fixture-model", _ => bytes, EvaluationTask.Context);
+        Check(runtimeContext.response_format.type == "json_schema" && runtimeContext.response_format.json_schema.strict &&
+            !DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => bytes)).Contains("json_schema"),
+            "context requests enforce structured decoding while baseline jury format remains unchanged");
         Check(runtimeContext.messages[1].content[0].text.Contains("RUNTIME_BRIEF_SECRET") &&
             runtimeContext.messages[0].content[0].text.Contains("runtime-history-verified"), "verified runtime card reaches the context request and its admission instruction");
         Check(DiagnosticJson.Serialize(ModelRequest.Build(input, "fixture-model", _ => bytes)) == independentJury,

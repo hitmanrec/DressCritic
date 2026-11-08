@@ -8,7 +8,74 @@ namespace DressmakerCritic.Diagnostics
     [Serializable] public sealed class ModelImageUrl { public string url; }
     [Serializable] public sealed class ModelPart { public string type, text; public ModelImageUrl image_url; }
     [Serializable] public sealed class ModelMessage { public string role; public List<ModelPart> content = new List<ModelPart>(); }
-    [Serializable] public sealed class ModelFormat { public string type = "json_object"; }
+    [Serializable] public sealed class ModelFormat { public string type = "json_object"; public ContextOutputSchema json_schema; }
+    // Context decoding is constrained at the server as well as validated locally.
+    // Independent jury requests retain their existing json_object format.
+    [Serializable] public sealed class ContextOutputSchema
+    {
+        public string name = "dresscritic_context_v2";
+        public bool strict = true;
+        public ContextObjectSchema schema;
+        public ContextOutputSchema(bool order, bool customer) { schema = new ContextObjectSchema(order, customer); }
+    }
+    [Serializable] public sealed class ContextObjectSchema
+    {
+        public string type = "object";
+        public bool additionalProperties = false;
+        public List<string> required = new List<string> { "schemaVersion", "orderCompliance", "customerCompatibility", "limitations" };
+        public ContextProperties properties;
+        public ContextObjectSchema(bool order, bool customer) { properties = new ContextProperties(order, customer); }
+    }
+    [Serializable] public sealed class ContextProperties
+    {
+        public ConstantStringSchema schemaVersion = new ConstantStringSchema("2.0.0");
+        public ContextJudgementSchema orderCompliance, customerCompatibility;
+        public StringArraySchema limitations = new StringArraySchema(0, 16, 512);
+        public ContextProperties(bool order, bool customer)
+        {
+            orderCompliance = new ContextJudgementSchema("provided-summary-only", order);
+            customerCompatibility = new ContextJudgementSchema("verified-customer-preferences-only", customer);
+        }
+    }
+    [Serializable] public sealed class ContextJudgementSchema
+    {
+        public string type = "object";
+        public bool additionalProperties = false;
+        public List<string> required = new List<string> { "status", "scope", "score", "remarks" };
+        public ContextJudgementProperties properties;
+        public ContextJudgementSchema(string scope, bool available) { properties = new ContextJudgementProperties(scope, available); }
+    }
+    [Serializable] public sealed class ContextJudgementProperties
+    {
+        public EnumStringSchema status;
+        public ConstantStringSchema scope;
+        public ContextScoreSchema score;
+        public StringArraySchema remarks = new StringArraySchema(1, 2, 240);
+        public ContextJudgementProperties(string value, bool available)
+        {
+            status = new EnumStringSchema(available ? new[] { "consistent", "inconsistent", "unknown" } : new[] { "unknown" });
+            scope = new ConstantStringSchema(value); score = new ContextScoreSchema(available);
+        }
+    }
+    [Serializable] public sealed class ConstantStringSchema
+    { public string type = "string", @const; public ConstantStringSchema(string value) { @const = value; } }
+    [Serializable] public sealed class EnumStringSchema
+    { public string type = "string"; public List<string> @enum; public EnumStringSchema(string[] values) { @enum = values.ToList(); } }
+    [Serializable] public sealed class ContextScoreSchema
+    {
+        public List<string> type;
+        public int minimum = 0, maximum = 10;
+        public ContextScoreSchema(bool available) { type = (available ? new[] { "number", "null" } : new[] { "null" }).ToList(); }
+    }
+    [Serializable] public sealed class StringArraySchema
+    {
+        public string type = "array";
+        public int minItems, maxItems;
+        public BoundedStringSchema items;
+        public StringArraySchema(int min, int max, int length) { minItems = min; maxItems = max; items = new BoundedStringSchema(length); }
+    }
+    [Serializable] public sealed class BoundedStringSchema
+    { public string type = "string"; public int minLength = 1, maxLength; public BoundedStringSchema(int length) { maxLength = length; } }
     [Serializable] public sealed class JuryMaterial { public int index; public AssetIdentity fabric; }
     [Serializable] public sealed class JuryVisualFacts
     {
@@ -69,10 +136,15 @@ namespace DressmakerCritic.Diagnostics
             else
             {
                 if (!JuryContract.NeedsContext(input)) throw new InvalidOperationException("No verified order or customer context");
+                request.response_format = new ModelFormat { type = "json_schema", json_schema = new ContextOutputSchema(JuryContract.HasOrderContext(input), JuryContract.HasCustomerContext(input)) };
                 instruction = common + "Evaluate context separately from the fashion jury; no jury votes are provided. Order: assess only the explicitly selected order's sourced summary or verified displayed game brief, never unseen dialogue. " +
+                    "Order fit means how the pictured garment meets the requested look or activity. Ground remarks in visible silhouette, coverage, colors or decoration and relate those observations to the actual brief. " +
+                    "The application already checked source eligibility. Source verification, runtime status, titles and availability are not design achievements and cannot justify a compliance score. If you cannot identify visible evidence of fit, use unknown/null. " +
                     "Customer: assess only verified preferences with a source, never infer them from client name or order requirements. " +
+                    "Missing customer preferences do not invalidate a verified order brief: judge those two scopes independently. A brief supports only visible interpretation, never claims about insulation or physical comfort. " +
                     "Return one JSON object with exactly schemaVersion (string 2.0.0), orderCompliance, customerCompatibility and limitations (array of concrete limitations). " +
                     "Each contextual judgement has exactly status, scope, score, remarks. Order scope is provided-summary-only; customer scope is verified-customer-preferences-only. " +
+                    "orderCompliance and customerCompatibility are nested objects, never strings or entries in a contextualJudgements array. " +
                     "Each status can be consistent, inconsistent or unknown; known status requires a 0-10 score with at most one decimal, unknown requires null. " +
                     "remarks MUST be a JSON array of 1-2 strings, never a single string; each item is at most 240 characters. Use short evidence-based sentences, never placeholder or instruction text. " +
                     "If order brief.status is not verified-guid, asset-key or runtime-history-verified, orderCompliance must be unknown/null. If customer.status is not verified or preferences/source are absent, customerCompatibility must be unknown/null. " +

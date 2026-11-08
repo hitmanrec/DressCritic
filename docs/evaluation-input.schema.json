@@ -63,7 +63,8 @@
           ]
         },
         "deterministicRequirements": {
-          "type": "array"
+          "type": "array",
+          "description": "Known goal targets, including nullable minimumDistinctColors for ColorVarietyRequirement; actual completion is not evaluated."
         },
         "brief": {
           "type": "object",
