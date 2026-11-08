@@ -21,3 +21,5 @@
 - [History context: extraction, limits and next game test](HISTORY-CONTEXT.md)
 
 - [Three-dress history context results](HISTORY-CONTEXT-RESULTS.md)
+
+- [Native export integration: metadata probe and blocker](NATIVE-EXPORT.md)

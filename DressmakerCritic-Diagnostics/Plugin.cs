@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace DressmakerCritic.Diagnostics
 {
-    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.13")]
+    [BepInPlugin("community.dressmakercritic.diagnostics", "Dressmaker Critic", "0.15.14")]
     [BepInDependency("yuu.dressmaker.mods", "0.7.8")]
     public sealed class Plugin : BaseUnityPlugin
     {
@@ -29,7 +29,7 @@ namespace DressmakerCritic.Diagnostics
             model = Config.Bind("Inference", "Model", "", "Exact model ID from your local multimodal server; blank prevents inference.");
             endpoint = Config.Bind("Inference", "Endpoint", "http://127.0.0.1:11434/v1/chat/completions", "Loopback OpenAI-compatible vision endpoint only. No hosted API or embedded credentials.");
             inferenceTimeout = Config.Bind("Inference", "TimeoutSeconds", 300, "Per-request inference deadline, clamped to 30-600 seconds; cold model loading may take longer than a warm request.");
-            Logger.LogInfo("Dressmaker Critic 0.15.13: schema-constrained context output and verified history goals.");
+            Logger.LogInfo("Dressmaker Critic 0.15.14: read-only native export API discovery.");
         }
         private void Start()
         {
@@ -154,6 +154,7 @@ namespace DressmakerCritic.Diagnostics
                     }
                 });
                 capture.Stage("targeted-api-metadata", () => capture.Write("targeted-api.json", GameRuntimeReader.Metadata()));
+                capture.Stage("native-export-api", () => capture.Write("native-export-api.json", GameRuntimeReader.NativeExportMetadata(state)));
                 capture.Stage("saved-garment-candidates", () => capture.Write("history-candidates.json", GameRuntimeReader.HistorySnapshots(progress, input.capturedAtUtc, SceneManager.GetActiveScene().name, FieldSnapshot.ResolveFields(manager, "<CurrentScene>k__BackingField"))));
                 capture.Stage("viewer-selection-probe", () => capture.Write("viewer-selection.json", GameRuntimeReader.SelectionProbe(progress)));
                 string imageBinding = "unverified";

@@ -35,6 +35,8 @@
     <Compile Include="../DressmakerCritic-Diagnostics/NotebookPageGeometry.cs" Link="NotebookPageGeometry.cs" />
     <Compile Include="HistoryOrderTests.cs" />
     <Compile Include="HistoryContextFixtureTests.cs" />
+    <Compile Include="NativeExportApiProbeTests.cs" />
+    <Compile Include="../DressmakerCritic-Diagnostics/NativeExportApiProbe.cs" Link="NativeExportApiProbe.cs" />
     <Compile Include="../DressmakerCritic-Diagnostics/HistoryOrder.cs" Link="HistoryOrder.cs" />
     <Compile Include="RuntimeFixtures.cs" />
     <Compile Include="EvaluationSelectionTests.cs" />

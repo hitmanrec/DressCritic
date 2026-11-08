@@ -55,6 +55,24 @@ namespace DressmakerCritic.Diagnostics
     }
     public static class GameRuntimeReader
     {
+        private static NativeExportApiReport exportApi;
+        private static Type exportStateType;
+        public static NativeExportApiReport NativeExportMetadata(object state)
+        {
+            Type stateType = state?.GetType() ?? GameType("DressState");
+            if (exportApi == null || exportStateType != stateType || exportApi.unavailable.Count != 0)
+            {
+                exportStateType = stateType;
+                Type json = null;
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { json = assembly.GetType("Framework.JSONObject", false); } catch { continue; }
+                    if (json != null) break;
+                }
+                exportApi = NativeExportApiProbe.Capture(GameType("Sketchbook"), GameType("PhotoScene"), stateType, json);
+            }
+            return exportApi;
+        }
         public static Type GameType(string name) => AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "Assembly-CSharp")
             .Select(a => a.GetType(name, false)).FirstOrDefault(t => t != null);
         public static Component[] Find(string name)

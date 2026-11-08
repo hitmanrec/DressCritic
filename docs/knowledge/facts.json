@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "asOf": "2026-11-07",
-  "pluginVersion": "0.15.13",
+  "pluginVersion": "0.15.14",
   "statusDefinitions": {
     "confirmed": "Observed in the stated evidence; limited to that scope",
     "implemented-unverified": "Implementation exists; relevant native behaviour not confirmed",
@@ -9,6 +9,20 @@
     "unknown": "Insufficient evidence"
   },
   "facts": [
+    {
+      "id": "native_export.api_discovery",
+      "status": "implemented-unverified",
+      "claim": "v0.15.14 adds cached metadata-only discovery for observed void ExportDress UI handlers and referenced serialization paths, without invoking game code or emitting a native garment payload. Game DLLs are unavailable here; a safe in-memory serializer/configuration and exact state source remain unverified. Needs one in-game API report.",
+      "evidence": [
+        "docs/NATIVE-EXPORT.md",
+        "tests/NativeExportApiProbeTests.cs"
+      ],
+      "code": [
+        "DressmakerCritic-Diagnostics/NativeExportApiProbe.cs",
+        "DressmakerCritic-Diagnostics/GameRuntimeReader.cs",
+        "DressmakerCritic-Diagnostics/Plugin.cs"
+      ]
+    },
     {
       "id": "history.three_runtime_captures_01512",
       "status": "confirmed",

@@ -18,6 +18,7 @@ class Program
         NotebookPageGeometryTests.Run();
         HistoryOrderTests.Run();
         HistoryContextFixtureTests.Run();
+        NativeExportApiProbeTests.Run();
         SelectionProbeTests.Run();
         JuryTests.Run();
         EvidenceTests.Run();

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dresscritic:native-export-api:1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "nativeSerializationStatus",
+    "isNativeGarmentPayload",
+    "truncated",
+    "inspectedIlBytes",
+    "instructionCount",
+    "types",
+    "assemblies",
+    "methods",
+    "unavailable",
+    "limitation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "enum": [
+        "metadata-only",
+        "entrypoints-unavailable"
+      ]
+    },
+    "nativeSerializationStatus": {
+      "const": "not-invoked-unverified"
+    },
+    "isNativeGarmentPayload": {
+      "const": false
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "inspectedIlBytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 131072
+    },
+    "instructionCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8192
+    },
+    "types": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "members",
+          "interfaces",
+          "attributes",
+          "methods",
+          "fields"
+        ]
+      }
+    },
+    "assemblies": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "moduleVersionId"
+        ]
+      }
+    },
+    "methods": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "signature",
+          "assembly",
+          "status",
+          "bodySha256",
+          "isStatic",
+          "isVirtual",
+          "isAbstract",
+          "depth",
+          "bodyBytes",
+          "attributes",
+          "indirectOperations",
+          "references"
+        ],
+        "properties": {
+          "depth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "references": {
+            "type": "array",
+            "maxItems": 64
+          },
+          "signature": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1024
+          },
+          "bodySha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bodyBytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "unavailable": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitation": {
+      "type": "string"
+    }
+  }
+}
